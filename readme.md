@@ -3,6 +3,8 @@
 ### Dependencies
 This project uses Nvidia Cuda Toolkit and Intel MKL. Note that (where applicable) the libraries' include paths in the build scripts should match the adequate ones on the system.
 
+This project also uses routines from Eigen library (http://eigen.tuxfamily.org).
+
 ### CPU Versions
 
 Run buildParallelDPFP.sh, buildParallelSPFP.sh, buildSequentialDPFP.sh and buildSequentialSPFP.sh on the CPU folder.
