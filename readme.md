@@ -1,7 +1,7 @@
 # Experience of Using GPU in Power Flow Computation
 ## Build Binaries
 ### Dependencies
-This project uses Nvidia Cuda Tooklit and Intel MKL. Note that (when applicable) the libraries' include paths in the build scripts should match the ones where the respective libraries' are present on the system.
+This project uses Nvidia Cuda Toolkit and Intel MKL. Note that (where applicable) the libraries' include paths in the build scripts should match the adequate ones on the system.
 
 ### CPU Versions
 
@@ -19,15 +19,15 @@ The programs' execution options are set in the CPU/data.txt and GPU/data.txt fil
 
 Main options:
 
-* metodo (sets the method to be used):
-    * esparso (sparse routines),
-    * denso (dense routines)
+* `metodo` (sets the method to be used):
+    * `esparso` (sparse routines),
+    * `denso` (dense routines)
 
-* openmp:
-    * ON - enable openmp parallelism (option used for parallell tests),
-    * OFF - disable openmp parallelism (option used for sequential tests)
+* `openmp`:
+    * `ON` - enable openmp parallelism (option used for parallell tests),
+    * `OFF` - disable openmp parallelism (option used for sequential tests)
 
-* arq_entrada (sets the system data file to be read):
+* `arq_entrada` (sets the system data file to be read):
     * ieee14.cdf
     * ieee30.cdf
     * ieee57.cdf
@@ -44,12 +44,12 @@ Main options:
 
 Main options:
 
-* metodo (sets the method to be used):
-    * hibridoC (hybrid CPU-GPU routines),
-    * esparso (sparse routines),
-    * denso (dense routines)
+* `metodo` (sets the method to be used):
+    * `hibridoC` (hybrid CPU-GPU routines),
+    * `esparso` (sparse routines),
+    * `denso` (dense routines)
 
-* arq_entrada (sets the system data file to be read):
+* `arq_entrada` (sets the system data file to be read):
     * ieee14.cdf
     * ieee30.cdf
     * ieee57.cdf
