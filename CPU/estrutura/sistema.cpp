@@ -12,7 +12,7 @@ void initSistema(sistemaType &sistema){
 		if (global::metodo == denso || global::metodo == esparsoSimples) {
 			sistema.Y = (complex_type *)malloc(sistema.nB*sistema.nB * sizeof(complex_type));
 
-			for (unsigned int i = 0; i < sistema.nB*sistema.nB; i++){
+			for (int i = 0; i < sistema.nB*sistema.nB; i++){
 				sistema.Y[i] = _mkComplex(0., 0.);
 			}
 		}
@@ -21,14 +21,14 @@ void initSistema(sistemaType &sistema){
 		if (global::metodo == denso || global::metodo == hibridoB) {
 			sistema.Y = (complex_type *)malloc(sistema.nB*sistema.nB * sizeof(complex_type));
 
-			for (unsigned int i = 0; i < sistema.nB*sistema.nB; i++){
+			for (int i = 0; i < sistema.nB*sistema.nB; i++){
 				sistema.Y[i] = _mkComplex
 			}
 		}
 	#endif
 
-	sistema.barrasPV = (unsigned int *)malloc(sistema.nPV * sizeof(unsigned int));
-	sistema.barrasPQ = (unsigned int *)malloc(sistema.nPQ * sizeof(unsigned int));
+	sistema.barrasPV = (int *)malloc(sistema.nPV * sizeof(int));
+	sistema.barrasPQ = (int *)malloc(sistema.nPQ * sizeof(int));
 
 	//limite de injeção de reativos
 	sistema.limQinf = (float_type*)malloc(sistema.nPV * sizeof(float_type));

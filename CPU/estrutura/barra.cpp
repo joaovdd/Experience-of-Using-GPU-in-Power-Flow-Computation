@@ -1,7 +1,7 @@
 #include "barra.h"
 
 void initBus(sistemaType &sistema, barraType &barra){
-	barra.id = (unsigned int *)malloc(sistema.nB * sizeof(unsigned int));
+	barra.id = (int *)malloc(sistema.nB * sizeof(int));
 	barra.V		= (float_type *)malloc(sistema.nB * sizeof(float_type));
 	barra.theta = (float_type *)malloc(sistema.nB * sizeof(float_type));
 
@@ -17,39 +17,39 @@ void initBus(sistemaType &sistema, barraType &barra){
 	barra.gsh	= (float_type *)malloc(sistema.nB * sizeof(float_type));
 	barra.bsh	= (float_type *)malloc(sistema.nB * sizeof(float_type));
 
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.V[i] = global::v_inicial;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.theta[i] = global::theta_inicial;
 	}
 
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.Pliq[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.Qliq[i] = 0.;
 	}
 
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.Pload[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.Qload[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.Pg[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.Qg[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.Vbase[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.gsh[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		barra.bsh[i] = 0.;
 	}
 }

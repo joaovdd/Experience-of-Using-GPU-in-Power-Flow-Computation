@@ -96,9 +96,9 @@ int main(void)
 	cudaDeviceProp deviceProp;
 	deviceProp = initGPU(); // deve ser contabilisado?
 
-	//clock_t inicio = clock();
-	//auto inicio = std::chrono::high_resolution_clock::now();
-	{ BENCHMARK_GERAL
+	cudaEventCreate(&global::start);
+	cudaEventCreate(&global::stop);
+	{ cudaEventRecord(global::start); // BENCHMARK_GERAL
 		{ BENCHMARK_ADMITANCIA
 			// calcula Ybus
 			switch (global::metodoDeCalculoDeYbus) {
@@ -106,7 +106,10 @@ int main(void)
 				calcYbus(h_sistema, h_barra, h_ramo);
 				break;
 			case metodoDeCalculoDeYbus::spCPU:
-				calcYbusSp_eficinte(h_sistema, h_barra, h_ramo);
+				if (global::isMatpower)
+					calcYbusSp_Matpower(h_sistema, h_barra, h_ramo);
+				else
+					calcYbusSp_eficinte(h_sistema, h_barra, h_ramo);
 				break;
 			default:
 				printf("\n\n[ERRO] calcYbus: metodo inválido!\n\n");
@@ -118,6 +121,8 @@ int main(void)
 		if (global::verbose_mode) {
 			printAll(h_sistema, h_barra, h_ramo);
 		}
+
+		// std::cout << *h_sistema.spY << std::endl;
 
 		// cudaDeviceProp deviceProp;
 		
@@ -132,7 +137,7 @@ int main(void)
 			// ADICIONAL para paralelismo P Q e transferencias de memória
 			if (global::streams) {
 				if (global::metodo == metodo::esparso || global::metodo == metodo::hibridoB) {
-					for (size_t i = 0; i < nStreams; i++)
+					for (int i = 0; i < nStreams; i++)
 					{
 						checkCudaErrors(cudaStreamCreate(&streams[i]));
 					}
@@ -224,7 +229,7 @@ int main(void)
 			checkCudaErrors(cudaDeviceSynchronize()); // deve-se terminar o a cópia de dados antes de finalizar a contagem de tempo
 		}
 
-		//auto fim = std::chrono::high_resolution_clock::now(); //clock_t fim = clock();
+		cudaEventRecord(global::stop);
 	}
 	//std::chrono::duration<float_type, std::milli> duracao = fim - inicio;
 
@@ -252,7 +257,7 @@ int main(void)
 		benchmarksPrint(iterPon);
 	}
 
-	for (unsigned int i = 0; i < nStreams; i++) {
+	for (int i = 0; i < nStreams; i++) {
 		if (streams[i]) { checkCudaErrors(cudaStreamDestroy(streams[i])); }
 	}
 

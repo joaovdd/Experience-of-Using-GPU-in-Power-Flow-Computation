@@ -18,16 +18,16 @@ struct ramoType {
 
 	float_type* phi;
 	Eigen::SparseMatrix<float_type, Eigen::StorageOptions::RowMajor> eigen_phi;
-	//unsigned int csrColIndPhi; // GPU only
-	//unsigned int csrRowPtrPhi;
+	//int csrColIndPhi; // GPU only
+	//int csrRowPtrPhi;
 
 	float_type* Pdp;
 	float_type* Ppd;
 	float_type* Qdp;
 	float_type* Qpd;
 
-	unsigned int* de; //[NL];
-	unsigned int* para; //[NL];
+	int* de; //[NL];
+	int* para; //[NL];
 };
 
 void initBranch(sistemaType &sistema, ramoType &ramo);

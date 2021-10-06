@@ -5,13 +5,13 @@ void impressao2(sistemaType& sistema, barraType& barra, ramoType& ramo, iterativ
 	printf("\n\n                                 FLUXOS DE POTENCIA\n");
 
 	printf("        BUS      V         ANG        Pli        Qli        Pge        Qge      TO        PIJ          QIJ\n");
-	for (unsigned int i = 0; i < sistema.nB; i++)
+	for (int i = 0; i < sistema.nB; i++)
 	{
 		//printf("      %4d%11.5f%11.5f%11.5f%11.5f  ", i + 1, barra.V[i], barra.theta[i], barra.Pliq[i], barra.Qliq[i]);
 		printf("      %4d%11.5f%11.5f%11.5f%11.5f%11.5f%11.5f  ", barra.id[i], barra.V[i], barra.theta[i], iterativo.Pcalc[i], iterativo.Qcalc[i], iterativo.Pcalc[i] + barra.Pload[i], iterativo.Qcalc[i] + barra.Qload[i]);
 		//Todo: fazer um return com erro antes do while extrapolar os limites dos vetores
 		//'**ERROR** UNABLE TO CALCULATE POWER FLOWS'
-		unsigned int j;
+		int j;
 		for (j = 0; j < sistema.nL; j++)
 		{
 			if (ramo.de[j] == (i + 1)) {
@@ -41,13 +41,13 @@ void impressao(sistemaType &sistema, barraType &barra, ramoType &ramo, iterativo
 	printf("\n\n                                 FLUXOS DE POTENCIA\n");
             
 	printf("        BUS      V         ANG         P          Q        TO       PIJ          QIJ\n");
-	for (unsigned int i = 0; i < sistema.nB; i++)
+	for (int i = 0; i < sistema.nB; i++)
 	{
 		//printf("      %4d%11.5f%11.5f%11.5f%11.5f  ", i + 1, barra.V[i], barra.theta[i], barra.Pliq[i], barra.Qliq[i]);
 		printf("      %4d%11.5f%11.5f%11.5f%11.5f  ", barra.id[i], barra.V[i], barra.theta[i], iterativo.Pcalc[i], iterativo.Qcalc[i]);
 		//Todo: fazer um return com erro antes do while extrapolar os limites dos vetores
 		//'**ERROR** UNABLE TO CALCULATE POWER FLOWS'
-		unsigned int j;
+		int j;
 		for (j = 0; j < sistema.nL; j++)
 		{
 			if (ramo.de[j] == (i + 1)) {
@@ -112,7 +112,7 @@ void benchmarkModePrint(iterativoType& iterPon, /*std::chrono::duration<double, 
 	outfile << iterPon.iteracao << "; iteracoes.; " << (int)auxInt << ',' << (int)round(auxFrac * 1000000) << "; ms.;\n";
 }
 
-// rotinas de impressão para os valores de benchmark coletados
+// rotinas de impressï¿½o para os valores de benchmark coletados
 void benchmarksPrint(iterativoType& iterPon) {
 	//std::string aux("out_" + met2str(global::metodo) + "-" + global::arq_entrada.substr(9) + ".csv");
 
@@ -273,17 +273,17 @@ void printDoubleToFile(std::ofstream& outfile, double numero) {
 	outfile << (int)auxInt << ',' << (int)round(auxFrac * 1000000) << ';';
 }
 
-// rotinas de impressão para os valores de benchmark coletados
+// rotinas de impressï¿½o para os valores de benchmark coletados
 void benchmarksPrintFile(iterativoType& iterPon) {
 	std::string ptFl = DOUBLE_MODE ? "double_" : "float_";
 
 	std::string aux("out_" + ptFl + met2str(global::metodo) + "-" + /*global::arq_entrada*/ global::arq_entrada.substr(global::arq_entrada.find_last_of('/') + 1, global::arq_entrada.find_last_of('.') - 1 - global::arq_entrada.find_last_of('/')) + ".csv"); //("out_" + met2str(global::metodo) + "-" + global::arq_entrada.substr(9) + ".csv");
 
 	unsigned noDoTeste = 1;
-	// verifica se o cabeçalho ja foi escrito
+	// verifica se o cabeï¿½alho ja foi escrito
 	std::ifstream infile(aux);
 	if (infile.good()) {
-		// conta número de linhas
+		// conta nï¿½mero de linhas
 		// new lines will be skipped unless we stop it from happening:    
 		infile.unsetf(std::ios_base::skipws);
 

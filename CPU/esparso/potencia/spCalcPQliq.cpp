@@ -2,9 +2,9 @@
 
 // Calcula valores de P
 void spCalcP(sistemaType& sistema, barraType& barra, ramoType& ramo, iterativoType& iterativo){
-	//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
+	//int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
 #pragma omp parallel for if (global::openmp)
-	for (unsigned int idx = 1; idx <= sistema.nB; idx++){
+	for (int idx = 1; idx <= sistema.nB; idx++){
 		//calculo de P_idx	
 		float_type aux = 0;
 		float_type acc = 0;
@@ -25,9 +25,9 @@ void spCalcP(sistemaType& sistema, barraType& barra, ramoType& ramo, iterativoTy
 }
 
 void spCalcQ(sistemaType& sistema, barraType& barra, ramoType& ramo, iterativoType& iterativo){
-	//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
+	//int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
 #pragma omp parallel for if (global::openmp)
-	for (unsigned int idx = 1; idx <= sistema.nB; idx++){
+	for (int idx = 1; idx <= sistema.nB; idx++){
  		//calculo de P_idx	
  		float_type aux = 0;
 		float_type acc = 0;

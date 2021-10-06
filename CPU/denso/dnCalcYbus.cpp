@@ -9,7 +9,7 @@ void calcYbus(sistemaType &sistema, barraType &barra, ramoType &ramo) {
 	//inicializar Y - (check 2020)
 
 	//percorre ramos
-	for (unsigned int i = 1; i <= sistema.nL; i++) {
+	for (int i = 1; i <= sistema.nL; i++) {
 		complex_type aux = _cuCon(ramo.tap[IDX1F(i)]); // t*
 		aux = _cuDiv(_mkComplex(-1., 0.), aux); // -1/t*
 		
@@ -35,7 +35,7 @@ void calcYbus(sistemaType &sistema, barraType &barra, ramoType &ramo) {
 	}
 
 	//percorre barras
-	for (unsigned int i = 1; i <= sistema.nB; i++) {
+	for (int i = 1; i <= sistema.nB; i++) {
 		sistema.Y[IDX2F(i, i, sistema.nB)] = _cuAdd(sistema.Y[IDX2F(i, i, sistema.nB)], _mkComplex(barra.gsh[IDX1F(i)], barra.bsh[IDX1F(i)])); // bsh_k + SUM[|t_km|^2*y_km + bsh_km/2]
 	}
 }

@@ -30,9 +30,9 @@ void dnEigenSolver(sistemaType* sistema, barraType* barra, ramoType* ramo, itera
 		//Matrix<float_type, Dynamic, Dynamic> A(sistema->nB - 1 + sistema->nB - 1, sistema->nB - 1 + sistema->nB - 1);
 
 		#pragma omp parallel for if (global::openmp)
-			for (unsigned int i = 1; i <= sistema->nB - 1 + iterativo->nPQlim; i++){
-				for (unsigned int j = 1; j <= sistema->nB - 1 + iterativo->nPQlim; j++) {
-					A((unsigned int)i-1,(unsigned int)j-1) = iterativo->Jlim[IDX2F(i, j, sistema->nB - 1 + iterativo->nPQlim)];
+			for (int i = 1; i <= sistema->nB - 1 + iterativo->nPQlim; i++){
+				for (int j = 1; j <= sistema->nB - 1 + iterativo->nPQlim; j++) {
+					A((int)i-1,(int)j-1) = iterativo->Jlim[IDX2F(i, j, sistema->nB - 1 + iterativo->nPQlim)];
 				}
 			}
 
@@ -42,8 +42,8 @@ void dnEigenSolver(sistemaType* sistema, barraType* barra, ramoType* ramo, itera
 		//Matrix<float_type, Dynamic, Dynamic> B(sistema->nB - 1 + sistema->nB - 1, 1);
 
 		#pragma omp parallel for if (global::openmp)
-			for (unsigned int i = 1; i <= sistema->nB - 1 + iterativo->nPQlim; i++) {
-				B((unsigned int)i - 1) = iterativo->gLim[IDX1F(i)];
+			for (int i = 1; i <= sistema->nB - 1 + iterativo->nPQlim; i++) {
+				B((int)i - 1) = iterativo->gLim[IDX1F(i)];
 			}
 
 		//std::cout << "Here is the matrix b:\n" << B << std::endl;
@@ -57,7 +57,7 @@ void dnEigenSolver(sistemaType* sistema, barraType* barra, ramoType* ramo, itera
 		//std::cout << "Here is the matrix x:\n"/* << X */<< std::endl;
 
 		#pragma omp parallel for if (global::openmp)
-			for (unsigned int i = 1; i <= sistema->nB - 1 + iterativo->nPQlim; i++) {
-				iterativo->gLim[IDX1F(i)] = X(IDX1F((unsigned int)i));
+			for (int i = 1; i <= sistema->nB - 1 + iterativo->nPQlim; i++) {
+				iterativo->gLim[IDX1F(i)] = X(IDX1F((int)i));
 			}
 }

@@ -22,9 +22,9 @@ using namespace Eigen;
 //         printf( "\n" );
 // }
 
-float_type maxi(float_type* vet, unsigned int dim){
+float_type maxi(float_type* vet, int dim){
 	float_type aux = 0;
-	for (unsigned int i = 0; i < dim; i++){
+	for (int i = 0; i < dim; i++){
 		if (abs(vet[i]) > aux) {
 			aux = abs(vet[i]);
 			//printf("oi %d\n", aux);
@@ -36,7 +36,7 @@ float_type maxi(float_type* vet, unsigned int dim){
 // Calcula o resíduo
 void calcRes(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo){
 	// deltaPs
-	for (unsigned int i = 1; i < sistema->barraVO; i++){ //antes da swing; i percorre barras
+	for (int i = 1; i < sistema->barraVO; i++){ //antes da swing; i percorre barras
 		// deltaP = |Pcalc - Pesp|
 		iterativo->g[IDX1F(i)] = barra->Pliq[IDX1F(i)] - iterativo->Pcalc[IDX1F(i)];
 		//printf("g[%d] = ", i-1);
@@ -44,7 +44,7 @@ void calcRes(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 		//printf("g[%d] = %e\n", i, iterativo->g[IDX1F(i)]);
 	}
 
-	for (unsigned int i = sistema->barraVO+1; i <= sistema->nB; i++){ // depois da swing; i percorre barras
+	for (int i = sistema->barraVO+1; i <= sistema->nB; i++){ // depois da swing; i percorre barras
 		// deltaP = |Pcalc - Pesp|
 		float_type aux = barra->Pliq[IDX1F(i)] - iterativo->Pcalc[IDX1F(i)];
 		iterativo->g[IDX1F(i) - 1] = aux;
@@ -54,8 +54,8 @@ void calcRes(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 	}
 
 	// deltaQs
-	const unsigned int offset = sistema->nB-1;
-	for (unsigned int i = 0; i < sistema->nPQ; i++){ // i � iterador das barras PQ
+	const int offset = sistema->nB-1;
+	for (int i = 0; i < sistema->nPQ; i++){ // i � iterador das barras PQ
 		// deltaQ = |Qcalc - Qesp|
 		iterativo->g[i+offset] = barra->Qliq[IDX1F(sistema->barrasPQ[i])] - iterativo->Qcalc[IDX1F(sistema->barrasPQ[i])];
 		//printf("g[%d] = ", i+sistema->nPQ+sistema->nPV);
@@ -65,17 +65,17 @@ void calcRes(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 }
 
 void attVO(sistemaType* sistema, barraType* barra, iterativoType* iterativo){
-	for (unsigned int i = 1; i < sistema->barraVO; i++){ // i percorre as barras diretamente e pula a barra swing
+	for (int i = 1; i < sistema->barraVO; i++){ // i percorre as barras diretamente e pula a barra swing
 		barra->theta[IDX1F(i)] += iterativo->g[IDX1F(i)];  // atualiza valor de theta; g � igual a -deltaX!
 		//printf("attVO: theta[%d] = %f\n", i, barra->theta[IDX1F(i)]);
 	}
-	for (unsigned int i = sistema->barraVO+1; i <= sistema->nB; i++) { // i percorre as barras diretamente e pula a barra swing
+	for (int i = sistema->barraVO+1; i <= sistema->nB; i++) { // i percorre as barras diretamente e pula a barra swing
 		barra->theta[IDX1F(i)] += iterativo->g[IDX1F(i)-1];              // atualiza valor de theta; g � igual a -deltaX!
 		//printf("attVO: theta[%d] = %f\n", i, barra->theta[IDX1F(i)]);
 	}
 
-	const unsigned int offset = sistema->nB - 1;
-	for (unsigned int i = 0; i < sistema->nPQ; i++) {                    // i � iterador das barras PQ
+	const int offset = sistema->nB - 1;
+	for (int i = 0; i < sistema->nPQ; i++) {                    // i � iterador das barras PQ
 		barra->V[IDX1F(sistema->barrasPQ[i])] += iterativo->g[i + offset]; // atualiza valor de V; g � igual a -deltaX!
 		//printf("attVO: V[%d] = %f\n", sistema->barrasPQ[i], barra->V[IDX1F(sistema->barrasPQ[i])]);
 	}
@@ -179,7 +179,7 @@ bool simpleChkLimQ(sistemaType* sistema, barraType* barra, ramoType* ramo, itera
 	//printf("\n");
 	auto folga = global::tol_limInjReat; //0.01; //global::tol
 //#pragma omp parallel for if (global::openmp)
-	for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV
+	for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 		// Qg = Qliq - Qload
 		float_type aux = (iterativo->Qcalc[IDX1F(sistema->barrasPV[i])] + barra->Qload[IDX1F(sistema->barrasPV[i])]);
 		if (aux < (sistema->limQinf[i] - folga)) {
@@ -192,9 +192,9 @@ bool simpleChkLimQ(sistemaType* sistema, barraType* barra, ramoType* ramo, itera
 	return true;
 }
 
-bool hasTrue(bool* arr, unsigned int size) {
+bool hasTrue(bool* arr, int size) {
 //#pragma omp parallel for if (global::openmp)
-	for (unsigned int i = 0; i < size; i++) { // percorre barras PV
+	for (int i = 0; i < size; i++) { // percorre barras PV
 		if (arr[i]) {
 			return true;
 		}
@@ -202,9 +202,9 @@ bool hasTrue(bool* arr, unsigned int size) {
 	return false;
 }
 
-float_type accumulate(float_type* arr, unsigned int size) {
+float_type accumulate(float_type* arr, int size) {
 	float_type ans = 0;
-	for (unsigned int i = 0; i < size; i++) { // percorre barras PV
+	for (int i = 0; i < size; i++) { // percorre barras PV
 		ans += abs(arr[i]);
 	}
 	return ans;
@@ -213,7 +213,7 @@ float_type accumulate(float_type* arr, unsigned int size) {
 void nR(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo){
 	//bool flgLimInjReat = false;
 	
-	int n = sistema->nPQ + sistema->nPV + sistema->nPQ;
+	// int n = sistema->nPQ + sistema->nPV + sistema->nPQ;
 
 	initLim(sistema, barra, ramo, iterativo);
 	if (global::verbose_mode && global::lim_inj_reat) {
@@ -251,7 +251,7 @@ void nR(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* i
 					evalLimInjReat(sistema, barra, ramo, iterativo);
 					//calcResLim(sistema, barra, ramo, iterativo); // resíduo = iterativo->g
 				}
-				else if (hasTrue(iterativo->limQ, sistema->nPV) /*&& maxi(&(iterativo->gLim[0]), iterativo->ngLim) < 1 /*global::tol  /*&& 0*/) {
+				else if (hasTrue(iterativo->limQ, sistema->nPV) /*&& maxi(&(iterativo->gLim[0]), iterativo->ngLim) < 1 global::tol && 0*/) {
 					// se o limInjReat de alguma barra foi violado
 					// checar se ainda está violado
 					undo_LimInjReat(sistema, barra, ramo, iterativo);
@@ -298,7 +298,7 @@ void nR(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* i
 
 				printf("\nQg_barrasPV^(%d) =\n", iterativo->iteracao);
 				cout << '[' << iterativo->Qcalc[IDX1F(sistema->barrasPV[0])] + barra->Qload[IDX1F(sistema->barrasPV[0])] << endl;
-				for (unsigned int i = 1; i < (sistema->nPV - 1); i++) {
+				for (int i = 1; i < (sistema->nPV - 1); i++) {
 					cout << ' ' << iterativo->Qcalc[IDX1F(sistema->barrasPV[i])] + barra->Qload[IDX1F(sistema->barrasPV[i])] << endl;
 				}
 				cout << ' ' << iterativo->Qcalc[IDX1F(sistema->barrasPV[sistema->nPV - 1])] + barra->Qload[IDX1F(sistema->barrasPV[sistema->nPV - 1])] << ']' << endl;
@@ -318,7 +318,7 @@ void nR(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* i
 			}
 
 			float_type maxG = maxi(iterativo->gLim, iterativo->ngLim); // retorna valor absoluto do elto de maior módulo em g 
-			if (global::output_processo_iterativo && !global::laconic_mode) {
+			if ((global::verbose_mode || global::output_processo_iterativo) && !global::laconic_mode) {
 				printf("max(gLim) = %e; sum(gLim) = %e\n", maxG, accumulate(iterativo->gLim, iterativo->ngLim));
 			}
 			if (maxG <= global::tol) {

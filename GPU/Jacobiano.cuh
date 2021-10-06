@@ -7,13 +7,13 @@
 // percorre uma coluna de H
 // idx = 1:nnzY
 __global__ void calcHlim_Eficiente(const sistema sistPon, const iterativo iterPon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo) {
-	unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	unsigned int id = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
-	//unsigned int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
+	int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	int id = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	//int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
 
 	if (id <= (sistPon.nnzY)) { // só faz calculos dentro das dimenções de H
-		unsigned int idx = sistPon.cooRowIndY[IDX1F(id)];
-		unsigned int idy = sistPon.csrColIndY[IDX1F(id)];
+		int idx = sistPon.cooRowIndY[IDX1F(id)];
+		int idy = sistPon.csrColIndY[IDX1F(id)];
 
 		if ((idx != sistPon.barraVO) && (idy != sistPon.barraVO)) {
 			bool offm = (idx >= sistPon.barraVO); // barra idx, posicao idx+offswing
@@ -48,9 +48,9 @@ __global__ void calcHlim_Eficiente(const sistema sistPon, const iterativo iterPo
 // percorre uma coluna de H
 // idx = 1:nB-1
 __global__ void calcHlim(const sistema sistPon, const iterativo iterPon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo) { //(sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo) {
-	unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
-	unsigned int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
+	int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
 
 	if (idx <= (d_sistema->nB - 1) && idy <= (d_sistema->nB - 1)) { // só faz calculos dentro das dimenções de H
 		//printf("(%d,%d) -> \n",idx,idy);
@@ -85,10 +85,10 @@ __global__ void calcHlim(const sistema sistPon, const iterativo iterPon, sistema
 
 // idx = 1:nPQ
 __global__ void calcLlim(const iterativo iterPon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo) {
-	unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
-	unsigned int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
-	unsigned int offset = d_sistema->nB - 1; // deslocamento para armazenar elementos na matriz J
+	int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
+	int offset = d_sistema->nB - 1; // deslocamento para armazenar elementos na matriz J
 
 	if (idx <= (iterPon.nPQlim) && idy <= (iterPon.nPQlim)) { // só faz calculos dentro das dimenções de L
 
@@ -121,16 +121,16 @@ __global__ void calcLlim(const iterativo iterPon, sistema* d_sistema, barra* d_b
 }
 
 __global__ void calcMlim(const sistema sistPon, const barra barraPon, const ramo ramoPon, const iterativo iterPon) {
-	unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
-	unsigned int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
+	int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
 	//printf("total: (idx, idy) = (%d,%d)\n", idx, idy);
 	if (idx <= (sistPon.nB - 1) && idy <= (iterPon.nPQlim)) { // só faz calculos dentro das dimenções de M
 		//printf("local: (idy, idx) = (%d,%d)\n", idy, idx);
 		bool offm = (idx >= sistPon.barraVO); // barra idx, posicao idx+offswing
 		idx += offm;
 
-		unsigned int offset = sistPon.nB - 1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J
+		int offset = sistPon.nB - 1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J
 
 		// idy é iterador do vetor barrasPQ, percorre linhas de M
 		// idy=1:nPQ
@@ -173,14 +173,14 @@ __global__ void calcMlim(const sistema sistPon, const barra barraPon, const ramo
 
 // idx = 1:nPQ
 __global__ void calcNlim(const sistema sistPon, const barra barraPon, const ramo ramoPon, const iterativo iterPon){
-	unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
-	unsigned int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
+	int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
 	//printf("total: (idx, idy) = (%d,%d)\n", idx, idy);
 	if(idx<=(iterPon.nPQlim) && idy<=(sistPon.nB-1)){ // só faz calculos dentro das dimenções de N
-		//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1 // if idx >= swing : idx = idx = threadIdx.x + blockDim.x * blockIdx.x + 2
+		//int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1 // if idx >= swing : idx = idx = threadIdx.x + blockDim.x * blockIdx.x + 2
 		//printf("loacal: (idx, idy) = (%d,%d)\n", idx, idy);
-		unsigned int offset = sistPon.nB-1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J (colunas)
+		int offset = sistPon.nB-1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J (colunas)
 
 		// idx é iterador do vetor barrasPQ, percorre colunas de N
 		// idx=1:nPQ
@@ -212,46 +212,46 @@ __global__ void calcNlim(const sistema sistPon, const barra barraPon, const ramo
 }
 
 void calcHfLim_eficiente(sistema& sistPon, iterativo& iterPon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, cudaDeviceProp deviceprop) {
-	unsigned int tamanho = sistPon.nnzY;
+	int tamanho = sistPon.nnzY;
 
 	dim3 dimBlock(16 * deviceprop.warpSize, 1);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanho) / (float)16 * deviceprop.warpSize), 1);
+	dim3 dimGrid((int)ceil(((float)tamanho) / (float)16 * deviceprop.warpSize), 1);
 
 	calcHlim_Eficiente <<<dimGrid, dimBlock >>> (sistPon, iterPon, d_sistema, d_barra, d_ramo, d_iterativo);
 }
 
 void calcHfLim(sistema& sistPon, iterativo& iterPon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, cudaDeviceProp deviceprop) {
-	unsigned int tamanho = sistPon.nB - 1;
+	int tamanho = sistPon.nB - 1;
 
 	dim3 dimBlock(deviceprop.warpSize, 16);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanho) / (float)deviceprop.warpSize), (unsigned int)ceil(((float)tamanho) / (float)16));
+	dim3 dimGrid((int)ceil(((float)tamanho) / (float)deviceprop.warpSize), (int)ceil(((float)tamanho) / (float)16));
 
 	calcHlim <<<dimGrid, dimBlock >>> (sistPon, iterPon, d_sistema, d_barra, d_ramo, d_iterativo);
 }
 
 void calcLfLim(iterativo& iterPon, sistema& h_sistema, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, cudaDeviceProp deviceprop) {
-	unsigned int tamanho = iterPon.nPQlim;
+	int tamanho = iterPon.nPQlim;
 
 
 	dim3 dimBlock(deviceprop.warpSize, deviceprop.warpSize);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanho) / (float)deviceprop.warpSize), (unsigned int)ceil(((float)tamanho) / (float)deviceprop.warpSize));
+	dim3 dimGrid((int)ceil(((float)tamanho) / (float)deviceprop.warpSize), (int)ceil(((float)tamanho) / (float)deviceprop.warpSize));
 
 	calcLlim <<<dimGrid, dimBlock >>> (iterPon, d_sistema, d_barra, d_ramo, d_iterativo);
 }
 
 void calcMfLim(sistema& sistPon, barra& barraPon, ramo& ramoPon, iterativo& iterPon, cudaDeviceProp deviceprop) {
-	unsigned int tamanhoX = sistPon.nB - 1;
-	unsigned int tamanhoY = iterPon.nPQlim;
+	int tamanhoX = sistPon.nB - 1;
+	int tamanhoY = iterPon.nPQlim;
 
 	// printf("size      = (%d,%d)\n", tamanhoX, tamanhoY);
 	// printf("blocksize = (%d,%d)\n", deviceprop.warpSize, deviceprop.warpSize);
-	// printf("gridsize  = (%d,%d)\n", (unsigned int)ceil(( (float)tamanhoX )/(float)deviceprop.warpSize), (unsigned int)ceil(( (float)tamanhoY )/(float)deviceprop.warpSize) );
+	// printf("gridsize  = (%d,%d)\n", (int)ceil(( (float)tamanhoX )/(float)deviceprop.warpSize), (int)ceil(( (float)tamanhoY )/(float)deviceprop.warpSize) );
 
 	// dim3 dimBlock(deviceprop.warpSize, deviceprop.warpSize);
-	// dim3 dimGrid((unsigned int)ceil(((float)tamanhoX)/(float)deviceprop.warpSize), (unsigned int)ceil(((float)tamanhoY)/(float)deviceprop.warpSize));
+	// dim3 dimGrid((int)ceil(((float)tamanhoX)/(float)deviceprop.warpSize), (int)ceil(((float)tamanhoY)/(float)deviceprop.warpSize));
 
 	dim3 dimBlock(32, 16);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanhoX) / (float)32), (unsigned int)ceil(((float)tamanhoY) / (float)16));
+	dim3 dimGrid((int)ceil(((float)tamanhoX) / (float)32), (int)ceil(((float)tamanhoY) / (float)16));
 
 	//calcM<<<dimGrid, dimBlock>>>(sistPon, barraPon, ramoPon, iterPon);
 	calcMlim <<<dimGrid, dimBlock >>> (sistPon, barraPon, ramoPon, iterPon);
@@ -259,14 +259,14 @@ void calcMfLim(sistema& sistPon, barra& barraPon, ramo& ramoPon, iterativo& iter
 }
 
 void calcNfLim(sistema& sistPon, barra& barraPon, ramo& ramoPon, iterativo& iterPon, cudaDeviceProp deviceprop) {
-	unsigned int tamanhoX = iterPon.nPQlim;
-	unsigned int tamanhoY = sistPon.nB - 1;
+	int tamanhoX = iterPon.nPQlim;
+	int tamanhoY = sistPon.nB - 1;
 
 	// dim3 dimBlock(deviceprop.warpSize, deviceprop.warpSize); // cada bloco é 32x32 em GPU típica
-	// dim3 dimGrid((unsigned int)ceil(((float)tamanhoX)/(float)deviceprop.warpSize), (unsigned int)ceil(((float)tamanhoY)/(float)deviceprop.warpSize));
+	// dim3 dimGrid((int)ceil(((float)tamanhoX)/(float)deviceprop.warpSize), (int)ceil(((float)tamanhoY)/(float)deviceprop.warpSize));
 
 	dim3 dimBlock(16, 32); // cada bloco é 32x32 em GPU típica
-	dim3 dimGrid((unsigned int)ceil(((float)tamanhoX) / (float)16), (unsigned int)ceil(((float)tamanhoY) / (float)32));
+	dim3 dimGrid((int)ceil(((float)tamanhoX) / (float)16), (int)ceil(((float)tamanhoY) / (float)32));
 
 	calcNlim <<<dimGrid, dimBlock >>> (sistPon, barraPon, ramoPon, iterPon);
 	//	cudaDeviceSynchronize();
@@ -379,15 +379,15 @@ void calcJacLim_H_eficiente(sistema& h_sistema, iterativo& h_iterativo, sistema*
 
 //// idx para cada nnzH
 __global__ void SpCalcH(const sistema sistPon, const iterativo iterPon, const d_sparse sparsePon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo) {
-	//unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	unsigned int id = threadIdx.x + blockDim.x * blockIdx.x;
+	//int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	int id = threadIdx.x + blockDim.x * blockIdx.x;
 	//printf("<<<%d, %d, %d>>> (%d)\n", threadIdx.x, blockDim.x, blockIdx.x, id);
 	//__syncthreads();
 	if (id < (sparsePon.nnzH)) { // só faz calculos dentro das dimenções de H
 		//printf("<<<%d, %d, %d>>> (%d)\n", threadIdx.x, blockDim.x, blockIdx.x, id);
 
-		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
-		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
+		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
+		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
 		//printf("(%d, %d)\n\n", idx, idy);
 
 		if ((idx != sistPon.barraVO) && (idy != sistPon.barraVO)) {
@@ -421,9 +421,9 @@ __global__ void SpCalcH(const sistema sistPon, const iterativo iterPon, const d_
 
 // uso de memoria compartilhada (deu errado a cópia...)
 //__global__ void SpCalcH(const sistema sistPon, const iterativo iterPon, const d_sparse sparsePon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo) {
-//	//unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-//	unsigned int id = threadIdx.x + blockDim.x * blockIdx.x;
-//	// unsigned int idx = threadIdx.x;
+//	//int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+//	int id = threadIdx.x + blockDim.x * blockIdx.x;
+//	// int idx = threadIdx.x;
 //	//printf("<<<%d, %d, %d>>> (%d)\n", threadIdx.x, blockDim.x, blockIdx.x, id);
 //	//__syncthreads();
 //	if (id < (sparsePon.nnzH)) { // só faz calculos dentro das dimenções de H
@@ -433,17 +433,17 @@ __global__ void SpCalcH(const sistema sistPon, const iterativo iterPon, const d_
 //		int* s_csrColIndY = s_csrRowPtrY + sistPon.nB;
 //
 //		
-//		for (size_t i = threadIdx.x; i <= sistPon.nB; i+= blockDim.x)	{
+//		for (int i = threadIdx.x; i <= sistPon.nB; i+= blockDim.x)	{
 //			s_csrRowPtrY[i] = sistPon.csrRowPtrY[i];
 //		}
 //
-//		for (size_t i = threadIdx.x; i < sistPon.nnzY; i += blockDim.x) {
+//		for (int i = threadIdx.x; i < sistPon.nnzY; i += blockDim.x) {
 //			s_csrColIndY[i] = sistPon.csrColIndY[i];
 //		}
 //		
 //
-//		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
-//		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
+//		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
+//		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
 //		//printf("(%d, %d)\n\n", idx, idy);
 //
 //		if ((idx != sistPon.barraVO) && (idy != sistPon.barraVO)) {
@@ -476,16 +476,16 @@ __global__ void SpCalcH(const sistema sistPon, const iterativo iterPon, const d_
 //}
 
 __global__ void SpCalcL(const sistema sistPon, const iterativo iterPon, const d_sparse sparsePon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo) {
-	//unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	unsigned int id = threadIdx.x + blockDim.x * blockIdx.x;
+	//int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	int id = threadIdx.x + blockDim.x * blockIdx.x;
 
 	//printf("<<<%d, %d, %d>>> (%d)\n", threadIdx.x, blockDim.x, blockIdx.x, id);
 	//__syncthreads();
 	if (id < sparsePon.nnzL) { // só faz calculos dentro das dimenções de L
 		//printf("<<<%d, %d, %d>>> (%d)\n", threadIdx.x, blockDim.x, blockIdx.x, id);
 		//__syncthreads();
-		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Lpos[id]] + 1;
-		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Lpos[id]] + 1;
+		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Lpos[id]] + 1;
+		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Lpos[id]] + 1;
 		//printf("(%d, %d)\n\n", idx, idy);
 		//__syncthreads();
 
@@ -507,23 +507,23 @@ __global__ void SpCalcL(const sistema sistPon, const iterativo iterPon, const d_
 }
 
 __global__ void SpCalcM(const sistema sistPon, const barra barraPon, const ramo ramoPon, const iterativo iterPon, const d_sparse sparsePon) {
-	//unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
-	//unsigned int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
+	//int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	//int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	//int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
 
-	unsigned int id = threadIdx.x + blockDim.x * blockIdx.x;
+	int id = threadIdx.x + blockDim.x * blockIdx.x;
 
 	//printf("<<<%d, %d, %d>>> (%d)\n", threadIdx.x, blockDim.x, blockIdx.x, id);
 
 	if (id < sparsePon.nnzM) { // só faz calculos dentro das dimenções de M
 
-		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Mpos[id]] + 1;
-		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Mpos[id]] + 1;
+		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Mpos[id]] + 1;
+		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Mpos[id]] + 1;
 
 		//bool offm = (idx >= sistPon.barraVO); // barra idx, posicao idx+offswing
 		//idx += offm;
 
-		// unsigned int offset = sistPon.nB - 1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J
+		// int offset = sistPon.nB - 1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J
 
 		// idy é iterador do vetor barrasPQ, percorre linhas de M
 		// idy=1:nPQ
@@ -544,20 +544,20 @@ __global__ void SpCalcM(const sistema sistPon, const barra barraPon, const ramo 
 }
 
 __global__ void SpCalcN(const sistema sistPon, const barra barraPon, const ramo ramoPon, const iterativo iterPon, const d_sparse sparsePon) {
-	//unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
-	//unsigned int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
+	//int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	//int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	//int idy = threadIdx.y + blockDim.y * blockIdx.y + 1; //começa de 1
 
-	unsigned int id = threadIdx.x + blockDim.x * blockIdx.x;
+	int id = threadIdx.x + blockDim.x * blockIdx.x;
 
 	if (id < sparsePon.nnzN) { // só faz calculos dentro das dimenções de N
 		
-		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Npos[id]] + 1;
-		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Npos[id]] + 1;
+		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Npos[id]] + 1;
+		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Npos[id]] + 1;
 		
 		//printf("(%d, %d)\n\n", idx, idy);
 
-		// unsigned int offset = sistPon.nB - 1;
+		// int offset = sistPon.nB - 1;
 
 		// idx é iterador do vetor barrasPQ, percorre colunas de N
 		// idx=1:nPQ
@@ -588,38 +588,38 @@ __global__ void SpCalcN(const sistema sistPon, const barra barraPon, const ramo 
 }
 
 void SpCalcHf(sistema& sistPon, iterativo& iterPon, d_sparse& sparsePon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, cudaDeviceProp deviceprop, cudaStream_t* streams) {
-	unsigned int tamanho = sparsePon.nnzH;
+	int tamanho = sparsePon.nnzH;
 
 	dim3 dimBlock(16 * deviceprop.warpSize, 1);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanho) / ((float)16 * deviceprop.warpSize)), 1);
+	dim3 dimGrid((int)ceil(((float)tamanho) / ((float)16 * deviceprop.warpSize)), 1);
 
-	SpCalcH <<<dimGrid, dimBlock, 0 /*(sistPon.nnzY + sistPon.nB + 1) * sizeof(unsigned int)*/, streams[0]>>> (sistPon, iterPon, sparsePon, d_sistema, d_barra, d_ramo, d_iterativo);
+	SpCalcH <<<dimGrid, dimBlock, 0 /*(sistPon.nnzY + sistPon.nB + 1) * sizeof(int)*/, streams[0]>>> (sistPon, iterPon, sparsePon, d_sistema, d_barra, d_ramo, d_iterativo);
 }
 
 void SpCalcLf(sistema& sistPon, iterativo& iterPon, d_sparse& sparsePon, sistema& h_sistema, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, cudaDeviceProp deviceprop, cudaStream_t* streams) {
-	unsigned int tamanho = sparsePon.nnzL;
+	int tamanho = sparsePon.nnzL;
 
 
 	dim3 dimBlock(16 * deviceprop.warpSize, 1);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanho) / ((float)16 * deviceprop.warpSize)), 1);
+	dim3 dimGrid((int)ceil(((float)tamanho) / ((float)16 * deviceprop.warpSize)), 1);
 
 	SpCalcL <<<dimGrid, dimBlock, 0, streams[1]>>> (sistPon, iterPon, sparsePon, d_sistema, d_barra, d_ramo, d_iterativo);
 }
 
 void SpCalcMf(sistema& sistPon, barra& barraPon, ramo& ramoPon, iterativo& iterPon, d_sparse& sparsePon, cudaDeviceProp deviceprop, cudaStream_t* streams) {
-	unsigned int tamanho = sparsePon.nnzM;
+	int tamanho = sparsePon.nnzM;
 
 	dim3 dimBlock(8 * deviceprop.warpSize, 1);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanho) / ((float)8 * deviceprop.warpSize)), 1);
+	dim3 dimGrid((int)ceil(((float)tamanho) / ((float)8 * deviceprop.warpSize)), 1);
 
 	SpCalcM <<<dimGrid, dimBlock, 0, streams[2]>>> (sistPon, barraPon, ramoPon, iterPon, sparsePon);
 }
 
 void SpCalcNf(sistema& sistPon, barra& barraPon, ramo& ramoPon, iterativo& iterPon, d_sparse& sparsePon, cudaDeviceProp deviceprop, cudaStream_t* streams) {
-	unsigned int tamanho = sparsePon.nnzN;
+	int tamanho = sparsePon.nnzN;
 
 	dim3 dimBlock(8 * deviceprop.warpSize, 1);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanho) / ((float)8 * deviceprop.warpSize)), 1);
+	dim3 dimGrid((int)ceil(((float)tamanho) / ((float)8 * deviceprop.warpSize)), 1);
 
 	SpCalcN <<<dimGrid, dimBlock, 0, streams[3]>>> (sistPon, barraPon, ramoPon, iterPon, sparsePon);
 }
@@ -677,12 +677,12 @@ void SpCalcJac(sistema& h_sistema, iterativo& h_iterativo, sistema* d_sistema, b
 // **********************************************
 
 __global__ void SpCalcJUno(const sistema sistPon, const barra barraPon, const iterativo iterPon, const d_sparse sparsePon, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo) {
-	//unsigned int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
-	unsigned int id = threadIdx.x + blockDim.x * blockIdx.x;
+	//int szJ = iterPon.nPVlim + iterPon.nPQlim + iterPon.nPQlim;
+	int id = threadIdx.x + blockDim.x * blockIdx.x;
 
 	if (id < (sparsePon.nnzH)) { // H
-		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
-		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
+		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
+		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Hpos[id]] + 1; // 1 based
 
 		if ((idx != sistPon.barraVO) && (idy != sistPon.barraVO)) {
 			// idx percorre colunas de H diretamente
@@ -707,8 +707,8 @@ __global__ void SpCalcJUno(const sistema sistPon, const barra barraPon, const it
 	else if (id < (sparsePon.nnzH + sparsePon.nnzL)) { // L
 		id -= sparsePon.nnzH;
 
-		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Lpos[id]] + 1;
-		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Lpos[id]] + 1;
+		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Lpos[id]] + 1;
+		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Lpos[id]] + 1;
 
 		// idy   é iterador do vetor barrasPQ, percorre linhas  de L
 		// idx é iterador do vetor barrasPQ, percorre colunas de L
@@ -729,8 +729,8 @@ __global__ void SpCalcJUno(const sistema sistPon, const barra barraPon, const it
 	else if (id < (sparsePon.nnzH + sparsePon.nnzL + sparsePon.nnzM)) { // M
 		id -= sparsePon.nnzH + sparsePon.nnzL;
 
-		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Mpos[id]] + 1;
-		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Mpos[id]] + 1;
+		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Mpos[id]] + 1;
+		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Mpos[id]] + 1;
 
 		// idy é iterador do vetor barrasPQ, percorre linhas de M
 		// idy=1:nPQ
@@ -751,8 +751,8 @@ __global__ void SpCalcJUno(const sistema sistPon, const barra barraPon, const it
 	else if (id < (sparsePon.nnzH + sparsePon.nnzL + sparsePon.nnzM + sparsePon.nnzN)) { // N
 		id -= sparsePon.nnzH + sparsePon.nnzL + sparsePon.nnzM;
 
-		unsigned int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Npos[id]] + 1;
-		unsigned int idx = sparsePon.cooColIndSubMatJ[sparsePon.Npos[id]] + 1;
+		int idy = sparsePon.cooRowIndSubMatJ[sparsePon.Npos[id]] + 1;
+		int idx = sparsePon.cooColIndSubMatJ[sparsePon.Npos[id]] + 1;
 
 		// idx é iterador do vetor barrasPQ, percorre colunas de N
 		// idx=1:nPQ
@@ -782,10 +782,10 @@ __global__ void SpCalcJUno(const sistema sistPon, const barra barraPon, const it
 }
 
 void SpCalcJUnof(sistema& h_sistema, iterativo& h_iterativo, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, sistema& sistPon, barra& barraPon, ramo& ramoPon, iterativo& iterPon, d_sparse& sparsePon, cudaDeviceProp deviceprop, cudaStream_t* streams) {
-	unsigned int tamanho = sparsePon.nnzJ;
+	int tamanho = sparsePon.nnzJ;
 
 	dim3 dimBlock(8 * deviceprop.warpSize, 1);
-	dim3 dimGrid((unsigned int)ceil(((float)tamanho) / ((float)8 * deviceprop.warpSize)), 1);
+	dim3 dimGrid((int)ceil(((float)tamanho) / ((float)8 * deviceprop.warpSize)), 1);
 
 	SpCalcJUno <<<dimGrid, dimBlock>>> (sistPon, barraPon, iterPon, sparsePon, d_sistema, d_barra, d_ramo, d_iterativo);
 }
@@ -793,37 +793,37 @@ void SpCalcJUnof(sistema& h_sistema, iterativo& h_iterativo, sistema* d_sistema,
 // **********************************************
 
 //__global__ void stencilGPU(const sistema sistPon, const barra barraPon, const iterativo iterPon, const d_sparse sparsePon) {
-//	unsigned int id = threadIdx.x + blockDim.x * blockIdx.x;
+//	int id = threadIdx.x + blockDim.x * blockIdx.x;
 //	if (id < (sistPon.nB - 1 + sistPon.nPQ)) {
 //
 //	}
 //}
 
 //void stencilGPUf(sistema& sistPon, barra& barraPon, iterativo& iterPon, d_sparse& sparsePon) {
-//	checkCudaErrors(cudaMalloc(&(sparsePon.cooColIndJ), 4 * sistPon.nnzY * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.cooColIndJ, 0, 4 * sistPon.nnzY * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.cooColIndJ), 4 * sistPon.nnzY * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.cooColIndJ, 0, 4 * sistPon.nnzY * sizeof(int)));
 //
-//	checkCudaErrors(cudaMalloc(&(sparsePon.cooRowIndJ), 4 * sistPon.nnzY * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.cooRowIndJ, 0, 4 * sistPon.nnzY * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.cooRowIndJ), 4 * sistPon.nnzY * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.cooRowIndJ, 0, 4 * sistPon.nnzY * sizeof(int)));
 //
-//	checkCudaErrors(cudaMalloc(&(sparsePon.csrRowPtrJ), sistPon.nB * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.csrRowPtrJ, 0, sistPon.nB * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.csrRowPtrJ), sistPon.nB * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.csrRowPtrJ, 0, sistPon.nB * sizeof(int)));
 //
-//	checkCudaErrors(cudaMalloc(&(sparsePon.cooColIndSubMatJ), 4 * sistPon.nnzY * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.cooColIndSubMatJ, 0, 4 * sistPon.nnzY * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.cooColIndSubMatJ), 4 * sistPon.nnzY * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.cooColIndSubMatJ, 0, 4 * sistPon.nnzY * sizeof(int)));
 //
-//	checkCudaErrors(cudaMalloc(&(sparsePon.cooRowIndSubMatJ), 4 * sistPon.nnzY * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.cooRowIndSubMatJ, 0, 4 * sistPon.nnzY * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.cooRowIndSubMatJ), 4 * sistPon.nnzY * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.cooRowIndSubMatJ, 0, 4 * sistPon.nnzY * sizeof(int)));
 //
-//	checkCudaErrors(cudaMalloc(&(sparsePon.Hpos), sistPon.nnzY * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.Hpos, 0, sistPon.nnzY * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.Hpos), sistPon.nnzY * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.Hpos, 0, sistPon.nnzY * sizeof(int)));
 //
-//	checkCudaErrors(cudaMalloc(&(sparsePon.Lpos), sistPon.nnzY * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.Lpos, 0, sistPon.nnzY * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.Lpos), sistPon.nnzY * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.Lpos, 0, sistPon.nnzY * sizeof(int)));
 //
-//	checkCudaErrors(cudaMalloc(&(sparsePon.Mpos), sistPon.nnzY * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.Mpos, 0, sistPon.nnzY * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.Mpos), sistPon.nnzY * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.Mpos, 0, sistPon.nnzY * sizeof(int)));
 //
-//	checkCudaErrors(cudaMalloc(&(sparsePon.Npos), sistPon.nnzY * sizeof(unsigned int)));
-//	checkCudaErrors(cudaMemset(sparsePon.Npos, 0, sistPon.nnzY * sizeof(unsigned int)));
+//	checkCudaErrors(cudaMalloc(&(sparsePon.Npos), sistPon.nnzY * sizeof(int)));
+//	checkCudaErrors(cudaMemset(sparsePon.Npos, 0, sistPon.nnzY * sizeof(int)));
 //}

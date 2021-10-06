@@ -18,12 +18,12 @@ void impressao(sistema &sistema, barra &barra, ramo &ramo, iterativo &iterativo)
 	printf("\n\n                                 FLUXOS DE POTENCIA\n");
             
 	printf("        BUS      V         ANG         P          Q        TO       PIJ          QIJ\n");
-	for (unsigned short i = 0; i < sistema.nB; i++)
+	for (int i = 0; i < sistema.nB; i++)
 	{
 		printf("      %4d%11.5f%11.5f%11.5f%11.5f  ", i + 1, barra.V[i], barra.theta[i], iterativo.Pcalc[i], iterativo.Qcalc[i]); // barra.Pliq[i], barra.Qliq[i]);
 		//Todo: fazer um return com erro antes do while extrapolar os limites dos vetores
 		//'**ERROR** UNABLE TO CALCULATE POWER FLOWS'
-		unsigned short j;
+		int j;
 		for (j = 0; j < sistema.nL; j++)
 		{
 			if (ramo.de[j] == (i + 1)) {
@@ -54,13 +54,13 @@ void impressao2(sistema& sistema, barra& barra, ramo& ramo, iterativo& iterativo
 	printf("\n\n                                 FLUXOS DE POTENCIA\n");
 
 	printf("        BUS      V         ANG        Pli        Qli        Pge        Qge      TO        PIJ          QIJ\n");
-	for (unsigned int i = 0; i < sistema.nB; i++)
+	for (int i = 0; i < sistema.nB; i++)
 	{
 		//printf("      %4d%11.5f%11.5f%11.5f%11.5f  ", i + 1, barra.V[i], barra.theta[i], barra.Pliq[i], barra.Qliq[i]);
 		printf("      %4d%11.5f%11.5f%11.5f%11.5f%11.5f%11.5f  ", barra.id[i], barra.V[i], barra.theta[i], iterativo.Pcalc[i], iterativo.Qcalc[i], iterativo.Pcalc[i] + barra.Pload[i], iterativo.Qcalc[i] + barra.Qload[i]);
 		//Todo: fazer um return com erro antes do while extrapolar os limites dos vetores
 		//'**ERROR** UNABLE TO CALCULATE POWER FLOWS'
-		unsigned int j;
+		int j;
 		for (j = 0; j < sistema.nL; j++)
 		{
 			if (ramo.de[j] == (i + 1)) {
@@ -214,6 +214,10 @@ void benchmarksPrint(iterativo& iterPon) {
 			}
 		}
 	}
+	printf("*Geral***********************************\n\n" AVISO_ERRO_TEMPO_TOTAL);
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, global::start, global::stop);
+	printf(" Tempo total de execucao: %f ms.\n Numero de iteracoes: %d.\n\n", milliseconds, iterPon.iteracao);
 	if (flgAdmitancia) {
 		printf("*Ybus************************************\n\n");
 		for (std::tuple<benchmarkType, int, double> i : global::tracker.benchmarkTable) {
@@ -468,9 +472,15 @@ void benchmarksPrintFile(iterativo& iterPon) {
 			}
 		}
 	}
-	else {
-		outfile << ';' << ';';
-	}
+	// else {
+	// 	outfile << ';' << ';';
+	// }
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, global::start, global::stop);
+	outfile << ';';
+	printDoubleToFile(outfile, milliseconds);
+	// outfile << ';';
+	outfile << iterPon.iteracao << ';';
 	if (flgAdmitancia) {
 		//printf("*Ybus************************************\n\n");
 		for (std::tuple<benchmarkType, int, double> i : global::tracker.benchmarkTable) {

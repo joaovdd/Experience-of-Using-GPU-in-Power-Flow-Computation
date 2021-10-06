@@ -23,13 +23,13 @@ enum subMatJ {
 };
 
 struct sistema {
-	unsigned int* barrasPV;//[NPV]; // indexador simples (iterador)
-	unsigned int nPV;// = 0;
-	unsigned int* barrasPQ;//[NPQ]; // indexador simples (iterador)
-	unsigned int nPQ;// = 0;
-	unsigned int barraVO;// = 0;
-	unsigned int nB;
-	unsigned int nL;
+	int* barrasPV;//[NPV]; // indexador simples (iterador)
+	int nPV;// = 0;
+	int* barrasPQ;//[NPQ]; // indexador simples (iterador)
+	int nPQ;// = 0;
+	int barraVO;// = 0;
+	int nB;
+	int nL;
 	float_type baseMVA;
 
 	complex_type* Y;//[NB*NB]; // elementos da matriz admitância (via IDX2F)
@@ -87,7 +87,7 @@ struct d_sparse {
 
 // indexador é o numero da barra (via IDX1F)
 struct barra {
-	unsigned int* id; // bus identifier number
+	int* id; // bus identifier number
 
 	float_type* V;//[NB];
 	float_type* theta;//[NB];
@@ -115,18 +115,18 @@ struct ramo {
 
 	float_type* phi;
 	Eigen::SparseMatrix<float_type, Eigen::StorageOptions::RowMajor>* eigen_phi;
-	unsigned int* d_csrColIndPhi; // gpu only
-	unsigned int* d_csrRowPtrPhi; // gpu only
+	int* d_csrColIndPhi; // gpu only
+	int* d_csrRowPtrPhi; // gpu only
 	float_type* phiVal;               // gpu only
-	unsigned int nnzPhi;          // gpu only
+	int nnzPhi;          // gpu only
 
 	float_type* Pdp;
 	float_type* Ppd;
 	float_type* Qdp;
 	float_type* Qpd;
 
-	unsigned int* de;//[NL];
-	unsigned int* para;//[NL];
+	int* de;//[NL];
+	int* para;//[NL];
 };
 
 struct iterativo {
@@ -134,7 +134,7 @@ struct iterativo {
 	float_type* Qcalc;//[NB];
 
 	//float_type* J;//[(NB-1+NPQ)*(NB-1+NPQ)]; -> Jlim
-	unsigned int iteracao, noMax;
+	int iteracao, noMax;
 
 	//float_type* deltaP;
 	//float_type* deltaQ;
@@ -149,10 +149,10 @@ struct iterativo {
 	bool* limQ; // FUTURO?:dois bits: o 1o é 0 se o limite atingido é o superior, 1 se o inferior. O segundo é
 				// 0 se o limite de injeção de reativos não foi atingido, 1 caso contrário
 				// nPV entradas
-	unsigned short* barrasPVlim; //[NPV]; // vetor contendo as barras de tipo PV após a análise de limite de reativos
-	unsigned short nPVlim; // número de barras de tipo PV após a análise de limite de reativos
-	unsigned short* barrasPQlim; //[NPV]; // vetor contendo as barras de tipo PV após a análise de limite de reativos
-	unsigned short nPQlim; // número de barras de tipo PV após a análise de limite de reativos
+	int* barrasPVlim; //[NPV]; // vetor contendo as barras de tipo PV após a análise de limite de reativos
+	int nPVlim; // número de barras de tipo PV após a análise de limite de reativos
+	int* barrasPQlim; //[NPV]; // vetor contendo as barras de tipo PV após a análise de limite de reativos
+	int nPQlim; // número de barras de tipo PV após a análise de limite de reativos
 
 	float_type* QliqLim;       // atualização do limite do valor de Qliq para as novas barras de tipo PQ
 	bool flgMudancaLimInjReat;
@@ -162,7 +162,7 @@ struct iterativo {
 void InitCsrPhi(sistema& sistema, ramo& ramo) {
 
 	std::vector<Eigen::Triplet<float_type>> valores;
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		valores.push_back(Eigen::Triplet<float_type>(IDX1F(ramo.de[i]), IDX1F(ramo.para[i]), ramo.phi[i]));
 	}
 
@@ -193,8 +193,8 @@ void initBranch(sistema& sistema, ramo& ramo) {
 	ramo.tap = (complex_type*)malloc(sistema.nL * sizeof(complex_type));
 	ramo.phi = (float_type*)malloc(sistema.nL * sizeof(float_type));
 
-	ramo.de = (unsigned int*)malloc(sistema.nL * sizeof(float_type));
-	ramo.para = (unsigned int*)malloc(sistema.nL * sizeof(float_type));
+	ramo.de = (int*)malloc(sistema.nL * sizeof(float_type));
+	ramo.para = (int*)malloc(sistema.nL * sizeof(float_type));
 
 	ramo.Pdp = (float_type*)malloc(sistema.nL * sizeof(float_type));
 	ramo.Qdp = (float_type*)malloc(sistema.nL * sizeof(float_type));
@@ -202,31 +202,31 @@ void initBranch(sistema& sistema, ramo& ramo) {
 	ramo.Qpd = (float_type*)malloc(sistema.nL * sizeof(float_type));
 
 
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.z[i] = _mkComplex(0., 0.);
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.bsh[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.tap[i] = _mkComplex(1., 0.);
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.de[i] = 0;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.para[i] = 0;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.Pdp[i] = 0;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.Qdp[i] = 0;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.Ppd[i] = 0;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.Qpd[i] = 0;
 	}
 }
@@ -241,7 +241,7 @@ void initSistema(sistema& sistema) {
 
 	if (global::metodo == metodo::denso) {
 		sistema.Y = (complex_type*)malloc(sistema.nB * sistema.nB * sizeof(complex_type));
-		for (unsigned int i = 0; i < sistema.nB * sistema.nB; i++) {
+		for (int i = 0; i < sistema.nB * sistema.nB; i++) {
 			sistema.Y[i] = _mkComplex(0., 0.);
 		}
 	}
@@ -249,8 +249,8 @@ void initSistema(sistema& sistema) {
 		sistema.Y = nullptr;
 	}
 
-	sistema.barrasPV = (unsigned int*)malloc(sistema.nPV * sizeof(unsigned int));
-	sistema.barrasPQ = (unsigned int*)malloc(sistema.nPQ * sizeof(unsigned int));
+	sistema.barrasPV = (int*)malloc(sistema.nPV * sizeof(int));
+	sistema.barrasPQ = (int*)malloc(sistema.nPQ * sizeof(int));
 
 
 	//limite de injeção de reativos
@@ -265,7 +265,7 @@ void initSistema(sistema& sistema) {
 }
 
 void initBus(sistema& sistema, barra& barra) {
-	barra.id = (unsigned int*)malloc(sistema.nB * sizeof(unsigned int));
+	barra.id = (int*)malloc(sistema.nB * sizeof(int));
 
 	barra.V = (float_type*)malloc(sistema.nB * sizeof(float_type));
 	barra.theta = (float_type*)malloc(sistema.nB * sizeof(float_type));
@@ -284,42 +284,42 @@ void initBus(sistema& sistema, barra& barra) {
 
 	barra.phi = (float_type*)malloc(sistema.nB * sistema.nB * sizeof(float_type));
 
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.V[i] = global::v_inicial;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.theta[i] = global::theta_inicial;
 	}
 
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.Pliq[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.Qliq[i] = 0.;
 	}
 
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.Pload[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.Qload[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.Pg[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.Qg[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.Vbase[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.gsh[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB; i++) {
 		barra.bsh[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nB * sistema.nB; i++) {
+	for (int i = 0; i < sistema.nB * sistema.nB; i++) {
 		barra.phi[i] = 0.;
 	}
 }
@@ -335,13 +335,13 @@ void initIter(sistema& sistema, iterativo& iterativo) {
 
 	iterativo.iteracao = 0;
 	iterativo.noMax = global::no_max_iter;
-	for (unsigned int i = 0; i < sistema.nB - 1; i++) {
+	for (int i = 0; i < sistema.nB - 1; i++) {
 		iterativo.Pcalc[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nPQ; i++) {
+	for (int i = 0; i < sistema.nPQ; i++) {
 		iterativo.Qcalc[i] = 0.;
 	}
-	//for (unsigned int i = 0; i < (sistema.nB - 1 + sistema.nPQ) * (sistema.nB - 1 + sistema.nPQ); i++) {
+	//for (int i = 0; i < (sistema.nB - 1 + sistema.nPQ) * (sistema.nB - 1 + sistema.nPQ); i++) {
 	//	iterativo.J[i] = 0.;
 	//}
 
@@ -350,7 +350,7 @@ void initIter(sistema& sistema, iterativo& iterativo) {
 	iterativo.gLim = (float_type*)malloc((sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * sizeof(float_type));
 	if (global::metodo == metodo::denso) {
 		iterativo.Jlim = (float_type*)malloc((sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * sizeof(float_type));
-		for (unsigned int i = 0; i < (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ); i++) {
+		for (int i = 0; i < (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ); i++) {
 			iterativo.Jlim[i] = 0.;
 		}
 	}
@@ -360,8 +360,8 @@ void initIter(sistema& sistema, iterativo& iterativo) {
 
 	//limite de injeção de reativos
 	iterativo.limQ = (bool*)malloc(sistema.nPV * sizeof(bool));
-	iterativo.barrasPVlim = (unsigned short*)malloc(sistema.nPV * sizeof(unsigned short));
-	iterativo.barrasPQlim = (unsigned short*)malloc((sistema.nPV + sistema.nPQ) * sizeof(unsigned short));
+	iterativo.barrasPVlim = (int*)malloc(sistema.nPV * sizeof(int));
+	iterativo.barrasPQlim = (int*)malloc((sistema.nPV + sistema.nPQ) * sizeof(int));
 	iterativo.QliqLim = (float_type*)malloc(sistema.nB * sizeof(float_type));
 }
 
@@ -377,8 +377,8 @@ void finSistema(sistema& sistema) {
 	if (sistema.VfixadaPV == nullptr) { free(sistema.VfixadaPV); }
 
 	if (sistema.spY != nullptr) { delete(sistema.spY); }
-	if (sistema.csrRowPtrY != nullptr) { free(sistema.csrRowPtrY); }
-	if (sistema.csrColIndY != nullptr) { free(sistema.csrColIndY); }
+	// if (sistema.csrRowPtrY != nullptr) { free(sistema.csrRowPtrY); }
+	// if (sistema.csrColIndY != nullptr) { free(sistema.csrColIndY); }
 }
 
 void finBranch(ramo& ramo) {
@@ -474,16 +474,16 @@ bool lerTamanhos(std::string cdfFile, sistema& sistema) {
 		}
 		std::getline(CDF, line); // pula duas linhas
 		sistema.nL = 0;
-		std::vector<unsigned int> de, para;
+		std::vector<int> de, para;
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 		{
 			if (line.find("-999") == std::string::npos) {
 
-				unsigned int auxde = atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
-				unsigned int auxpara = atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
+				int auxde = atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
+				int auxpara = atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
 				bool flgRamoNovo = 1;
 
-				for (unsigned int i = 0; i < sistema.nL; i++) {
+				for (int i = 0; i < sistema.nL; i++) {
 					if ((de[i] == auxde) && (para[i] == auxpara)) {
 						// ramo atual é o mesmo que o i-ésimo ramo
 						// soma elementos em paralelo
@@ -606,7 +606,7 @@ bool lerTamanhos(std::string cdfFile, sistema& sistema) {
 //
 //		std::getline(CDF, line); // pula duas linhas
 //		sistema.nL = 0;
-//		unsigned int nRamosDuplicatas = 0;
+//		int nRamosDuplicatas = 0;
 //		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 //		{
 //			if (line.find("-999") == std::string::npos) {
@@ -615,10 +615,10 @@ bool lerTamanhos(std::string cdfFile, sistema& sistema) {
 //				//ramo.de[IDX1F(sistema.nL)]   = atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
 //				//ramo.para[IDX1F(sistema.nL)] = atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
 //
-//				unsigned int auxde = atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
-//				unsigned int auxpara = atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
+//				int auxde = atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
+//				int auxpara = atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
 //				bool flgRamoNovo = 1;
-//				unsigned int i;
+//				int i;
 //
 //				for (i = 0; i < sistema.nL; i++) {
 //					if ((ramo.de[i] == auxde) && (ramo.para[i] == auxpara)) {
@@ -711,9 +711,9 @@ bool lerTamanhos(std::string cdfFile, sistema& sistema) {
 //	return 0;
 //}
 
-unsigned int id2i(unsigned int id, sistema& sistema, barra& barra) {
+int id2i(int id, sistema& sistema, barra& barra) {
 	// TODO: pesquisar por id em barra.id[] eretornar posição i
-	for (unsigned int i = 0; i <= sistema.nB; i++) {
+	for (int i = 0; i <= sistema.nB; i++) {
 		if (barra.id[i] == id) {
 			return i + 1;
 		}
@@ -738,7 +738,7 @@ bool readCDF(std::string cdfFile, sistema& sistema, barra& barra, ramo& ramo) {
 		//std::cout << "linha: " << atoi(line.substr(31, 6).c_str()) << std::endl;
 		sistema.baseMVA = atoi(line.substr(31, 6).c_str());
 
-		unsigned int i = 0; // i é o número da barra que está sendo lida
+		int i = 0; // i é o número da barra que está sendo lida
 
 		std::getline(CDF, line); // pula duas linhas
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
@@ -810,15 +810,15 @@ bool readCDF(std::string cdfFile, sistema& sistema, barra& barra, ramo& ramo) {
 
 		std::getline(CDF, line); // pula duas linhas
 		sistema.nL = 0;
-		unsigned int nRamosDuplicatas = 0;
+		int nRamosDuplicatas = 0;
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 		{
 			if (line.find("-999") == std::string::npos) {
 				// Parse branch	
-				unsigned int auxde = id2i(atoi(line.substr(0, 4).c_str()), sistema, barra); // ramo da linha i // [0, 3]
-				unsigned int auxpara = id2i(atoi(line.substr(4, 5).c_str()), sistema, barra); // at� a j // [4, 8]
+				int auxde = id2i(atoi(line.substr(0, 4).c_str()), sistema, barra); // ramo da linha i // [0, 3]
+				int auxpara = id2i(atoi(line.substr(4, 5).c_str()), sistema, barra); // at� a j // [4, 8]
 				bool flgRamoNovo = 1;
-				unsigned int i;
+				int i;
 
 				for (i = 0; i < sistema.nL; i++) {
 					if ((ramo.de[i] == auxde) && (ramo.para[i] == auxpara)) {
@@ -902,7 +902,7 @@ void calcYbus2(sistema& sistema, barra& barra, ramo& ramo) {
 	//inicializar Y
 
 	//percorre ramos
-	for (unsigned int i = 1; i <= sistema.nL; i++) {
+	for (int i = 1; i <= sistema.nL; i++) {
 		complex_type aux = _cuCon(ramo.tap[IDX1F(i)]); // t*
 		aux = _cuMul(_mkComplex(-1., 0.), aux); // -t*
 		complex_type aux1 = _cuDiv(aux, ramo.z[IDX1F(i)]);	// -t*/z
@@ -930,14 +930,14 @@ void calcYbus2(sistema& sistema, barra& barra, ramo& ramo) {
 	}
 
 	//percorre barras
-	for (unsigned int i = 1; i <= sistema.nB; i++) {
+	for (int i = 1; i <= sistema.nB; i++) {
 		sistema.Y[IDX2F(i, i, sistema.nB)] = _cuAdd(sistema.Y[IDX2F(i, i, sistema.nB)], _mkComplex(0., barra.bsh[IDX1F(i)])); // bsh_k + SUM[|t_km|^2*y_km + bsh_km/2]
 	}
 }
 
 void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 	// percorre ramos
-		for (unsigned int i = 1; i <= sistema.nL; i++) {
+		for (int i = 1; i <= sistema.nL; i++) {
 			complex_type aux = _cuCon(ramo.tap[IDX1F(i)]); // t*
 			aux = _cuDiv(_mkComplex(-1., 0.), aux); // -1/t*
 
@@ -963,14 +963,14 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 		}
 
 	//percorre barras
-	for (unsigned int i = 1; i <= sistema.nB; i++) {
+	for (int i = 1; i <= sistema.nB; i++) {
 		sistema.Y[IDX2F(i, i, sistema.nB)] = _cuAdd(sistema.Y[IDX2F(i, i, sistema.nB)], _mkComplex(barra.gsh[IDX1F(i)], barra.bsh[IDX1F(i)])); // bsh_k + SUM[|t_km|^2*y_km + bsh_km/2]
 	}
 	
 	//não matpower
 
 	////percorre ramos
-	//for (unsigned int i = 1; i <= sistema.nL; i++) {
+	//for (int i = 1; i <= sistema.nL; i++) {
 	//	complex_type aux = _cuCon(ramo.tap[IDX1F(i)]); // t*
 	//	aux = _cuMul(_mkComplex(-1., 0.), aux); // -t*
 	//	complex_type aux2 = _cuMul(ramo.z[IDX1F(i)], aux); // -t* * z
@@ -995,7 +995,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 	//}
 
 	////percorre barras
-	//for (unsigned int i = 1; i <= sistema.nB; i++) {
+	//for (int i = 1; i <= sistema.nB; i++) {
 	//	sistema.Y[IDX2F(i, i, sistema.nB)] = _cuAdd(sistema.Y[IDX2F(i, i, sistema.nB)], _mkComplex(0., barra.bsh[IDX1F(i)])); // bsh_k + SUM[|t_km|^2*y_km + bsh_km/2]
 	//}
 
@@ -1006,7 +1006,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 	////inicializar Y
 
 	////percorre ramos
-	//for (unsigned int i = 1; i <= sistema.nL; i++) {
+	//for (int i = 1; i <= sistema.nL; i++) {
 	//	complex_type aux = _cuCon(ramo.tap[IDX1F(i)]); // t*
 	//	aux = _cuMul(_mkComplex(-1., 0.), aux); // -t*
 	//	aux = _cuMul(ramo.z[IDX1F(i)], aux); // -t* * z
@@ -1031,7 +1031,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 	//}
 
 	////percorre barras
-	//for (unsigned int i = 1; i <= sistema.nB; i++) {
+	//for (int i = 1; i <= sistema.nB; i++) {
 	//	sistema.Y[IDX2F(i, i, sistema.nB)] = _cuAdd(sistema.Y[IDX2F(i, i, sistema.nB)], _mkComplex(0., barra.bsh[IDX1F(i)])); // bsh_k + SUM[|t_km|^2*y_km + bsh_km/2]
 	//}
 }
@@ -1044,7 +1044,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 //	Eigen::MatrixXcd dnY = Eigen::MatrixXcd::Zero(sistema.nB, sistema.nB);
 //
 //	//percorre ramos
-//	for (unsigned short i = 1; i <= sistema.nL; i++) {
+//	for (int i = 1; i <= sistema.nL; i++) {
 //
 //		std::complex<float_type> aux = -1. / ((ramo.z[IDX1F(i)].x + ramo.z[IDX1F(i)].y * 1i) * std::conj(ramo.tap[IDX1F(i)].x + ramo.tap[IDX1F(i)].y * 1i));
 //		dnY(IDX1F(ramo.de[IDX1F(i)]), IDX1F(ramo.para[IDX1F(i)])) = aux;
@@ -1082,7 +1082,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 //	}
 //
 //	//percorre barras
-//	for (unsigned short i = 1; i <= sistema.nB; i++) {
+//	for (int i = 1; i <= sistema.nB; i++) {
 //		// sistema.Y[IDX2F(i, i, sistema.nB)] = _cuAdd(sistema.Y[IDX2F(i, i, sistema.nB)], _mkComplex(0., barra.bsh[IDX1F(i)])); // bsh_k + SUM[|t_km|^2*y_km + bsh_km/2]
 //		dnY(IDX1F(i), IDX1F(i)) = dnY(IDX1F(i), IDX1F(i)) + barra.bsh[IDX1F(i)] * 1i;
 //	}
@@ -1108,7 +1108,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 //
 //	// conversão de sistema.spYvalE de std::complex<float_type> para complex_type
 //	sistema.spYval = (complex_type*)malloc(sistema.nnzY * sizeof(complex_type));
-//	for (size_t i = 0; i < sistema.nnzY; i++) {
+//	for (int i = 0; i < sistema.nnzY; i++) {
 //		sistema.spYval[i].x = real(sistema.spYvalE[i]);
 //		sistema.spYval[i].y = imag(sistema.spYvalE[i]);
 //	}
@@ -1148,7 +1148,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 //	Eigen::MatrixXcd dnY = Eigen::MatrixXcd::Zero(sistema.nB, sistema.nB);
 //
 //	//percorre ramos
-//	for (unsigned short i = 1; i <= sistema.nL; i++) {
+//	for (int i = 1; i <= sistema.nL; i++) {
 //
 //		std::complex<float_type> aux = -1. / ((ramo.z[IDX1F(i)].x + ramo.z[IDX1F(i)].y * 1i) * std::conj(ramo.tap[IDX1F(i)].x + ramo.tap[IDX1F(i)].y * 1i));
 //		dnY(IDX1F(ramo.de[IDX1F(i)]), IDX1F(ramo.para[IDX1F(i)])) = aux;
@@ -1186,7 +1186,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 //	}
 //
 //	//percorre barras
-//	for (unsigned short i = 1; i <= sistema.nB; i++) {
+//	for (int i = 1; i <= sistema.nB; i++) {
 //		// sistema.Y[IDX2F(i, i, sistema.nB)] = _cuAdd(sistema.Y[IDX2F(i, i, sistema.nB)], _mkComplex(0., barra.bsh[IDX1F(i)])); // bsh_k + SUM[|t_km|^2*y_km + bsh_km/2]
 //		dnY(IDX1F(i), IDX1F(i)) = dnY(IDX1F(i), IDX1F(i)) + barra.bsh[IDX1F(i)] * 1i;
 //	}
@@ -1212,7 +1212,7 @@ void calcYbus(sistema& sistema, barra& barra, ramo& ramo) {
 //
 //	// conversão de sistema.spYvalE de std::complex<float_type> para complex_type
 //	sistema.spYval = (complex_type*)malloc(sistema.nnzY * sizeof(complex_type));
-//	for (size_t i = 0; i < sistema.nnzY; i++) {
+//	for (int i = 0; i < sistema.nnzY; i++) {
 //		sistema.spYval[i].x = real(sistema.spYvalE[i]);
 //		sistema.spYval[i].y = imag(sistema.spYvalE[i]);
 //	}
@@ -1293,7 +1293,7 @@ void calcYbusSp_eficinte(sistema& sistema, barra& barra, ramo& ramo) {
 	//std::vector<Eigen::Triplet<std::complex<float_type>>> valores;
 
 	////percorre ramos
-	//for (unsigned short i = 1; i <= sistema.nL; i++) {
+	//for (int i = 1; i <= sistema.nL; i++) {
 
 	//	std::complex<float_type> aux = -1. / ((ramo.z[IDX1F(i)].x + ramo.z[IDX1F(i)].y * 1i) * std::conj(ramo.tap[IDX1F(i)].x + ramo.tap[IDX1F(i)].y * 1i));
 	//	valores.push_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(ramo.de[IDX1F(i)]), IDX1F(ramo.para[IDX1F(i)]), aux));
@@ -1309,7 +1309,7 @@ void calcYbusSp_eficinte(sistema& sistema, barra& barra, ramo& ramo) {
 	//}
 
 	////percorre barras
-	//for (unsigned short i = 1; i <= sistema.nB; i++) {
+	//for (int i = 1; i <= sistema.nB; i++) {
 	//	valores.push_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(i), barra.bsh[IDX1F(i)] * 1i));
 	//}
 
@@ -1350,7 +1350,7 @@ void calcYbusSp_eficinte(sistema& sistema, barra& barra, ramo& ramo) {
 
 	// conversão de sistema.spYvalE de std::complex<float_type> para complex_type
 	sistema.spYval = (complex_type*)malloc(sistema.nnzY * sizeof(complex_type));
-	for (size_t i = 0; i < sistema.nnzY; i++) {
+	for (int i = 0; i < sistema.nnzY; i++) {
 		sistema.spYval[i].x = real(sistema.spYvalE[i]);
 		sistema.spYval[i].y = imag(sistema.spYvalE[i]);
 	}
@@ -1375,4 +1375,458 @@ void calcYbusSp_eficinte(sistema& sistema, barra& barra, ramo& ramo) {
 			}
 		}
 	}
+}
+
+void calcYbusSp_Matpower(sistema& sistema, barra& barra, ramo& ramo) {
+	std::vector<Eigen::Triplet<std::complex<float_type>>> triplCt, triplCf;
+	std::vector<Eigen::Triplet<std::complex<float_type>>> triplYff, triplYft, triplYtf, triplYtt, triplYsh;
+
+	triplCt.reserve(sistema.nL);
+	triplCf.reserve(sistema.nL);
+	triplYff.reserve(sistema.nL);
+	triplYft.reserve(sistema.nL);
+	triplYtf.reserve(sistema.nL);
+	triplYtt.reserve(sistema.nL);
+	triplYsh.reserve(sistema.nB);
+
+	//percorre ramos
+	//using namespace std::complex_literals;
+	for (int i = 1; i <= sistema.nL; i++) {
+		// construção das matrizes de conexao
+		triplCf.emplace_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(ramo.de[IDX1F(i)]), 1));
+		triplCt.emplace_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(ramo.para[IDX1F(i)]), 1));
+
+		// construcao das matrizes diagonais
+		auto aux = _cuAdd(_cuDiv(_mkComplex(1, 0), ramo.z[IDX1F(i)]), _mkComplex(0, ramo.bsh[IDX1F(i)] / 2.));
+		auto daux = _cuAbs(ramo.tap[IDX1F(i)]); // cuCmul(_cuCon(ramo.tap[IDX1F(i)]), ramo.tap[IDX1F(i)]);
+		aux = _cuMul(aux, _mkComplex(1/(daux*daux), 0));
+		triplYff.emplace_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(i),
+			std::complex<float_type>(_cuReal(aux), _cuImag(aux))));
+
+		aux = _cuDiv(_cuDiv(_mkComplex(-1, 0), _cuCon(ramo.tap[IDX1F(i)])), ramo.z[IDX1F(i)]);
+		triplYft.emplace_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(i),
+			std::complex<float_type>(_cuReal(aux), _cuImag(aux))));
+
+		aux = _cuDiv(_cuDiv(_mkComplex(-1, 0), ramo.tap[IDX1F(i)]), ramo.z[IDX1F(i)]);
+		triplYtf.emplace_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(i),
+			std::complex<float_type>(_cuReal(aux), _cuImag(aux))));
+
+		aux = _cuAdd(_cuDiv(_mkComplex(1, 0), ramo.z[IDX1F(i)]), _mkComplex(0, ramo.bsh[IDX1F(i)] / 2.));
+		triplYtt.emplace_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(i),
+			std::complex<float_type>(_cuReal(aux), _cuImag(aux))));
+	}
+
+	//percorre barras
+	for (int i = 1; i <= sistema.nB; i++) {
+		auto aux = _mkComplex(barra.gsh[IDX1F(i)], barra.bsh[IDX1F(i)]);
+		triplYsh.emplace_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(i),
+			std::complex<float_type>(_cuReal(aux), _cuImag(aux))));
+	}
+
+	Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> Cf(sistema.nL, sistema.nB), Ct(sistema.nL, sistema.nB);
+	Cf.setFromTriplets(triplCf.begin(), triplCf.end());
+	Ct.setFromTriplets(triplCt.begin(), triplCt.end());
+	Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> Yff(sistema.nL, sistema.nL), Ytt(sistema.nL, sistema.nL),
+		Yft(sistema.nL, sistema.nL), Ytf(sistema.nL, sistema.nL), Ysh(sistema.nB, sistema.nB);
+	Yff.setFromTriplets(triplYff.begin(), triplYff.end());
+	Ytt.setFromTriplets(triplYtt.begin(), triplYtt.end());
+	Yft.setFromTriplets(triplYft.begin(), triplYft.end());
+	Ytf.setFromTriplets(triplYtf.begin(), triplYtf.end());
+	Ysh.setFromTriplets(triplYsh.begin(), triplYsh.end());
+
+	Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> Yf = Yff * Cf + Yft * Ct;
+	Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> Yt = Ytf * Cf + Ytt * Ct;
+
+	auto aux = Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>(Cf.transpose());
+	auto aux1 = Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>(Ct.transpose());
+	auto aux2 = Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>((aux * Yf) + (aux1 * Yt));
+	
+	Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> ans = aux2 + Ysh;
+
+	sistema.spY = new Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>(sistema.nB, sistema.nB);
+
+	*(sistema.spY) = ans;
+
+	// Cópia da outra função
+
+	// https://eigen.tuxfamily.org/dox/classEigen_1_1SparseMatrix.html#ac2684952b14b5c9b0f68ae3bb8c517a6
+	sistema.nnzY = sistema.spY->nonZeros();
+	sistema.spYvalE = sistema.spY->valuePtr();
+	//sistema.csrRowPtrY = sistema.spY->innerIndexPtr();
+	//sistema.csrColIndY = sistema.spY->outerIndexPtr();
+
+    // conversão de sistema.spYvalE de std::complex<float_type> para complex_type
+	sistema.spYval = (complex_type*)malloc(sistema.nnzY * sizeof(complex_type));
+	for (int i = 0; i < sistema.nnzY; i++) {
+		sistema.spYval[i].x = real(sistema.spYvalE[i]);
+		sistema.spYval[i].y = imag(sistema.spYvalE[i]);
+	}
+
+	sistema.csrColIndY = (int*)malloc(sistema.spY->nonZeros() * sizeof(int));
+	for (int j = 0; j < sistema.spY->nonZeros(); j++) {
+		sistema.csrColIndY[j] = sistema.spY->innerIndexPtr()[j];
+	}
+
+	sistema.csrRowPtrY = (int*)malloc((sistema.spY->outerSize() + 1) * sizeof(int));
+	for (int j = 0; j <= sistema.spY->outerSize(); j++) {
+		sistema.csrRowPtrY[j] = sistema.spY->outerIndexPtr()[j];
+	}
+
+	sistema.cooRowIndY = (int*)malloc(sistema.spY->nonZeros() * sizeof(int));
+	{
+		int acc = 0;
+		// csr to coo
+		for (int j = 0; j < sistema.spY->outerSize(); j++) {
+			for (; acc < sistema.spY->outerIndexPtr()[j + 1]; acc++) {
+				sistema.cooRowIndY[acc] = j;
+			}
+		}
+	}
+}
+
+#define MKL_INT int
+#define MKL_Complex16 std::complex<float_type>
+
+#include "mkl_types.h"
+#include "mkl_spblas.h"
+
+void printMKL_z_csr(const sparse_matrix_t *source) {
+    sparse_index_base_t indexing;
+    MKL_INT rows, cols, *rows_start, *rows_end, *col_indx;
+    MKL_Complex16 *values;
+
+    sparse_status_t status = mkl_sparse_z_export_csr(*source, &indexing, &rows, &cols, &rows_start,
+        &rows_end, &col_indx, &values);
+
+    if(status == SPARSE_STATUS_SUCCESS) {
+        printf("nRows: %d\nnCols: %d\nnnz: %d\n", rows, cols, rows_end[rows - 1] - indexing);
+        printf("Row Pointer Vector:\n");
+        for(int i = 0; i < rows - 1; i++) {
+            printf("%d, ", rows_start[i]);
+        }
+        printf("%d\n", rows_start[rows - 1]);
+		printf("Column Index Vector:\n");
+        for(int i = 0; i < rows_end[rows - 1] - indexing - 1; i++){
+            printf("%d, ", col_indx[i]);
+        }
+        printf("%d\n", col_indx[rows_end[rows - 1] - indexing - 1]);
+		printf("Values Vector:\n");
+        for(int i = 0; i < rows_end[rows - 1] - indexing - 1; i++){
+            printf(" %f + j * %f\n", std::real(values[i]), std::imag(values[i]));
+        }
+        printf(" %f + j * %f\n", std::real(values[rows_end[rows - 1] - indexing - 1]), std::imag(values[rows_end[rows - 1] - indexing - 1]));
+    }
+    else {
+        printf("ERRO\n");
+    }
+}
+
+void calcYbusSp_Matpower_(sistema& sistema, barra& barra, ramo& ramo) {
+	// std::vector<Eigen::Triplet<std::complex<float_type>>> triplCt, triplCf;
+	// std::vector<Eigen::Triplet<std::complex<float_type>>> triplYff, triplYft, triplYtf, triplYtt, triplYsh;
+
+    // struct matrix_descr descr;
+	// descr.type = SPARSE_MATRIX_TYPE_GENERAL;
+    // descr.mode = SPARSE_FILL_MODE_UPPER;
+    // descr.diag = SPARSE_DIAG_NON_UNIT;
+
+	// sparse_matrix_t cooCt, cooCf, cooYff, cooYft, cooYtf, cooYtt, cooYsh;
+	std::vector<MKL_INT>                  cooCt_rows, cooCf_rows, cooYff_rows, cooYft_rows, cooYtf_rows, cooYtt_rows, cooYsh_rows,
+	                                      cooCt_cols, cooCf_cols, cooYff_cols, cooYft_cols, cooYtf_cols, cooYtt_cols, cooYsh_cols;
+	std::vector<std::complex<float_type>> cooCt_vals, cooCf_vals, cooYff_vals, cooYft_vals, cooYtf_vals, cooYtt_vals, cooYsh_vals;
+	// mkl_sparse_d_create_csr(&csrA, SPARSE_INDEX_BASE_ZERO, n, n, ia, ia + 1, ja, a);
+
+	// mkl_sparse_sp2m(SPARSE_OPERATION_NON_TRANSPOSE, descr, matrix_vectors[0], SPARSE_OPERATION_NON_TRANSPOSE, general_type, matrix_vectors[1], SPARSE_STAGE_NNZ_COUNT, &result_vectors[0]);
+
+	//percorre ramos
+	//using namespace std::complex_literals;
+	for (int i = 1; i <= sistema.nL; i++) {
+		// construção das matrizes de conexao
+		cooCf_rows.push_back(IDX1F(i));
+		cooCf_cols.push_back(IDX1F(ramo.de[IDX1F(i)]));
+		cooCf_vals.push_back(1);
+
+		cooCt_rows.push_back(IDX1F(i));
+		cooCt_cols.push_back(IDX1F(ramo.para[IDX1F(i)]));
+		cooCt_vals.push_back(1);
+
+		// construcao das matrizes diagonais
+		auto aux = _cuAdd(_cuDiv(_mkComplex(1, 0), ramo.z[IDX1F(i)]), _mkComplex(0, ramo.bsh[IDX1F(i)] / 2.));
+
+		// aux = _cuAdd(_cuDiv(_mkComplex(1, 0), ramo.z[IDX1F(i)]), _mkComplex(0, ramo.bsh[IDX1F(i)] / 2.));
+		cooYtt_rows.push_back(IDX1F(i));
+		cooYtt_cols.push_back(IDX1F(i));
+		cooYtt_vals.emplace_back(std::complex<float_type>(_cuReal(aux), _cuImag(aux)));	
+
+		auto daux = _cuAbs(ramo.tap[IDX1F(i)]);
+		aux = _cuMul(aux, _mkComplex(1/(daux*daux), 0));
+		cooYff_rows.push_back(IDX1F(i));
+		cooYff_cols.push_back(IDX1F(i));
+		cooYff_vals.emplace_back(std::complex<float_type>(_cuReal(aux), _cuImag(aux)));
+
+		aux = _cuDiv(_cuDiv(_mkComplex(-1, 0), _cuCon(ramo.tap[IDX1F(i)])), ramo.z[IDX1F(i)]);
+		cooYft_rows.push_back(IDX1F(i));
+		cooYft_cols.push_back(IDX1F(i));
+		cooYft_vals.emplace_back(std::complex<float_type>(_cuReal(aux), _cuImag(aux)));
+
+		aux = _cuDiv(_cuDiv(_mkComplex(-1, 0), ramo.tap[IDX1F(i)]), ramo.z[IDX1F(i)]);
+		cooYtf_rows.push_back(IDX1F(i));
+		cooYtf_cols.push_back(IDX1F(i));
+		cooYtf_vals.emplace_back(std::complex<float_type>(_cuReal(aux), _cuImag(aux)));		
+	}
+
+	//percorre barras
+	for (int i = 1; i <= sistema.nB; i++) {
+		// auto aux = _mkComplex(barra.gsh[IDX1F(i)], barra.bsh[IDX1F(i)]);
+		// triplYsh.push_back(Eigen::Triplet<std::complex<float_type>>(IDX1F(i), IDX1F(i),
+		// 	std::complex<float_type>(_cuReal(aux), _cuImag(aux))));
+		cooYsh_rows.push_back(IDX1F(i));
+		cooYsh_cols.push_back(IDX1F(i));
+		cooYsh_vals.emplace_back(std::complex<float_type>(barra.gsh[IDX1F(i)], barra.bsh[IDX1F(i)]));
+	}
+
+	// Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> Cf(sistema.nL, sistema.nB), Ct(sistema.nL, sistema.nB);
+	// Cf.setFromTriplets(triplCf.begin(), triplCf.end());
+	// Ct.setFromTriplets(triplCt.begin(), triplCt.end());
+	// Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> Yff(sistema.nL, sistema.nL), Ytt(sistema.nL, sistema.nL), Yft(sistema.nL, sistema.nL), Ytf(sistema.nL, sistema.nL), Ysh(sistema.nB, sistema.nB);
+	// Yff.setFromTriplets(triplYff.begin(), triplYff.end());
+	// Ytt.setFromTriplets(triplYtt.begin(), triplYtt.end());
+	// Yft.setFromTriplets(triplYft.begin(), triplYft.end());
+	// Ytf.setFromTriplets(triplYtf.begin(), triplYtf.end());
+	// Ysh.setFromTriplets(triplYsh.begin(), triplYsh.end());
+
+    // sparse_status_t mkl_sparse_d_create_csr( sparse_matrix_t           *A,
+    //                                          const sparse_index_base_t indexing, /* indexing: C-style or Fortran-style */
+    //                                          const MKL_INT             rows,
+    //                                          const MKL_INT             cols,
+    //                                                MKL_INT             *rows_start,
+    //                                                MKL_INT             *rows_end,
+    //                                                MKL_INT             *col_indx,
+    //                                                double              *values );
+
+	// mkl_sparse_z_create_coo(A, indexing, rows, cols, nnz, row_indx, col_indx, values )
+
+	sparse_status_t status;
+	sparse_matrix_t cooCt, cooCf, cooYff, cooYft, cooYtf, cooYtt, cooYsh, cooYf, cooYt, aux1, aux2, aux3;
+	status = mkl_sparse_z_create_coo(&cooCt, SPARSE_INDEX_BASE_ZERO, sistema.nL, sistema.nB, cooCt_rows.size(), cooCt_rows.data(), cooCt_cols.data(), cooCt_vals.data());
+	status = mkl_sparse_z_create_coo(&cooCf, SPARSE_INDEX_BASE_ZERO, sistema.nL, sistema.nB, cooCf_rows.size(), cooCf_rows.data(), cooCf_cols.data(), cooCf_vals.data());
+	status = mkl_sparse_z_create_coo(&cooYff, SPARSE_INDEX_BASE_ZERO, sistema.nL, sistema.nL, cooYff_rows.size(), cooYff_rows.data(), cooYff_cols.data(), cooYff_vals.data());
+	status = mkl_sparse_z_create_coo(&cooYft, SPARSE_INDEX_BASE_ZERO, sistema.nL, sistema.nL, cooYft_rows.size(), cooYft_rows.data(), cooYft_cols.data(), cooYft_vals.data());
+	status = mkl_sparse_z_create_coo(&cooYtf, SPARSE_INDEX_BASE_ZERO, sistema.nL, sistema.nL, cooYtf_rows.size(), cooYtf_rows.data(), cooYtf_cols.data(), cooYtf_vals.data());
+	status = mkl_sparse_z_create_coo(&cooYtt, SPARSE_INDEX_BASE_ZERO, sistema.nL, sistema.nL, cooYtt_rows.size(), cooYtt_rows.data(), cooYtt_cols.data(), cooYtt_vals.data());
+	status = mkl_sparse_z_create_coo(&cooYsh, SPARSE_INDEX_BASE_ZERO, sistema.nB, sistema.nB, cooYsh_rows.size(), cooYsh_rows.data(), cooYsh_cols.data(), cooYsh_vals.data());
+	// mkl_sparse_d_create_csr(&csrA, SPARSE_INDEX_BASE_ZERO, sistema.nB, sistema.nB, nnz, rowIndex, colIndex, values);
+
+	status = mkl_sparse_convert_csr(cooCt, SPARSE_OPERATION_NON_TRANSPOSE, &cooCt);
+	status = mkl_sparse_convert_csr(cooCf, SPARSE_OPERATION_NON_TRANSPOSE, &cooCf);
+	status = mkl_sparse_convert_csr(cooYff, SPARSE_OPERATION_NON_TRANSPOSE, &cooYff);
+	status = mkl_sparse_convert_csr(cooYft, SPARSE_OPERATION_NON_TRANSPOSE, &cooYft);
+	status = mkl_sparse_convert_csr(cooYtf, SPARSE_OPERATION_NON_TRANSPOSE, &cooYtf);
+	status = mkl_sparse_convert_csr(cooYtt, SPARSE_OPERATION_NON_TRANSPOSE, &cooYtt);
+	status = mkl_sparse_convert_csr(cooYsh, SPARSE_OPERATION_NON_TRANSPOSE, &cooYsh);
+	
+	if (global::verbose_mode && !global::laconic_mode)
+	{
+		printf("csrCt:\n");
+		printMKL_z_csr(&cooCt);
+		printf("csrCf:\n");
+		printMKL_z_csr(&cooCf);
+		printf("csrYff:\n");
+		printMKL_z_csr(&cooYff);
+		printf("csrYft:\n");
+		printMKL_z_csr(&cooYft);
+		printf("csrYtf:\n");
+		printMKL_z_csr(&cooYtf);
+		printf("csrYtt:\n");
+		printMKL_z_csr(&cooYtt);
+		printf("csrYsh:\n");
+		printMKL_z_csr(&cooYsh);
+	}
+
+	MKL_Complex16 alpha = std::complex<float_type>(1,0);
+
+	// Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> Yf = Yff * Cf + Yft * Ct;
+	// Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> Yt = Ytf * Cf + Ytt * Ct;
+
+	// Yf = Yff * Cf + Yft * Ct;
+	// sparse_status_t mkl_sparse_sp2m ( const sparse_operation_t transA , const struct matrix_descr descrA , const sparse_matrix_t A , const sparse_operation_t transB , const struct matrix_descr descrB , const sparse_matrix_t B , const sparse_request_t request , sparse_matrix_t *C );
+	// status = mkl_sparse_sp2m(SPARSE_OPERATION_NON_TRANSPOSE, descr, cooYff, SPARSE_OPERATION_NON_TRANSPOSE, descr, cooCf, SPARSE_STAGE_FULL_MULT_NO_VAL, &aux1);
+	status = mkl_sparse_spmm(SPARSE_OPERATION_NON_TRANSPOSE, cooYff, cooCf, &aux1);
+
+	if (global::verbose_mode && !global::laconic_mode)
+	{
+		printf("aux1:\n");
+		printMKL_z_csr(&aux1);
+	}
+
+	// status = mkl_sparse_sp2m(SPARSE_OPERATION_NON_TRANSPOSE, descr, cooYft, SPARSE_OPERATION_NON_TRANSPOSE, descr, cooCt, SPARSE_STAGE_NNZ_COUNT, &aux2);
+	status = mkl_sparse_spmm(SPARSE_OPERATION_NON_TRANSPOSE, cooYft, cooCt, &aux2);
+
+	if (global::verbose_mode && !global::laconic_mode)
+	{
+		printf("aux2:\n");
+		printMKL_z_csr(&aux2);
+	}
+
+	status = mkl_sparse_z_add(SPARSE_OPERATION_NON_TRANSPOSE, aux1, alpha, aux2, &cooYf);
+	
+	if (global::verbose_mode && !global::laconic_mode)
+	{
+		printf("cooYf:\n");
+		printMKL_z_csr(&cooYf);
+	}
+
+	mkl_sparse_destroy(aux1);
+	mkl_sparse_destroy(aux2);
+	// Yt = Ytf * Cf + Ytt * Ct;
+	// status = mkl_sparse_sp2m(SPARSE_OPERATION_NON_TRANSPOSE, descr, cooYtf, SPARSE_OPERATION_NON_TRANSPOSE, descr, cooCf, SPARSE_STAGE_NNZ_COUNT, &aux1);
+	status = mkl_sparse_spmm(SPARSE_OPERATION_NON_TRANSPOSE, cooYtf, cooCf, &aux1);
+	// status = mkl_sparse_sp2m(SPARSE_OPERATION_NON_TRANSPOSE, descr, cooYtt, SPARSE_OPERATION_NON_TRANSPOSE, descr, cooCt, SPARSE_STAGE_NNZ_COUNT, &aux2);
+	status = mkl_sparse_spmm(SPARSE_OPERATION_NON_TRANSPOSE, cooYtt, cooCt, &aux2);
+	status = mkl_sparse_z_add(SPARSE_OPERATION_NON_TRANSPOSE, aux1, alpha, aux2, &cooYt);
+	mkl_sparse_destroy(aux1);
+	mkl_sparse_destroy(aux2);
+
+	if (global::verbose_mode && !global::laconic_mode)
+	{
+		printf("cooYt:\n");
+		printMKL_z_csr(&cooYt);
+	}
+	// auto aux = Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>(Cf.transpose());
+	// auto aux1 = Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>(Ct.transpose());
+	// auto aux2 = Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>((aux * Yf) + (aux1 * Yt));
+	
+	// aux2 = (aux * Yf) + (aux1 * Yt)
+	// status = mkl_sparse_sp2m(SPARSE_OPERATION_TRANSPOSE, descr, cooCf, SPARSE_OPERATION_NON_TRANSPOSE, descr, cooYf, SPARSE_STAGE_NNZ_COUNT, &aux1);
+	status = mkl_sparse_spmm(SPARSE_OPERATION_TRANSPOSE, cooCf, cooYf, &aux1);
+	// status = mkl_sparse_sp2m(SPARSE_OPERATION_TRANSPOSE, descr, cooCt, SPARSE_OPERATION_NON_TRANSPOSE, descr, cooYt, SPARSE_STAGE_NNZ_COUNT, &aux2);
+	status = mkl_sparse_spmm(SPARSE_OPERATION_TRANSPOSE, cooCt, cooYt, &aux2);
+	status = mkl_sparse_z_add(SPARSE_OPERATION_NON_TRANSPOSE, aux1, alpha, aux2, &aux3);
+	mkl_sparse_destroy(aux1);
+	mkl_sparse_destroy(aux2);
+
+	// Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> ans = aux2 + Ysh;
+	status = mkl_sparse_z_add(SPARSE_OPERATION_NON_TRANSPOSE, aux3, alpha, cooYsh, &aux1);
+
+	status = mkl_sparse_order(aux1);
+	
+	if (global::verbose_mode && !global::laconic_mode)
+	{
+		printf("spY:\n");
+		printMKL_z_csr(&aux1);
+	}
+	
+	sistema.spY = new Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>(sistema.nB, sistema.nB);
+
+	// *(sistema.spY) = ans;
+
+	/////////////////////////////////////////////////////////////////
+	// Leitura de Ybus //////////////////////////////////////////////
+
+    sparse_index_base_t indexing;
+    MKL_INT rows, cols, *rows_start, *rows_end, *col_indx;
+    MKL_Complex16 *values;
+
+    status = mkl_sparse_z_export_csr(aux1, &indexing, &rows, &cols, &rows_start,
+        &rows_end, &col_indx, &values);
+
+    if(status != SPARSE_STATUS_SUCCESS) {
+		printf("Error!\n");
+	}
+
+	// int outerIndexPtr[cols+1];
+	// int innerIndices[nnz];
+	// double values[nnz];
+	// sistema.spY =
+	auto x = new Eigen::Map< const Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor> >(
+		rows, cols, rows_end[rows - 1] - indexing, rows_start, col_indx, values
+	);
+	
+	// sistema.spY = x.sum(Eigen::SparseMatrix<std::complex<float_type>, Eigen::StorageOptions::RowMajor>(sistema.nB, sistema.nB));
+
+	// for (int i = 0; i < rows; i++)
+	// {
+	// 	for (int j = rows_start[i]; j < rows_start[i+1]; j++)
+	// 	{
+	// 		i, col_indx[j], values[j]
+	// 	}
+	// }
+	
+	/////////////////////////////////////////////////////////////////
+
+	// Cópia da outra função
+
+	// https://eigen.tuxfamily.org/dox/classEigen_1_1SparseMatrix.html#ac2684952b14b5c9b0f68ae3bb8c517a6
+	sistema.nnzY = rows_end[rows - 1] - indexing;
+	sistema.spYvalE = values;
+
+    // conversão de sistema.spYvalE de std::complex<float_type> para complex_type
+	sistema.spYval = (complex_type*)malloc(sistema.nnzY * sizeof(complex_type));
+	for (int i = 0; i < sistema.nnzY; i++) {
+		sistema.spYval[i].x = real(sistema.spYvalE[i]);
+		sistema.spYval[i].y = imag(sistema.spYvalE[i]);
+	}
+
+	sistema.csrColIndY = col_indx; // (int*)malloc(sistema.spY->nonZeros() * sizeof(int));
+
+	sistema.csrRowPtrY = rows_start;// (int*)malloc((sistema.spY->outerSize() + 1) * sizeof(int));
+
+	// funcional /////////////////////////////////////////////////////////////////////////////////////////
+
+	// // cria matriz
+
+    // std::vector<Eigen::Triplet<std::complex<float_type>>> triplY;
+	// triplY.reserve(rows_end[rows - 1] - indexing);
+
+	// for (int i = 0; i < rows; i++)
+	// {
+	// 	for (int j = rows_start[i]; j < rows_start[i+1]; j++)
+	// 	{
+	// 		triplY.emplace_back(Eigen::Triplet<std::complex<float_type>>(i, col_indx[j],
+	// 			std::complex<float_type>(std::real(values[j]), std::imag(values[j]))));
+	// 	}
+	// }
+	
+	// sistema.spY->setFromTriplets(triplY.begin(), triplY.end());
+
+	// // Cópia da outra função 2
+
+	// // https://eigen.tuxfamily.org/dox/classEigen_1_1SparseMatrix.html#ac2684952b14b5c9b0f68ae3bb8c517a6
+	// sistema.nnzY = sistema.spY->nonZeros();
+	// sistema.spYvalE = sistema.spY->valuePtr();
+	// //sistema.csrRowPtrY = sistema.spY->innerIndexPtr();
+	// //sistema.csrColIndY = sistema.spY->outerIndexPtr();
+
+    // // conversão de sistema.spYvalE de std::complex<float_type> para complex_type
+	// sistema.spYval = (complex_type*)malloc(sistema.nnzY * sizeof(complex_type));
+	// for (int i = 0; i < sistema.nnzY; i++) {
+	// 	sistema.spYval[i].x = real(sistema.spYvalE[i]);
+	// 	sistema.spYval[i].y = imag(sistema.spYvalE[i]);
+	// }
+
+	// sistema.csrColIndY = (int*)malloc(sistema.spY->nonZeros() * sizeof(int));
+	// for (int j = 0; j < sistema.spY->nonZeros(); j++) {
+	// 	sistema.csrColIndY[j] = sistema.spY->innerIndexPtr()[j];
+	// }
+
+	// sistema.csrRowPtrY = (int*)malloc((sistema.spY->outerSize() + 1) * sizeof(int));
+	// for (int j = 0; j <= sistema.spY->outerSize(); j++) {
+	// 	sistema.csrRowPtrY[j] = sistema.spY->outerIndexPtr()[j];
+	// }
+
+	// sistema.cooRowIndY = (int*)malloc(sistema.spY->nonZeros() * sizeof(int));
+	// {
+	// 	int acc = 0;
+	// 	// csr to coo
+	// 	for (int j = 0; j < sistema.spY->outerSize(); j++) {
+	// 		for (; acc < sistema.spY->outerIndexPtr()[j + 1]; acc++) {
+	// 			sistema.cooRowIndY[acc] = j;
+	// 		}
+	// 	}
+	// }
+
+	// mkl_sparse_destroy(aux1);
+	//          /////////////////////////////////////////////////////////////////////////////////////////
+
+	mkl_sparse_destroy(aux3);
 }

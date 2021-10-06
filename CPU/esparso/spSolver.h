@@ -15,3 +15,5 @@
 void spEigenSolverNaive(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo);
 
 bool spSolve(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo);
+
+bool spSolveMKL(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo);

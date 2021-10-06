@@ -68,7 +68,7 @@ MODO DE USAR
 #include <tuple>
 #include <chrono>
 
-#include <limits> // std::numeric_limits<unsigned int>::max(); 
+#include <limits> // std::numeric_limits<int>::max(); 
 
 // contém todos os tipos de elementos que estão sendo individualmente avaliados
 enum class benchmarkType {
@@ -103,6 +103,7 @@ public:
 //}
 namespace global {
 	trackerType tracker;
+	cudaEvent_t start, stop;
 }
 
 // tipo do objeto que medira tempo usando a biblioteca chrono com seu construtor e destrutor

@@ -1,3 +1,6 @@
+#pragma once
+#include "m.h"
+
 bool lerTamanhosCDFX(std::string cdfFile, sistema& sistema) {
 	std::string line;
 	std::fstream CDF;
@@ -43,16 +46,16 @@ bool lerTamanhosCDFX(std::string cdfFile, sistema& sistema) {
 		}
 		std::getline(CDF, line); // pula duas linhas
 		sistema.nL = 0;
-		std::vector<unsigned int> de, para;
+		std::vector<int> de, para;
 
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 		{
 			if (line.find("-999") == std::string::npos) {
-				unsigned int auxde = atoi(line.substr(0, 5).c_str()); // ramo da linha i // [0, 3]
-				unsigned int auxpara = atoi(line.substr(6, 5).c_str()); // at� a j // [4, 8]
+				int auxde = atoi(line.substr(0, 5).c_str()); // ramo da linha i // [0, 3]
+				int auxpara = atoi(line.substr(6, 5).c_str()); // at� a j // [4, 8]
 				bool flgRamoNovo = 1;
 
-				for (unsigned int i = 0; i < sistema.nL; i++) {
+				for (int i = 0; i < sistema.nL; i++) {
 					if ((de[i] == auxde) && (para[i] == auxpara)) {
 						// ramo atual é o mesmo que o i-ésimo ramo
 						// soma elementos em paralelo
@@ -97,7 +100,7 @@ bool readCDFX(std::string cdfFile, sistema& sistema, barra& barra, ramo& ramo) {
 		//std::cout << "linha: " << atoi(line.substr(31, 6).c_str()) << std::endl;
 		sistema.baseMVA = atoi(line.substr(31, 6).c_str());
 
-		unsigned int i = 0; // i é o número da barra que está sendo lida
+		int i = 0; // i é o número da barra que está sendo lida
 
 		std::getline(CDF, line); // pula duas linhas
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
@@ -169,15 +172,15 @@ bool readCDFX(std::string cdfFile, sistema& sistema, barra& barra, ramo& ramo) {
 
 		std::getline(CDF, line); // pula duas linhas
 		sistema.nL = 0;
-		unsigned int nRamosDuplicatas = 0;
+		int nRamosDuplicatas = 0;
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 		{
 			if (line.find("-999") == std::string::npos) {
 				// Parse branch	
-				unsigned int auxde = id2i(atoi(line.substr(0, 5).c_str()), sistema, barra); // ramo da linha i 
-				unsigned int auxpara = id2i(atoi(line.substr(6, 5).c_str()), sistema, barra); // at� a j 
+				int auxde = id2i(atoi(line.substr(0, 5).c_str()), sistema, barra); // ramo da linha i 
+				int auxpara = id2i(atoi(line.substr(6, 5).c_str()), sistema, barra); // at� a j 
 				bool flgRamoNovo = 1;
-				unsigned int i;
+				int i;
 
 				for (i = 0; i < sistema.nL; i++) {
 					if ((ramo.de[i] == auxde) && (ramo.para[i] == auxpara)) {
@@ -274,9 +277,10 @@ void lerArquivoEAlocarMemoria(sistema& sistema, barra& barra, ramo& ramo, iterat
 		initIter(sistema, iterativo);
 
 		if (readCDF(global::arq_entrada, sistema, barra, ramo)) { // l� dados do arquivo .CDF
-			printf("Deu ruim...");
+			printf("Erro ao abrir o arquivo...");
 		}
 		InitCsrPhi(sistema, ramo);
+		global::isMatpower = false;
 	}
 	else if (ext == "cdfx") {
 		lerTamanhosCDFX(global::arq_entrada, sistema); // para aloca��o din�mica das vari�veis
@@ -287,9 +291,18 @@ void lerArquivoEAlocarMemoria(sistema& sistema, barra& barra, ramo& ramo, iterat
 		initIter(sistema, iterativo);
 
 		if (readCDFX(global::arq_entrada, sistema, barra, ramo)) { // l� dados do arquivo .CDF
-			printf("Deu ruim...");
+			printf("Erro ao abrir o arquivo...");
 		}
 		InitCsrPhi(sistema, ramo);
+		global::isMatpower = false;
+	}
+	else if (ext == "m") {
+		//matlab - MatPOWER file
+
+		matPowerDataType mpData = lerMatPowerEAlocarMemoria(global::arq_entrada, sistema, barra, ramo, iterativo);
+
+		InitCsrPhi(sistema, ramo);
+		global::isMatpower = true;
 	}
 	else {
 		printf("nda == %s", ext.c_str());

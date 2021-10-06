@@ -5,7 +5,7 @@
 void InitCsrPhi(sistemaType& sistema, ramoType& ramo) {
 
 	std::vector<Eigen::Triplet<float_type>> valores;
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		valores.push_back(Eigen::Triplet<float_type>(IDX1F(ramo.de[i]), IDX1F(ramo.para[i]), ramo.phi[i]));
 	}
 
@@ -32,8 +32,8 @@ void initBranch(sistemaType &sistema, ramoType &ramo){
 	ramo.tap = (complex_type *)malloc(sistema.nL * sizeof(complex_type));
 	ramo.phi  = (float_type *)malloc(sistema.nL * sizeof(float_type));
 	
-	ramo.de	  = (unsigned int *)malloc(sistema.nL * sizeof(float_type));
-	ramo.para = (unsigned int *)malloc(sistema.nL * sizeof(float_type));
+	ramo.de	  = (int *)malloc(sistema.nL * sizeof(float_type));
+	ramo.para = (int *)malloc(sistema.nL * sizeof(float_type));
 
 	ramo.Pdp = (float_type *)malloc(sistema.nL * sizeof(float_type));
 	ramo.Qdp = (float_type *)malloc(sistema.nL * sizeof(float_type));
@@ -41,31 +41,31 @@ void initBranch(sistemaType &sistema, ramoType &ramo){
 	ramo.Qpd = (float_type *)malloc(sistema.nL * sizeof(float_type));
 
 
-	for (unsigned int i = 0; i < sistema.nL; i++){
+	for (int i = 0; i < sistema.nL; i++){
 		ramo.z[i] = _mkComplex(0., 0.);
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++){
+	for (int i = 0; i < sistema.nL; i++){
 		ramo.bsh[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++){
+	for (int i = 0; i < sistema.nL; i++){
 		ramo.tap[i] = _mkComplex(1., 0.);
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++){
+	for (int i = 0; i < sistema.nL; i++){
 		ramo.de[i] = 0;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++){
+	for (int i = 0; i < sistema.nL; i++){
 		ramo.para[i] = 0;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.Pdp[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.Qdp[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.Ppd[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nL; i++) {
+	for (int i = 0; i < sistema.nL; i++) {
 		ramo.Qpd[i] = 0.;
 	}
 }

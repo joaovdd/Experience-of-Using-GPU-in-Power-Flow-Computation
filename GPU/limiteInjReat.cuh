@@ -7,7 +7,7 @@ void chkLimQ(sistema* sistema, barra* barra, iterativo* iterativo) {
 	// prints não modificados...
 	printf("\n");
 	#pragma omp parallel for if (openmp)
-		for (unsigned short i = 0; i < sistema->nPV; i++) { // percorre barras PV
+		for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 			// Qg = Qliq - Qload
 			if ((iterativo->Qcalc[IDX1F(sistema->barrasPV[i])] + barra->Qload[IDX1F(sistema->barrasPV[i])]) < (sistema->limQinf[i] - global::tol)) {
 				if (!iterativo->limQ[i]) {
@@ -44,10 +44,10 @@ void chkLimQ(sistema* sistema, barra* barra, iterativo* iterativo) {
 // preenche vetor sistema->barrasPQlim com as barras PQ e as PV que atingiram os limites de 
 // reativos. Sempre em ordem crescente.
 void geraVetPQ(sistema* sistema, barra* barra, iterativo* iterativo) {
-	unsigned short pntPQ = 0; // aponta para a pr�xima entrada do vetor sistema->nPQ a ser copiada para sistema->barrasPQlim
-	unsigned short pntPQlim = 0; // aponta para a pr�xima entrada do vetor sistema->barrasPQlim a ser preenchida
+	int pntPQ = 0; // aponta para a pr�xima entrada do vetor sistema->nPQ a ser copiada para sistema->barrasPQlim
+	int pntPQlim = 0; // aponta para a pr�xima entrada do vetor sistema->barrasPQlim a ser preenchida
 	//#pragma omp parallel for if (openmp)
-	for (unsigned short i = 0; i < sistema->nPV; i++) { // percorre barras PV
+	for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 		if (iterativo->limQ[i]) { // encontrou o �ndice da barra PQ "novata"
 			while ((sistema->barrasPQ[pntPQ] < sistema->barrasPV[i]) && (pntPQ < sistema->nPQ)) { // j percorre barras PQ diretamente.
 																								  // enquanto forem inferiores � novata
@@ -72,7 +72,7 @@ void geraVetPQ(sistema* sistema, barra* barra, iterativo* iterativo) {
 void geraVetPV(sistema* sistema, barra* barra, iterativo* iterativo) {
 	iterativo->nPVlim = 0;
 	//#pragma omp parallel for if (openmp)
-	for (unsigned short i = 0; i < sistema->nPV; i++) { // percorre barras PV
+	for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 		if (!(iterativo->limQ[i])) {
 			iterativo->barrasPVlim[iterativo->nPVlim] = sistema->barrasPV[i];
 			iterativo->nPVlim++;
@@ -202,34 +202,34 @@ void d_attSparse(sistema& h_sistema, h_sparse& h_sparse, d_sparse& aux) {
 void initLim(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo& iterPon, iterativo* iterativo) {
 	// Barras PQ
 	#pragma omp parallel for if (openmp)
-		for (unsigned short i = 0; i < sistema->nPQ; i++) { // percorre barras PQ diretamente
+		for (int i = 0; i < sistema->nPQ; i++) { // percorre barras PQ diretamente
 			iterativo->barrasPQlim[i] = sistema->barrasPQ[i];
 		}
 	iterativo->nPQlim = sistema->nPQ;
 	iterPon.nPQlim = sistema->nPQ;
-	checkCudaErrors(cudaMemcpy(iterPon.barrasPQlim, iterativo->barrasPQlim, (sistema->nPV + sistema->nPQ) * sizeof(unsigned short), cudaMemcpyHostToDevice)); // ver transferencia device-device
+	checkCudaErrors(cudaMemcpy(iterPon.barrasPQlim, iterativo->barrasPQlim, (sistema->nPV + sistema->nPQ) * sizeof(int), cudaMemcpyHostToDevice)); // ver transferencia device-device
 
 	// Barras PV
 	#pragma omp parallel for if (openmp)
-		for (unsigned short i = 0; i < sistema->nPV; i++) { // percorre barras PV diretamente
+		for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV diretamente
 			iterativo->barrasPVlim[i] = sistema->barrasPV[i];
 		}
 	iterativo->nPVlim = sistema->nPV;
 	iterPon.nPVlim = sistema->nPV;
-	checkCudaErrors(cudaMemcpy(iterPon.barrasPVlim, iterativo->barrasPVlim, sistema->nPV * sizeof(unsigned short), cudaMemcpyHostToDevice)); // ver transferencia device-device
+	checkCudaErrors(cudaMemcpy(iterPon.barrasPVlim, iterativo->barrasPVlim, sistema->nPV * sizeof(int), cudaMemcpyHostToDevice)); // ver transferencia device-device
 
 	iterativo->ngLim = sistema->nPQ + sistema->nPQ + sistema->nPV;
 	iterPon.ngLim = sistema->nPQ + sistema->nPQ + sistema->nPV;
 
 	#pragma omp parallel for if (openmp)
-		for (unsigned short i = 0; i < sistema->nPV; i++) { // percorre barras PV diretamente
+		for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV diretamente
 			iterativo->limQ[i] = 0;
 		}
 	//checkCudaErrors(cudaMalloc(&(iterPon.limQ), h_sistema.nPV * sizeof(float_type)));
 	//checkCudaErrors(cudaMemset(iterPon.limQ, 0, h_sistema.nPV * sizeof(float_type)));
 
 	#pragma omp parallel for if (openmp)
-		for (unsigned short i = 0; i < sistema->nB; i++) {
+		for (int i = 0; i < sistema->nB; i++) {
 			iterativo->QliqLim[i] = barra->Qliq[i];
 		}
 
@@ -239,6 +239,7 @@ void initLim(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo& iter
 		//Jstencil0based(sistema, h_sparse, barra, iterativo); // calcula o estêncil da matriz jacobiano
 		//reordJac(sistema , h_sparse, barra, iterativo);
 		//Jstencil(sistema, h_sparse, barra, iterativo); // calcula o estêncil da matriz jacobiano com listas de trabalho já ordenadas para minimização da divergência
+		// Jstencil_eficiente_(sistema, h_sparse, barra, iterativo);
 		Jstencil_eficiente(sistema, h_sparse, barra, iterativo);
 	}
 }

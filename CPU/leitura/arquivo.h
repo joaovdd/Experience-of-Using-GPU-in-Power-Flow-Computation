@@ -6,5 +6,6 @@
 #include "id2i.h"
 #include "cdf.h"
 #include "pwf.h"
+#include "m.h"
 
 void lerArquivoEAlocarMemoria(sistemaType& sistema, barraType& barra, ramoType& ramo, iterativoType& iterativo);

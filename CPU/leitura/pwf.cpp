@@ -35,7 +35,7 @@ bool readPWF(sistemaType& sistema, barraType& barra, ramoType& ramo, DCTEtype& D
 
 	sistema.baseMVA = DCTE.BASE;
 
-	for (unsigned int i = 1; i <= DBAR.numero.size(); i++) {
+	for (size_t i = 1; i <= DBAR.numero.size(); i++) {
 
 		barra.id[IDX1F(i)] = DBAR.numero[IDX1F(i)];
 
@@ -94,13 +94,13 @@ bool readPWF(sistemaType& sistema, barraType& barra, ramoType& ramo, DCTEtype& D
 	sistema.nB = sistema.nPQ + sistema.nPV + 1;
 
 	sistema.nL = 0;
-	unsigned int nRamosDuplicatas = 0;
-	for (unsigned int i = 0; i < DLIN.daBarra.size(); i++) // i itera ramos
+	int nRamosDuplicatas = 0;
+	for (size_t i = 0; i < DLIN.daBarra.size(); i++) // i itera ramos
 	{
-		unsigned int auxde = id2i(DLIN.daBarra[i], sistema, barra); // atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
-		unsigned int auxpara = id2i(DLIN.paraBarra[i], sistema, barra); // atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
+		int auxde = id2i(DLIN.daBarra[i], sistema, barra); // atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
+		int auxpara = id2i(DLIN.paraBarra[i], sistema, barra); // atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
 		bool flgRamoNovo = 1;
-		unsigned int j; // j aponta número do ramo repetido
+		int j; // j aponta número do ramo repetido
 
 		for (j = 0; j < sistema.nL; j++) {
 			if ((ramo.de[j] == auxde) && (ramo.para[j] == auxpara)) {
@@ -141,7 +141,7 @@ bool readPWF(sistemaType& sistema, barraType& barra, ramoType& ramo, DCTEtype& D
 			// se valor lido é diferente do já armazenado: atenção!
 			if ((aux.x != ramo.tap[j].x) || (aux.y != ramo.tap[j].y)) {
 				if (!global::laconic_mode) {
-					printf("\nAtencao! Os parametros lidos para os transformadores de potencia das linhas de transmissão paralelas são diferentes! (linha %d)\n", i);
+					printf("\nAtencao! Os parametros lidos para os transformadores de potencia das linhas de transmissão paralelas são diferentes! (linha %zu)\n", i);
 				}
 			}
 			// impedância série
@@ -161,12 +161,12 @@ bool readPWF(sistemaType& sistema, barraType& barra, ramoType& ramo, DCTEtype& D
 		}
 	}
 
-	for (unsigned int i = 0; i < DCSC.daBarra.size(); i++) // i itera Compensadores Série Controláveis
+	for (size_t i = 0; i < DCSC.daBarra.size(); i++) // i itera Compensadores Série Controláveis
 	{
-		unsigned int auxde = id2i(DCSC.daBarra[i], sistema, barra); // atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
-		unsigned int auxpara = id2i(DCSC.paraBarra[i], sistema, barra); // atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
+		int auxde = id2i(DCSC.daBarra[i], sistema, barra); // atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
+		int auxpara = id2i(DCSC.paraBarra[i], sistema, barra); // atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
 		bool flgRamoNovo = 1;
-		unsigned int j; // j aponta número do ramo repetido
+		int j; // j aponta número do ramo repetido
 
 		for (j = 0; j < sistema.nL; j++) {
 			if ((ramo.de[j] == auxde) && (ramo.para[j] == auxpara)) {
@@ -207,7 +207,7 @@ bool readPWF(sistemaType& sistema, barraType& barra, ramoType& ramo, DCTEtype& D
 			// se valor lido é diferente do já armazenado: atenção!
 			if ((aux.x != ramo.tap[j].x) || (aux.y != ramo.tap[j].y)) {
 				if (!global::laconic_mode) {
-					printf("\nAtencao! Os parametros lidos para os transformadores de potencia das linhas de transmissão paralelas são diferentes! (linha %d)\n", i);
+					printf("\nAtencao! Os parametros lidos para os transformadores de potencia das linhas de transmissão paralelas são diferentes! (linha %zu)\n", i);
 				}
 			}
 			// impedância série
@@ -247,7 +247,7 @@ char ifBlanckSetDefault(char str, char defaultValue) {
 }
 
 // lê valor real com possibilidade de ponto decimal implícito parsePtoDecImp
-float parseFloatPtoDecImp(std::string str, unsigned int casaUnitariaDoPontoDecimalImplicito) {
+float parseFloatPtoDecImp(std::string str, int casaUnitariaDoPontoDecimalImplicito) {
 	auto aux = str.find('.');
 	if (aux != std::string::npos) {
 		return atof(str.c_str());

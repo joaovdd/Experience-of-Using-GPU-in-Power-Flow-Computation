@@ -11,13 +11,13 @@ void initIter(sistemaType &sistema, iterativoType &iterativo){
 
 	iterativo.iteracao = 0;
 	iterativo.noMax = global::no_max_iter;
-	for (unsigned int i = 0; i < sistema.nB-1; i++){
+	for (int i = 0; i < sistema.nB-1; i++){
 		iterativo.Pcalc[i] = 0.;
 	}
-	for (unsigned int i = 0; i < sistema.nPQ; i++){
+	for (int i = 0; i < sistema.nPQ; i++){
 		iterativo.Qcalc[i] = 0.;
 	}
-	//for (unsigned int i = 0; i < (sistema.nPV + sistema.nPQ + sistema.nPQ)*(sistema.nPV + sistema.nPQ + sistema.nPQ); i++){
+	//for (int i = 0; i < (sistema.nPV + sistema.nPQ + sistema.nPQ)*(sistema.nPV + sistema.nPQ + sistema.nPQ); i++){
 	//	iterativo.J[i] = 0.;
 	//}
 
@@ -26,7 +26,7 @@ void initIter(sistemaType &sistema, iterativoType &iterativo){
 
 	if (global::metodo == metodoType::denso || global::metodo == metodoType::esparsoSimples) {
 		iterativo.Jlim = (float_type*)malloc((sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * sizeof(float_type));
-		for (unsigned int i = 0; i < (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ); i++) {
+		for (int i = 0; i < (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * (sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ); i++) {
 			iterativo.Jlim[i] = 0.;
 		}
 	}
@@ -34,8 +34,8 @@ void initIter(sistemaType &sistema, iterativoType &iterativo){
 	//limite de injeção de reativos
 	iterativo.limQ = (bool*)malloc(sistema.nPV * sizeof(bool));
 	memset(iterativo.limQ, 0, sistema.nPV * sizeof(bool));
-	iterativo.barrasPVlim = (unsigned int*)malloc(sistema.nPV * sizeof(unsigned int));
-	iterativo.barrasPQlim = (unsigned int*)malloc((sistema.nPV + sistema.nPQ) * sizeof(unsigned int));
+	iterativo.barrasPVlim = (int*)malloc(sistema.nPV * sizeof(int));
+	iterativo.barrasPQlim = (int*)malloc((sistema.nPV + sistema.nPQ) * sizeof(int));
 	iterativo.QliqLim = (float_type*)malloc(sistema.nB * sizeof(float_type));
 }
 

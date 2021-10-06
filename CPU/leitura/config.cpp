@@ -19,7 +19,7 @@ void loadFile() {
 
 	// modo laconico
 	std::string aux = "laconic_mode";
-	unsigned int inicio = str.find('=', str.find(aux) + aux.size()) + 2, // fim do r�tulo + size("= ")
+	int inicio = str.find('=', str.find(aux) + aux.size()) + 2, // fim do r�tulo + size("= ")
 		fim = str.find(';', inicio);
 	aux = str.substr(inicio, fim - inicio);
 	std::string laconic_mode_aux = aux;

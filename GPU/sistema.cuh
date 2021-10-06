@@ -7,8 +7,8 @@
 #include "cusparse.h"
 #include "cusolverSp.h"
 
-void inline d_showVecf(complex_type* show, unsigned short dim);
-void d_showVecf(int* show, unsigned short dim);
+void inline d_showVecf(complex_type* show, int dim);
+void d_showVecf(int* show, int dim);
 
 sistema d_initSistema(sistema& h_sistema, sistema* d_sistema) {
 	sistema aux; // estrutura-ponteiro para d_sistema
@@ -40,11 +40,11 @@ sistema d_initSistema(sistema& h_sistema, sistema* d_sistema) {
 		break;
 	}
 
-	checkCudaErrors(cudaMalloc(&(aux.barrasPV), h_sistema.nPV * sizeof(unsigned int))); 					// barrasPV no device
-	checkCudaErrors(cudaMemset(aux.barrasPV, 0, h_sistema.nPV * sizeof(unsigned int)));
+	checkCudaErrors(cudaMalloc(&(aux.barrasPV), h_sistema.nPV * sizeof(int))); 					// barrasPV no device
+	checkCudaErrors(cudaMemset(aux.barrasPV, 0, h_sistema.nPV * sizeof(int)));
 
-	checkCudaErrors(cudaMalloc(&(aux.barrasPQ), h_sistema.nPQ * sizeof(unsigned int))); 					// barrasPQ no device
-	checkCudaErrors(cudaMemset(aux.barrasPQ, 0, h_sistema.nPQ * sizeof(unsigned int)));
+	checkCudaErrors(cudaMalloc(&(aux.barrasPQ), h_sistema.nPQ * sizeof(int))); 					// barrasPQ no device
+	checkCudaErrors(cudaMemset(aux.barrasPQ, 0, h_sistema.nPQ * sizeof(int)));
 
 	//limite de injeção de reativos
 	//checkCudaErrors(cudaMalloc(&(aux.limQinf), h_sistema.nPV * sizeof(float_type)));
@@ -82,9 +82,9 @@ void sistemacpyH2D(sistema& h_sistema, sistema* d_sistema, sistema& aux) {
 	aux.nB = h_sistema.nB;
 	aux.nL = h_sistema.nL;
 
-	checkCudaErrors(cudaMemcpy(aux.barrasPV, h_sistema.barrasPV, h_sistema.nPV * sizeof(unsigned int), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(aux.barrasPV, h_sistema.barrasPV, h_sistema.nPV * sizeof(int), cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMemcpy(aux.barrasPQ, h_sistema.barrasPQ, h_sistema.nPQ * sizeof(unsigned int), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(aux.barrasPQ, h_sistema.barrasPQ, h_sistema.nPQ * sizeof(int), cudaMemcpyHostToDevice));
 
 	switch (global::metodoDeCalculoDeYbus) {
 	case metodoDeCalculoDeYbus::dnCPU:
@@ -97,7 +97,7 @@ void sistemacpyH2D(sistema& h_sistema, sistema* d_sistema, sistema& aux) {
 	case metodoDeCalculoDeYbus::spCPU:
 		checkCudaErrors(cudaMemcpy(aux.csrColIndY, h_sistema.csrColIndY, h_sistema.nnzY * sizeof(int), cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(aux.csrRowPtrY, h_sistema.csrRowPtrY, (h_sistema.nB + 1) * sizeof(int), cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(aux.cooRowIndY, h_sistema.cooRowIndY, h_sistema.nnzY * sizeof(int), cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(aux.cooRowIndY, h_sistema.cooRowIndY, h_sistema.nnzY * sizeof(int), cudaMemcpyHostToDevice)); // dd
 
 		checkCudaErrors(cudaMemcpy(aux.spYval, h_sistema.spYval, h_sistema.nnzY * sizeof(complex_type), cudaMemcpyHostToDevice));
 
@@ -125,10 +125,10 @@ void sistemacpyH2D(sistema& h_sistema, sistema* d_sistema, sistema& aux) {
 
 void sistemacpyD2H(sistema &h_sistema, sistema *d_sistema, sistema &aux){
 	 // copia valores para o host
-//	checkCudaErrors(cudaMemcpy(&(d_sistema->nPV), &(h_sistema.nPV), sizeof(unsigned int), cudaMemcpyDeviceToHost));
-//	checkCudaErrors(cudaMemcpy(&(d_sistema->nPQ), &(h_sistema.nPQ), sizeof(unsigned int), cudaMemcpyDeviceToHost));
-//	checkCudaErrors(cudaMemcpy(&(d_sistema->nB) , &(h_sistema.nB) , sizeof(unsigned int), cudaMemcpyDeviceToHost));
-//	checkCudaErrors(cudaMemcpy(&(d_sistema->nL) , &(h_sistema.nL) , sizeof(unsigned int), cudaMemcpyDeviceToHost));
+//	checkCudaErrors(cudaMemcpy(&(d_sistema->nPV), &(h_sistema.nPV), sizeof(int), cudaMemcpyDeviceToHost));
+//	checkCudaErrors(cudaMemcpy(&(d_sistema->nPQ), &(h_sistema.nPQ), sizeof(int), cudaMemcpyDeviceToHost));
+//	checkCudaErrors(cudaMemcpy(&(d_sistema->nB) , &(h_sistema.nB) , sizeof(int), cudaMemcpyDeviceToHost));
+//	checkCudaErrors(cudaMemcpy(&(d_sistema->nL) , &(h_sistema.nL) , sizeof(int), cudaMemcpyDeviceToHost));
 
 	checkCudaErrors(cudaMemcpy(&(aux), d_sistema , sizeof(sistema), cudaMemcpyDeviceToHost));
 	checkCudaErrors(cudaMemcpy(h_sistema.Y, aux.Y, h_sistema.nB*h_sistema.nB * sizeof(complex_type), cudaMemcpyDeviceToHost));
@@ -314,11 +314,11 @@ ramo d_initRamo(sistema &h_sistema, ramo& h_ramo, ramo* d_ramo){
 	//checkCudaErrors(cudaMalloc(&(aux.I), h_sistema.nL * sizeof(float_type)));
 	//checkCudaErrors(cudaMemset(aux.I, 0, h_sistema.nL * sizeof(float_type)));
 
-	checkCudaErrors(cudaMalloc(&(aux.de), h_sistema.nL * sizeof(unsigned int)));
-	checkCudaErrors(cudaMemset(aux.de, 0, h_sistema.nL * sizeof(unsigned int)));
+	checkCudaErrors(cudaMalloc(&(aux.de), h_sistema.nL * sizeof(int)));
+	checkCudaErrors(cudaMemset(aux.de, 0, h_sistema.nL * sizeof(int)));
 
-	checkCudaErrors(cudaMalloc(&(aux.para), h_sistema.nL * sizeof(unsigned int)));
-	checkCudaErrors(cudaMemset(aux.para, 0, h_sistema.nL * sizeof(unsigned int)));
+	checkCudaErrors(cudaMalloc(&(aux.para), h_sistema.nL * sizeof(int)));
+	checkCudaErrors(cudaMemset(aux.para, 0, h_sistema.nL * sizeof(int)));
 
 	checkCudaErrors(cudaMemcpy(d_ramo, &aux, sizeof(ramo), cudaMemcpyHostToDevice)); // copia endereços para a estrutura na GPU
 
@@ -365,8 +365,8 @@ void ramocpyH2D(sistema &h_sistema, ramo &h_ramo, ramo *d_ramo, ramo aux){ // au
 	checkCudaErrors(cudaMemcpy(aux.Qpd,   h_ramo.Qpd,   h_sistema.nL * sizeof(float_type),          cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(aux.Qdp,   h_ramo.Qdp,   h_sistema.nL * sizeof(float_type),          cudaMemcpyHostToDevice));
 
-	checkCudaErrors(cudaMemcpy(aux.de,   h_ramo.de,   h_sistema.nL * sizeof(unsigned int), cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(aux.para, h_ramo.para, h_sistema.nL * sizeof(unsigned int), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(aux.de,   h_ramo.de,   h_sistema.nL * sizeof(int), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(aux.para, h_ramo.para, h_sistema.nL * sizeof(int), cudaMemcpyHostToDevice));
 }
 
 void ramocpyD2H(sistema &h_sistema, ramo &h_ramo, ramo *d_ramo, ramo aux){ // aux é estrutura-ponteiro para o d_ramo alocado
@@ -382,8 +382,8 @@ void ramocpyD2H(sistema &h_sistema, ramo &h_ramo, ramo *d_ramo, ramo aux){ // au
 	checkCudaErrors(cudaMemcpy(aux.Qpd,   h_ramo.Qpd,   h_sistema.nL * sizeof(float_type),          cudaMemcpyDeviceToHost));
 	checkCudaErrors(cudaMemcpy(aux.Qdp,   h_ramo.Qdp,   h_sistema.nL * sizeof(float_type),          cudaMemcpyDeviceToHost));
 
-	checkCudaErrors(cudaMemcpy(h_ramo.de,   aux.de,   h_sistema.nL * sizeof(unsigned int), cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(h_ramo.para, aux.para, h_sistema.nL * sizeof(unsigned int), cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(h_ramo.de,   aux.de,   h_sistema.nL * sizeof(int), cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(h_ramo.para, aux.para, h_sistema.nL * sizeof(int), cudaMemcpyDeviceToHost));
 }
 
 iterativo d_initIter(sistema &h_sistema, iterativo *d_iterativo){
@@ -414,8 +414,8 @@ iterativo d_initIter(sistema &h_sistema, iterativo *d_iterativo){
 	aux.noMax = 0;
 
 	//limite de injecao de reativos
-	checkCudaErrors(cudaMalloc(&(aux.barrasPQlim), (h_sistema.nPV + h_sistema.nPQ) * sizeof(unsigned short))); // aloca memória na GPU e armazena endereço em aux
-	checkCudaErrors(cudaMalloc(&(aux.barrasPVlim), h_sistema.nPV * sizeof(unsigned short))); // aloca memória na GPU e armazena endereço em aux
+	checkCudaErrors(cudaMalloc(&(aux.barrasPQlim), (h_sistema.nPV + h_sistema.nPQ) * sizeof(int))); // aloca memória na GPU e armazena endereço em aux
+	checkCudaErrors(cudaMalloc(&(aux.barrasPVlim), h_sistema.nPV * sizeof(int))); // aloca memória na GPU e armazena endereço em aux
 
 	checkCudaErrors(cudaMalloc(&(aux.gLim), (h_sistema.nB - 1) * 2 * sizeof(float_type))); // aloca memória na GPU e armazena endereço em aux
 	checkCudaErrors(cudaMemset(aux.gLim, 0, (h_sistema.nB - 1) * 2 * sizeof(float_type)));
@@ -446,8 +446,8 @@ void d_finIter(iterativo* d_iterativo, iterativo aux){
 void itercpyH2D(sistema &h_sistema, iterativo &h_iterativo, iterativo *d_iterativo, iterativo &aux){
 	//checkCudaErrors(cudaMemcpy(aux.z,   h_ramo.z,   h_sistema.nL * sizeof(complex_type), cudaMemcpyDeviceToHost));
 
-	//checkCudaErrors(cudaMemcpy(&(d_iterativo->iteracao), &(h_iterativo.iteracao), sizeof(unsigned int), cudaMemcpyHostToDevice));
-	//checkCudaErrors(cudaMemcpy(&(d_iterativo->noMax),	 &(h_iterativo.noMax),	  sizeof(unsigned int), cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMemcpy(&(d_iterativo->iteracao), &(h_iterativo.iteracao), sizeof(int), cudaMemcpyHostToDevice));
+	//checkCudaErrors(cudaMemcpy(&(d_iterativo->noMax),	 &(h_iterativo.noMax),	  sizeof(int), cudaMemcpyHostToDevice));
 
 	aux.iteracao = h_iterativo.iteracao;
 	aux.noMax    = h_iterativo.noMax;
@@ -493,63 +493,63 @@ void itercpyD2H(sistema &h_sistema, iterativo &h_iterativo, iterativo *d_iterati
 
 
 
-__global__ void d_printAll(sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo){
-	printf("printAll: d_sistema->Y        = %p\n", d_sistema->Y);
-	printf("printAll: d_sistema->barrasPV = %p\n", d_sistema->barrasPV);
-	printf("printAll: d_sistema->barrasPQ = %p\n\n", d_sistema->barrasPQ);
+// __global__ void d_printAll(sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo){
+// 	printf("printAll: d_sistema->Y        = %p\n", d_sistema->Y);
+// 	printf("printAll: d_sistema->barrasPV = %p\n", d_sistema->barrasPV);
+// 	printf("printAll: d_sistema->barrasPQ = %p\n\n", d_sistema->barrasPQ);
 
-	printf("printAll: d_barra->V     = %p\n", d_barra->V);
-	printf("printAll: d_barra->theta = %p\n", d_barra->theta);
-	printf("printAll: d_barra->Pliq  = %p\n", d_barra->Pliq);
-	printf("printAll: d_barra->Qliq  = %p\n", d_barra->Qliq);
-	printf("printAll: d_barra->Pload = %p\n", d_barra->Pload);
-	printf("printAll: d_barra->Qload = %p\n", d_barra->Qload);
-	printf("printAll: d_barra->Pg    = %p\n", d_barra->Pg);
-	printf("printAll: d_barra->Qg    = %p\n", d_barra->Qg);
-	printf("printAll: d_barra->Vbase = %p\n", d_barra->Vbase);
-	printf("printAll: d_barra->gsh   = %p\n", d_barra->gsh);
-	printf("printAll: d_barra->bsh   = %p\n\n", d_barra->bsh);
+// 	printf("printAll: d_barra->V     = %p\n", d_barra->V);
+// 	printf("printAll: d_barra->theta = %p\n", d_barra->theta);
+// 	printf("printAll: d_barra->Pliq  = %p\n", d_barra->Pliq);
+// 	printf("printAll: d_barra->Qliq  = %p\n", d_barra->Qliq);
+// 	printf("printAll: d_barra->Pload = %p\n", d_barra->Pload);
+// 	printf("printAll: d_barra->Qload = %p\n", d_barra->Qload);
+// 	printf("printAll: d_barra->Pg    = %p\n", d_barra->Pg);
+// 	printf("printAll: d_barra->Qg    = %p\n", d_barra->Qg);
+// 	printf("printAll: d_barra->Vbase = %p\n", d_barra->Vbase);
+// 	printf("printAll: d_barra->gsh   = %p\n", d_barra->gsh);
+// 	printf("printAll: d_barra->bsh   = %p\n\n", d_barra->bsh);
 
-	printf("printAll: &(d_barra->V)     = %p\n", &(d_barra->V));
-	printf("printAll: &(d_barra->theta) = %p\n", &(d_barra->theta));
-	printf("printAll: &(d_barra->Pliq)  = %p\n", &(d_barra->Pliq));
-	printf("printAll: &(d_barra->Qliq)  = %p\n", &(d_barra->Qliq));
-	printf("printAll: &(d_barra->Pload) = %p\n", &(d_barra->Pload));
-	printf("printAll: &(d_barra->Qload) = %p\n", &(d_barra->Qload));
-	printf("printAll: &(d_barra->Pg)    = %p\n", &(d_barra->Pg));
-	printf("printAll: &(d_barra->Qg)    = %p\n", &(d_barra->Qg));
-	printf("printAll: &(d_barra->Vbase) = %p\n", &(d_barra->Vbase));
-	printf("printAll: &(d_barra->gsh)   = %p\n", &(d_barra->gsh));
-	printf("printAll: &(d_barra->bsh)   = %p\n\n", &(d_barra->bsh));
+// 	printf("printAll: &(d_barra->V)     = %p\n", &(d_barra->V));
+// 	printf("printAll: &(d_barra->theta) = %p\n", &(d_barra->theta));
+// 	printf("printAll: &(d_barra->Pliq)  = %p\n", &(d_barra->Pliq));
+// 	printf("printAll: &(d_barra->Qliq)  = %p\n", &(d_barra->Qliq));
+// 	printf("printAll: &(d_barra->Pload) = %p\n", &(d_barra->Pload));
+// 	printf("printAll: &(d_barra->Qload) = %p\n", &(d_barra->Qload));
+// 	printf("printAll: &(d_barra->Pg)    = %p\n", &(d_barra->Pg));
+// 	printf("printAll: &(d_barra->Qg)    = %p\n", &(d_barra->Qg));
+// 	printf("printAll: &(d_barra->Vbase) = %p\n", &(d_barra->Vbase));
+// 	printf("printAll: &(d_barra->gsh)   = %p\n", &(d_barra->gsh));
+// 	printf("printAll: &(d_barra->bsh)   = %p\n\n", &(d_barra->bsh));
 
-	printf("printAll: sizeof(d_barra->V)     = %p\n", sizeof(d_barra->V));
-	printf("printAll: sizeof(d_barra->theta) = %p\n", sizeof(d_barra->theta));
-	printf("printAll: sizeof(d_barra->Pliq)  = %p\n", sizeof(d_barra->Pliq));
-	printf("printAll: sizeof(d_barra->Qliq)  = %p\n", sizeof(d_barra->Qliq));
-	printf("printAll: sizeof(d_barra->Pload) = %p\n", sizeof(d_barra->Pload));
-	printf("printAll: sizeof(d_barra->Qload) = %p\n", sizeof(d_barra->Qload));
-	printf("printAll: sizeof(d_barra->Pg)    = %p\n", sizeof(d_barra->Pg));
-	printf("printAll: sizeof(d_barra->Qg)    = %p\n", sizeof(d_barra->Qg));
-	printf("printAll: sizeof(d_barra->Vbase) = %p\n", sizeof(d_barra->Vbase));
-	printf("printAll: sizeof(d_barra->gsh)   = %p\n", sizeof(d_barra->gsh));
-	printf("printAll: sizeof(d_barra->bsh)   = %p\n\n", sizeof(d_barra->bsh));
+// 	printf("printAll: sizeof(d_barra->V)     = %p\n", sizeof(d_barra->V));
+// 	printf("printAll: sizeof(d_barra->theta) = %p\n", sizeof(d_barra->theta));
+// 	printf("printAll: sizeof(d_barra->Pliq)  = %p\n", sizeof(d_barra->Pliq));
+// 	printf("printAll: sizeof(d_barra->Qliq)  = %p\n", sizeof(d_barra->Qliq));
+// 	printf("printAll: sizeof(d_barra->Pload) = %p\n", sizeof(d_barra->Pload));
+// 	printf("printAll: sizeof(d_barra->Qload) = %p\n", sizeof(d_barra->Qload));
+// 	printf("printAll: sizeof(d_barra->Pg)    = %p\n", sizeof(d_barra->Pg));
+// 	printf("printAll: sizeof(d_barra->Qg)    = %p\n", sizeof(d_barra->Qg));
+// 	printf("printAll: sizeof(d_barra->Vbase) = %p\n", sizeof(d_barra->Vbase));
+// 	printf("printAll: sizeof(d_barra->gsh)   = %p\n", sizeof(d_barra->gsh));
+// 	printf("printAll: sizeof(d_barra->bsh)   = %p\n\n", sizeof(d_barra->bsh));
 
-	printf("printAll: d_ramo->z    = %p\n", d_ramo->z);
-	printf("printAll: d_ramo->bsh  = %p\n", d_ramo->bsh);
-	printf("printAll: d_ramo->tap  = %p\n", d_ramo->tap);
-	printf("printAll: d_ramo->de   = %p\n", d_ramo->de);
-	printf("printAll: d_ramo->para = %p\n\n", d_ramo->para);
+// 	printf("printAll: d_ramo->z    = %p\n", d_ramo->z);
+// 	printf("printAll: d_ramo->bsh  = %p\n", d_ramo->bsh);
+// 	printf("printAll: d_ramo->tap  = %p\n", d_ramo->tap);
+// 	printf("printAll: d_ramo->de   = %p\n", d_ramo->de);
+// 	printf("printAll: d_ramo->para = %p\n\n", d_ramo->para);
 
-	printf("printAll: d_iterativo->Pcalc  = %p\n", d_iterativo->Pcalc);
-	printf("printAll: d_iterativo->Qcalc  = %p\n", d_iterativo->Qcalc);
-	//printf("printAll: d_iterativo->g      = %p\n", d_iterativo->g);
-	//printf("printAll: d_iterativo->deltaQ = %p\n", d_iterativo->deltaQ);
-	//printf("printAll: d_iterativo->J      = %p\n\n", d_iterativo->J);
-	printf("printAll: d_iterativo->noMax = %d\n", d_iterativo->noMax);
-	printf("printAll: d_iterativo->iteracao = %d\n", d_iterativo->iteracao);
-}
+// 	printf("printAll: d_iterativo->Pcalc  = %p\n", d_iterativo->Pcalc);
+// 	printf("printAll: d_iterativo->Qcalc  = %p\n", d_iterativo->Qcalc);
+// 	//printf("printAll: d_iterativo->g      = %p\n", d_iterativo->g);
+// 	//printf("printAll: d_iterativo->deltaQ = %p\n", d_iterativo->deltaQ);
+// 	//printf("printAll: d_iterativo->J      = %p\n\n", d_iterativo->J);
+// 	printf("printAll: d_iterativo->noMax = %d\n", d_iterativo->noMax);
+// 	printf("printAll: d_iterativo->iteracao = %d\n", d_iterativo->iteracao);
+// }
 
-void printbarra(barra* d_barra){
+void printbarra(barra* d_barra) {
 	printf("printBarra: &(d_barra->V)     = %p\n", &(d_barra->V));
 	printf("printBarra: &(d_barra->theta) = %p\n", &(d_barra->theta));
 	printf("printBarra: &(d_barra->Pliq)  = %p\n", &(d_barra->Pliq));

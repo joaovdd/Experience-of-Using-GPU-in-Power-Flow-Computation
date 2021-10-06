@@ -10,14 +10,14 @@
 using namespace std;
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showVec(float_type* show, unsigned int dim, unsigned int prec){
+void showVec(float_type* show, int dim, int prec){
 	std::cout.unsetf(std::ios::floatfield);
 	std::cout.setf(std::ios::fixed, std::ios::floatfield);
 	std::cout.precision(prec);
 
 	cout << '[' << show[0] << endl;
 
-	for (unsigned int i = 1; i < dim - 1; i++){
+	for (int i = 1; i < dim - 1; i++){
 		cout << ' ' << show[i] << endl;
 	}
 
@@ -25,14 +25,14 @@ void showVec(float_type* show, unsigned int dim, unsigned int prec){
 }
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showVec(unsigned int* show, unsigned int dim, unsigned int prec){
+void showVec(int* show, int dim, int prec){
 	std::cout.unsetf(std::ios::floatfield);
 	std::cout.setf(std::ios::fixed, std::ios::floatfield);
 	std::cout.precision(prec);
 
 	cout << '[' << show[0] << endl;
 
-	for (unsigned int i = 1; i < dim - 1; i++){
+	for (int i = 1; i < dim - 1; i++){
 		cout << ' ' << show[i] << endl;
 	}
 
@@ -40,29 +40,14 @@ void showVec(unsigned int* show, unsigned int dim, unsigned int prec){
 }
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showVec(unsigned short* show, unsigned short dim, unsigned short prec) {
-	std::cout.unsetf(std::ios::floatfield);
-	std::cout.setf(std::ios::fixed, std::ios::floatfield);
-	std::cout.precision(prec);
-
-	cout << '[' << show[0] << endl;
-
-	for (unsigned short i = 1; i < dim - 1; i++) {
-		cout << ' ' << show[i] << endl;
-	}
-
-	cout << ' ' << show[dim - 1] << ']' << endl;
-}
-
-//      o que mostrar, dimens�o, no de casas decimais
-void showVec(bool* show, unsigned short dim, unsigned short prec) {
+void showVec(bool* show, int dim, int prec) {
 	//std::cout.unsetf(std::ios::floatfield);
 	//std::cout.setf(std::ios::fixed, std::ios::floatfield);
 	//std::cout.precision(prec);
 
 	cout << '[' << show[0] << endl;
 
-	for (unsigned short i = 1; i < dim - 1; i++) {
+	for (int i = 1; i < dim - 1; i++) {
 		cout << ' ' << show[i] << endl;
 	}
 
@@ -70,14 +55,14 @@ void showVec(bool* show, unsigned short dim, unsigned short prec) {
 }
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showVecR(complex_type* show, unsigned int dim, unsigned int prec){
+void showVecR(complex_type* show, int dim, int prec){
 	std::cout.unsetf(std::ios::floatfield);
 	std::cout.setf(std::ios::fixed, std::ios::floatfield);
 	std::cout.precision(prec);
 
 	cout << '[' << show[0].x << endl;
 
-	for (unsigned int i = 1; i < dim - 1; i++){
+	for (int i = 1; i < dim - 1; i++){
 		cout << ' ' << show[i].x << endl;
 	}
 
@@ -85,25 +70,25 @@ void showVecR(complex_type* show, unsigned int dim, unsigned int prec){
 }
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showVecI(complex_type* show, unsigned int dim, unsigned int prec){
+void showVecI(complex_type* show, int dim, int prec){
 	std::cout.unsetf(std::ios::floatfield);
 	std::cout.setf(std::ios::fixed, std::ios::floatfield);
 	std::cout.precision(prec);
 
 	cout << '[' << show[0].y << endl;
 
-	for (unsigned int i = 1; i < dim - 1; i++){
+	for (int i = 1; i < dim - 1; i++){
 		cout << ' ' << show[i].y << endl;
 	}
 
 	cout << ' ' << show[dim - 1].y << ']' << endl;
 }
 
-void showMatRI(const complex_type* show, const unsigned short dim) {
+void showMatRI(const complex_type* show, const int dim) {
 	printf("\nRe=\n[");
 
-	for (unsigned short j = 0; j < dim; j++) {
-		for (unsigned short i = 0; i < dim; i++) {
+	for (int j = 0; j < dim; j++) {
+		for (int i = 0; i < dim; i++) {
 			printf("%8.4f ", show[j + i * dim].x);
 		}
 		printf("\n ");
@@ -112,8 +97,8 @@ void showMatRI(const complex_type* show, const unsigned short dim) {
 
 	printf("\nIm=\n[");
 
-	for (unsigned short j = 0; j < dim; j++) {
-		for (unsigned short i = 0; i < dim; i++) {
+	for (int j = 0; j < dim; j++) {
+		for (int i = 0; i < dim; i++) {
 			printf("%8.4f ", show[j + i * dim].y);
 		}
 		printf("\n ");
@@ -123,14 +108,14 @@ void showMatRI(const complex_type* show, const unsigned short dim) {
 
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showVec(complex_type* show, unsigned int dim, unsigned int prec){
+void showVec(complex_type* show, int dim, int prec){
 	std::cout.unsetf(std::ios::floatfield);
 	std::cout.setf(std::ios::fixed, std::ios::floatfield);
 	std::cout.precision(prec);
 
 	cout << '[' << show[0].x << " + j*" << show[0].y << endl;
 
-	for (unsigned int i = 1; i < dim - 1; i++){
+	for (int i = 1; i < dim - 1; i++){
 		cout << ' ' << show[i].x << " + j*" << show[i].y << endl;
 	}
 
@@ -138,15 +123,15 @@ void showVec(complex_type* show, unsigned int dim, unsigned int prec){
 }
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showMatI(complex_type* show, unsigned int dim, unsigned int prec){
+void showMatI(complex_type* show, int dim, int prec){
 	std::cout.unsetf(std::ios::floatfield);
 	std::cout.setf(std::ios::fixed, std::ios::floatfield);
 	std::cout.precision(prec);
 
 	cout << '[' << show[0].y;
 
-	for (unsigned int j = 1; j < dim; j++){
-    	for (unsigned int i = 1; i < dim; i++){
+	for (int j = 1; j < dim; j++){
+    	for (int i = 1; i < dim; i++){
 	    	cout << ' ' << show[j+i*dim].y;
 	    }
 		cout << endl;
@@ -155,15 +140,15 @@ void showMatI(complex_type* show, unsigned int dim, unsigned int prec){
 }
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showMatR(complex_type* show, unsigned int dim, unsigned int prec){
+void showMatR(complex_type* show, int dim, int prec){
 	std::cout.unsetf(std::ios::floatfield);
 	std::cout.setf(std::ios::fixed, std::ios::floatfield);
 	std::cout.precision(prec);
 
 	cout << '[' << show[0].y;
 
-	for (unsigned int j = 1; j < dim; j++){
-    	for (unsigned int i = 1; i < dim; i++){
+	for (int j = 1; j < dim; j++){
+    	for (int i = 1; i < dim; i++){
 	    	cout << ' ' << show[j+i*dim].x;
 	    }
 		cout << endl;
@@ -172,11 +157,11 @@ void showMatR(complex_type* show, unsigned int dim, unsigned int prec){
 }
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showMat(const complex_type* show, const unsigned int dim){
+void showMat(const complex_type* show, const int dim){
 	printf("\n[");
 
-	for (unsigned int j = 0; j < dim; j++){
-    	for (unsigned int i = 0; i < dim; i++){
+	for (int j = 0; j < dim; j++){
+    	for (int i = 0; i < dim; i++){
     		printf("(%7.3f + j*%7.3f) ", show[j+i*dim].x ,show[j+i*dim].y);
 	    }
 		printf("\n ");
@@ -185,11 +170,11 @@ void showMat(const complex_type* show, const unsigned int dim){
 }
 
 //      o que mostrar, dimens�o, no de casas decimais
-void showMat(const float_type* show, const unsigned int dim){
+void showMat(const float_type* show, const int dim){
 	printf("\n[");
 
-	for (unsigned int j = 0; j < dim; j++){
-    	for (unsigned int i = 0; i < dim; i++){
+	for (int j = 0; j < dim; j++){
+    	for (int i = 0; i < dim; i++){
     		printf("%5.1f ", show[j+i*dim]);
 	    }
 		printf("\n ");
@@ -203,47 +188,55 @@ void printAll(sistema &sistema, barra &barra, ramo &ramo){
 	cout << "nPV = " << sistema.nPV << endl;
 	cout << "nl  = " << sistema.nL << endl;
 
-	cout << "Pload:" << endl;
-	showVec(barra.Pload, sistema.nB, 1);
-	cout << "Qload:" << endl;
-	showVec(barra.Qload, sistema.nB, 1);
-	cout << "Pg:" << endl;
-	showVec(barra.Pg, sistema.nB, 1);
-	cout << "Qg:" << endl;
-	showVec(barra.Qg, sistema.nB, 1);
-	cout << "VBase:" << endl;
-	showVec(barra.Vbase, sistema.nB, 1);
-	cout << "Vb:" << endl;
-	showVec(barra.V, sistema.nB, 5);
-	cout << "bsh:" << endl;
-	showVec(barra.bsh, sistema.nB, 1);
-	cout << "gsh:" << endl;
-	showVec(barra.gsh, sistema.nB, 1);
+	std::cout << "Pload:" << std::endl;
+	showVec(barra.Pload, sistema.nB, 4);
+	std::cout << "Qload:" << std::endl;
+	showVec(barra.Qload, sistema.nB, 4);
+	std::cout << "Pg:" << std::endl;
+	showVec(barra.Pg, sistema.nB, 4);
+	std::cout << "Qg:" << std::endl;
+	showVec(barra.Qg, sistema.nB, 4);
+	std::cout<< "Pliq:" << std::endl;
+	showVec(barra.Pliq, sistema.nB, 4);
+	std::cout<< "Qliq:" << std::endl;
+	showVec(barra.Qliq, sistema.nB, 4);
+	std::cout << "VBase:" << std::endl;
+	showVec(barra.Vbase, sistema.nB, 4);
+	std::cout << "V:" << std::endl;
+	showVec(barra.V, sistema.nB, 4);
+	std::cout<< "theta:" << std::endl;
+	showVec(barra.theta, sistema.nB, 4);
+	std::cout << "bsh:" << std::endl;
+	showVec(barra.bsh, sistema.nB, 4);
+	std::cout << "gsh:" << std::endl;
+	showVec(barra.gsh, sistema.nB, 4);
 	
-	cout << "de:" << endl;
-	showVec(ramo.de, sistema.nL, 1);
-	cout << "para:" << endl;
-	showVec(ramo.para, sistema.nL, 1);
-	cout << "bsh:" << endl;
-	showVec(ramo.bsh, sistema.nL, 1);
+	std::cout << "de:" << std::endl;
+	showVec(ramo.de, sistema.nL, 4);
+	std::cout << "para:" << std::endl;
+	showVec(ramo.para, sistema.nL, 4);
+	std::cout << "bsh(ramo):" << std::endl;
+	showVec(ramo.bsh, sistema.nL, 4);
+	std::cout<< "phi(trafo):" << std::endl;
+	showVec(ramo.phi, sistema.nL, 4);
 	
-	cout << "z:" << endl;	
+	std::cout << "z:" << std::endl;	
 	showVec(ramo.z, sistema.nL, 4);
 	//cout << "r:" << endl;
 	//showVecR(ramo.z, nl, 4);
 	//cout << "x:" << endl;
 	//showVecI(ramo.z, nl, 4);
 	//cout << "tap (Re):" << endl;
-	//showVecR(ramo.tap, nl, 1);
+	//showVecR(ramo.tap, nl, 4);
 	//cout << "tap (Im):" << endl;
-	//showVecI(ramo.tap, nl, 1);
-	cout << "tap :" << endl;
-	showVec(ramo.tap, sistema.nL, 1);
-	cout << "barrasPV :" << endl;
-	showVec(sistema.barrasPV, sistema.nPV, 1);
-	cout << "barrasPQ :" << endl;
-	showVec(sistema.barrasPQ, sistema.nPQ, 1);
-	cout << "barraVO : " << sistema.barraVO << endl;
+	//showVecI(ramo.tap, nl, 4);
+	std::cout << "tap :" << std::endl;
+	showVec(ramo.tap, sistema.nL, 4);
+	std::cout << "barrasPV :" << std::endl;
+	showVec(sistema.barrasPV, sistema.nPV, 4);
+	std::cout << "barrasPQ :" << std::endl;
+	showVec(sistema.barrasPQ, sistema.nPQ, 4);
+	std::cout << "barraVO : " << sistema.barraVO << std::endl;
 
 
 //	cout << "Ybus (Re):" << endl;

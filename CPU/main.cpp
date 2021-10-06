@@ -25,7 +25,7 @@
 
 #include "benchmarks.h"
 
-// ATENÇÃO: limite de sistemas de 65.535 barras pelo uso de unsigned int
+// ATENÇÃO: limite de sistemas de 65.535 barras pelo uso de int
 // Bug: barra swing do método esparso não pode ser a última!
 
 //#define JACOBIANO_ESPARSO_STENCIL true // ativar apenas um dos modos de cálculo do jacobiano -> no arquivo global.h
@@ -62,8 +62,8 @@ int main()
 		case esparso:
 		{ BENCHMARK_ADMITANCIA
 			//calcYbusSp(sistema, barra, ramo);
-			calcYbusSp_eficinte(sistema, barra, ramo);
-			//calcYbusSp_Matpower(sistema, barra, ramo);
+			//calcYbusSp_eficinte(sistema, barra, ramo);
+			calcYbusSp_Matpower(sistema, barra, ramo);
 			//std::cout << *sistema.spY << std::endl;
 			break;
 		}
@@ -120,6 +120,11 @@ int main()
 				break;
 			case esparso:
 				SpCalcFlux(&sistema, &barra, &ramo);
+				break;
+			case hibridoA:
+			case hibridoB:
+			case nda:
+			default:
 				break;
 			}
 		}

@@ -22,13 +22,13 @@ enum subMatJ {
 };
 
 struct sistemaType {
-	unsigned int* barrasPV;//[NPV]; // indexador simples (iterador)
-	unsigned int nPV;// = 0;
-	unsigned int* barrasPQ;//[NPQ]; // indexador simples (iterador)
-	unsigned int nPQ;// = 0;
-	unsigned int barraVO;// = 0;
-	unsigned int nB;
-	unsigned int nL;
+	int* barrasPV;//[NPV]; // indexador simples (iterador)
+	int nPV;// = 0;
+	int* barrasPQ;//[NPQ]; // indexador simples (iterador)
+	int nPQ;// = 0;
+	int barraVO;// = 0;
+	int nB;
+	int nL;
 	float_type baseMVA;
 
 	complex_type* Y;//[NB*NB]; // elementos da matriz admitância (via IDX2F)

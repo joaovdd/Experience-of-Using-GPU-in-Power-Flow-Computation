@@ -64,7 +64,7 @@ enum class output_benchmarkType {
 
 namespace global {
 	float_type v_inicial = 1.0, theta_inicial = 0.0;
-	unsigned short no_max_iter = 100;
+	int no_max_iter = 100;
 	float_type tol = 0.0001;
 	std::string arq_entrada = "ieee14.cdf";
 	bool verbose_mode = 0;
@@ -83,6 +83,8 @@ namespace global {
 	bool streams = true;
 
 	bool CPUsolverFlg = false;
+
+	bool isMatpower = false;
 }
 
 void loadFile() {
@@ -102,7 +104,7 @@ void loadFile() {
 
 	// modo de benchmark
 	std::string aux = "laconic_mode";
-	unsigned short inicio = str.find('=', str.find(aux) + aux.size()) + 2, // fim do r�tulo + size("= ")
+	int inicio = str.find('=', str.find(aux) + aux.size()) + 2, // fim do r�tulo + size("= ")
 		              fim = str.find(';', inicio);
 	aux = str.substr(inicio, fim - inicio);
 	std::string laconic_mode_aux = aux;

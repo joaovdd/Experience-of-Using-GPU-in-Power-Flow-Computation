@@ -38,8 +38,8 @@
 
 struct DBARtype
 {
-	//unsigned int numBarra = 0;
-	std::vector<unsigned int> numero;
+	//int numBarra = 0;
+	std::vector<int> numero;
 	std::vector<char> operacao;
 	std::vector<char> estado;
 	std::vector<char> tipo;
@@ -58,7 +58,7 @@ struct DBARtype
 	std::vector<float> cargaAtiva;
 	std::vector<float> cargaReativa;
 	std::vector<float> capacitorReator;
-	std::vector<unsigned int> area;
+	std::vector<int> area;
 	std::vector<float> tensaoParaDefinicaoDeCarga;
 	std::vector<float> modoDeVisualizacao;
 	std::vector<std::vector<char>> agregadores;
@@ -66,11 +66,11 @@ struct DBARtype
 
 struct DLINtype
 {
-	std::vector<unsigned int> daBarra;
+	std::vector<int> daBarra;
 	std::vector<char> aberturaDaBarra;
 	std::vector<char> operacao;
 	std::vector<char> aberturaParaABarra;
-	std::vector<unsigned int> paraBarra;
+	std::vector<int> paraBarra;
 	std::vector<int> circuito;
 	std::vector<char> estado;
 	std::vector<char> proprietario;
@@ -84,7 +84,7 @@ struct DLINtype
 	std::vector<int> barraControlada; // número
 	std::vector<float> capacidadeNormal; // MVA
 	std::vector<float> capacidadeEmEmergencia; // MVA
-	std::vector<unsigned int> numeroDeTaps; // número
+	std::vector<int> numeroDeTaps; // número
 	std::vector<float> capacidadeDeEquipamento; // Capacidade de carregamento do equipamento com menor capacidade de carregamento conectado ao circuito. 
 	std::vector<std::vector<char>> agregadores;
 };
@@ -104,18 +104,18 @@ struct DCTEtype
 	float BASE = 100.0f; // MVA
 	float DASE = 100.0f; // MW
 	float ZMAX = 500.0f; // %
-	unsigned int ACIT = 30;
-	unsigned int LPIT = 50;
-	unsigned int LFLP = 10;
-	unsigned int LFIT = 10;
-	unsigned int DCIT = 10;
-	unsigned int VSIT = 10;
-	unsigned int LCRT = 23;
-	unsigned int LPRT = 60;
-	unsigned int LFCV = 1;
-	unsigned int TPST = 2 * TEPR;
-	unsigned int QLST = 4 * TEPR;
-	unsigned int EXST = 4 * TEPA;
+	int ACIT = 30;
+	int LPIT = 50;
+	int LFLP = 10;
+	int LFIT = 10;
+	int DCIT = 10;
+	int VSIT = 10;
+	int LCRT = 23;
+	int LPRT = 60;
+	int LFCV = 1;
+	int TPST = 2 * TEPR;
+	int QLST = 4 * TEPR;
+	int EXST = 4 * TEPA;
 	float TLPP = 1.0;
 	float TSBZ = 0.01f;  // MW
 	float TSBA = 1.0f;   // %
@@ -126,20 +126,20 @@ struct DCTEtype
 	float VSTP = 5.0f;   // %
 	float CSTP = 5.0f;   // %
 	float VFLD = 70.f;   // %
-	unsigned int HIST;
+	int HIST;
 	float ZMIN = 0.0001f;// %
-	unsigned int PDIT = 10;
-	unsigned int ICIT = 30;
+	int PDIT = 10;
+	int ICIT = 30;
 	float FDIV = 2.0f;   // 
-	unsigned int DMAX = 5;   // 
+	int DMAX = 5;   // 
 	float ICMN = 0.05f;  // %
 	float VART = 5.0f;   // %
-	unsigned int TSTP = 33;   // 
+	int TSTP = 33;   // 
 	float TSDC = 0.01f;   // 
 	float ASDC = 1.f;     // º
 	float ICMV = 0.5f;   // %
-	unsigned int APAS = 90;   // %
-	unsigned int CPAR = 70;   // %
+	int APAS = 90;   // %
+	int CPAR = 70;   // %
 	float VAVT = 2.0f;   // %
 	float VAVF = 5.0f;   // %
 	float VMVF = 15.0f;  // MW
@@ -160,10 +160,10 @@ struct DCTEtype
 
 struct DCSCtype
 {
-	std::vector<unsigned int> daBarra;
+	std::vector<int> daBarra;
 	std::vector<char> operacao;
-	std::vector<unsigned int> paraBarra;
-	std::vector<unsigned int> circuito;
+	std::vector<int> paraBarra;
+	std::vector<int> circuito;
 	std::vector<char> estado;
 	std::vector<char> proprietario;
 	std::vector<char> bypass;
@@ -172,9 +172,9 @@ struct DCSCtype
 	std::vector<float> valorInicial; // %
 	std::vector<char> modoDeControle; // = 'X';
 	std::vector<float> valorEspecificado; // Reatância do CSC, em %, se o modo de controle especificado é Reatância Constante (X). 
-	std::vector<unsigned int> extremidadeDeMedicao; // Número da barra terminal do CSC na qual a potência ou a corrente é medida, como definido no campo Número do Código de Execução DBAR.
-	std::vector<unsigned int> numeroDeEstagios; // Número de estágios do CSC discreto (TSSC - Thyristor Switched Series Capacitor). O valor default é para o CSC que opera de modo contínuo (TCSC - Thyristor Controlled Series Capacitor). 
-	std::vector<unsigned int> agregador;
+	std::vector<int> extremidadeDeMedicao; // Número da barra terminal do CSC na qual a potência ou a corrente é medida, como definido no campo Número do Código de Execução DBAR.
+	std::vector<int> numeroDeEstagios; // Número de estágios do CSC discreto (TSSC - Thyristor Switched Series Capacitor). O valor default é para o CSC que opera de modo contínuo (TCSC - Thyristor Controlled Series Capacitor). 
+	std::vector<int> agregador;
 };
 
 struct DGBTtype
@@ -186,7 +186,7 @@ bool readPWF(sistemaType& sistema, barraType& barra, ramoType& ramo, DCTEtype& D
 
 std::string ifBlanckSetDefault(std::string str, std::string defaultValue);
 
-float parseFloatPtoDecImp(std::string str, unsigned int casaUnitariaDoPontoDecimalImplicito);
+float parseFloatPtoDecImp(std::string str, int casaUnitariaDoPontoDecimalImplicito);
 
 void parseDBARline(DBARtype& DBAR, std::string& str_pwf, unsigned long long& inicio);
 

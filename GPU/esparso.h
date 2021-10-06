@@ -17,69 +17,69 @@
 using namespace std;
 using namespace Eigen;
 
-std::pair<unsigned int, unsigned int> HtoJ(unsigned int row, unsigned int col, sistema* sistema) {
-	//std::pair<unsigned int, unsigned int> ans = 
+std::pair<int, int> HtoJ(int row, int col, sistema* sistema) {
+	//std::pair<int, int> ans = 
 	return { row - (row >= sistema->barraVO), col - (col >= sistema->barraVO) };
 }
 
-unsigned int HtoJrow(unsigned int row, sistema* sistema) {
+int HtoJrow(int row, sistema* sistema) {
 	return row+1 - (row+1 >= sistema->barraVO);
 }
 
-unsigned int HtoJcol(unsigned int col, sistema* sistema) {
+int HtoJcol(int col, sistema* sistema) {
 	return col+1 - (col+1 >= sistema->barraVO);
 }
 
-std::pair<unsigned int, unsigned int> LtoJ(unsigned int row, unsigned int col, sistema* sistema) {
-	//std::pair<unsigned int, unsigned int> ans = 
+std::pair<int, int> LtoJ(int row, int col, sistema* sistema) {
+	//std::pair<int, int> ans = 
 	return { row + sistema->nPV + sistema->nPQ, col + sistema->nPV + sistema->nPQ };
 }
 
-unsigned int LtoJrow(unsigned int row, sistema* sistema) {
+int LtoJrow(int row, sistema* sistema) {
 	return row + sistema->nB - 1;
 }
 
-unsigned int LtoJcol(unsigned int col, sistema* sistema) {
+int LtoJcol(int col, sistema* sistema) {
 	return col + sistema->nB - 1;
 }
 
-std::pair<unsigned int, unsigned int> MtoJ(unsigned int row, unsigned int col, sistema* sistema) {
-	//std::pair<unsigned int, unsigned int> ans = 
+std::pair<int, int> MtoJ(int row, int col, sistema* sistema) {
+	//std::pair<int, int> ans = 
 	return { row + sistema->nPV + sistema->nPQ, col - (col >= sistema->barraVO) };
 }
 
-unsigned int MtoJrow(unsigned int row, sistema* sistema) {
+int MtoJrow(int row, sistema* sistema) {
 	return row + sistema->nB - 1;
 }
 
-unsigned int MtoJcol(unsigned int col, sistema* sistema) {
+int MtoJcol(int col, sistema* sistema) {
 	return col - (col >= sistema->barraVO);
 }
 
-std::pair<unsigned int, unsigned int> NtoJ(unsigned int row, unsigned int col, sistema* sistema) {
-	//std::pair<unsigned int, unsigned int> ans = 
+std::pair<int, int> NtoJ(int row, int col, sistema* sistema) {
+	//std::pair<int, int> ans = 
 	return { row - (row >= sistema->barraVO), col + sistema->nPV + sistema->nPQ };
 }
 
-unsigned int NtoJrow(unsigned int row, sistema* sistema) {
+int NtoJrow(int row, sistema* sistema) {
 	return row+1 - (row+1 >= sistema->barraVO);
 }
 
-unsigned int NtoJcol(unsigned int col, sistema* sistema) {
+int NtoJcol(int col, sistema* sistema) {
 	return col+1 + sistema->nB - 1;
 }
 
 // agora com HLMNpos
 void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* ramo*/, iterativo* iterativo) {
 
-	unsigned int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
+	int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
 
 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
 	// segundo profiler do visual studio: parte mais onerosa são os push_backs. Contribuição insignificante para o resultado final (até ieee118x8).
 	// loops for não são paralelizáveis (dependem do valor de nnzJ)
 
-	for (size_t i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
@@ -92,8 +92,8 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			unsigned short* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 				continue;
 			}
@@ -102,7 +102,7 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+			int col = pntColPQ - iterativo->barrasPQlim;
 
 			h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -110,8 +110,8 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 			nnzJ++;
 		}
 	}
-	for (size_t i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
@@ -124,8 +124,8 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			unsigned short* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 				continue;
 			}
@@ -134,7 +134,7 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+			int col = pntColPQ - iterativo->barrasPQlim;
 
 			h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -145,8 +145,8 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 
 	// M L]
 
-	for (size_t i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
 
 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
@@ -162,8 +162,8 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 			nnzJ++;
 		}
 
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
-			unsigned short* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+			int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
 			if (pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim) { // se coluna for PQ
 				// linha de L
 				h_sparse->spJsubmatType.push_back(L);
@@ -171,7 +171,7 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 				h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 				h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-				unsigned int col = pntRowPQ - iterativo->barrasPQlim;
+				int col = pntRowPQ - iterativo->barrasPQlim;
 
 				h_sparse->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
 				h_sparse->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);
@@ -201,23 +201,23 @@ void Jstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra/*, ramo* 
 // coloca primeiro os eltos da diagonal principal para minimizar a divergência
 void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* iterativo) {
 
-	unsigned int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
+	int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
 
 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
 	// segundo profiler do visual studio: parte mais onerosa são os push_backs. Contribuição insignificante para o resultado final (até ieee118x8).
 	// loops for não são paralelizáveis (dependem do valor de nnzJ)
 
 	h_sparse->Hpos.resize(sistema->nB - 1);
-	unsigned int nDiagH = 0;
+	int nDiagH = 0;
 	h_sparse->Lpos.resize(sistema->nPQ);
-	unsigned int nDiagL = 0;
+	int nDiagL = 0;
 	h_sparse->Mpos.resize(sistema->nPQ);
-	unsigned int nDiagM = 0;
+	int nDiagM = 0;
 	h_sparse->Npos.resize(sistema->nPQ);
-	unsigned int nDiagN = 0;
+	int nDiagN = 0;
 
-	for (size_t i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
@@ -238,8 +238,8 @@ void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			unsigned short* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 				continue;
 			}
@@ -247,7 +247,7 @@ void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+			int col = pntColPQ - iterativo->barrasPQlim;
 
 			h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -263,8 +263,8 @@ void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 			nnzJ++;
 		}
 	}
-	for (size_t i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
@@ -284,8 +284,8 @@ void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			unsigned short* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 				continue;
 			}
@@ -293,7 +293,7 @@ void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+			int col = pntColPQ - iterativo->barrasPQlim;
 
 			h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -312,8 +312,8 @@ void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 
 	// M L]
 
-	for (size_t i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
 
 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
@@ -338,8 +338,8 @@ void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 			nnzJ++;
 		}
 
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
-			unsigned short* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+			int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
 			if (pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim) { // se coluna for PQ
 				// linha de L
 				h_sparse->spJsubmatType.push_back(L);
@@ -347,7 +347,7 @@ void Jstencil(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 				h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 				h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-				unsigned int col = pntRowPQ - iterativo->barrasPQlim;
+				int col = pntRowPQ - iterativo->barrasPQlim;
 
 				h_sparse->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
 				h_sparse->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);
@@ -387,7 +387,7 @@ void fillJstencil0based(sistema* sistema, h_sparse* h_sparse, barra* barra, ramo
 	//h_sparse->spJval.clear();
 	//h_sparse->spJval.resize(h_sparse->nnzJ);
 	#pragma omp parallel for if (openmp)
-		for (size_t i = 0; i < h_sparse->nnzJ; i++) {
+		for (int i = 0; i < h_sparse->nnzJ; i++) {
 			switch (h_sparse->spJsubmatType[i]) {
 			case H:
 				if (h_sparse->cooRowIndSubMatJ[i] != h_sparse->cooColIndSubMatJ[i]) {
@@ -481,7 +481,7 @@ void reordJac(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 	int szHdp = 0, szLdp = 0, szMdp = 0, szNdp = 0, aux;
 
 	// H
-	for (size_t i = 0; i < h_sparse->Hpos.size(); i++) {
+	for (int i = 0; i < h_sparse->Hpos.size(); i++) {
 		// se elto está na diagonal principal da submatriz, então colóca-o no início da
 		// fila para evitar divergência do kernel
 		if (h_sparse->cooRowIndSubMatJ[h_sparse->Hpos[i]] == h_sparse->cooColIndSubMatJ[h_sparse->Hpos[i]]) {
@@ -495,7 +495,7 @@ void reordJac(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 		}
 	}
 	// L
-	for (size_t i = 0; i < h_sparse->Lpos.size(); i++) {
+	for (int i = 0; i < h_sparse->Lpos.size(); i++) {
 		// se elto está na diagonal principal da submatriz, então colóca-o no início da
 		// fila para evitar divergência do kernel
 		if (h_sparse->cooRowIndSubMatJ[h_sparse->Lpos[i]] == h_sparse->cooColIndSubMatJ[h_sparse->Lpos[i]]) {
@@ -509,7 +509,7 @@ void reordJac(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 		}
 	}
 	// M
-	for (size_t i = 0; i < h_sparse->Mpos.size(); i++) {
+	for (int i = 0; i < h_sparse->Mpos.size(); i++) {
 		// se elto está na diagonal principal da submatriz, então colóca-o no início da
 		// fila para evitar divergência do kernel
 		if (h_sparse->cooRowIndSubMatJ[h_sparse->Mpos[i]] == h_sparse->cooColIndSubMatJ[h_sparse->Mpos[i]]) {
@@ -523,7 +523,7 @@ void reordJac(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 		}
 	}
 	// N
-	for (size_t i = 0; i < h_sparse->Npos.size(); i++) {
+	for (int i = 0; i < h_sparse->Npos.size(); i++) {
 		// se elto está na diagonal principal da submatriz, então colóca-o no início da
 		// fila para evitar divergência do kernel
 		if (h_sparse->cooRowIndSubMatJ[h_sparse->Npos[i]] == h_sparse->cooColIndSubMatJ[h_sparse->Npos[i]]) {
@@ -538,8 +538,8 @@ void reordJac(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* ite
 	}
 }
 
-unsigned int GLOBALauxIsPQ = 0;
-bool isPQ(unsigned int barra, sistema* sistema, iterativo* iterativo) {
+int GLOBALauxIsPQ = 0;
+bool isPQ(int barra, sistema* sistema, iterativo* iterativo) {
 	while (iterativo->barrasPQlim[GLOBALauxIsPQ] < barra) {
 		GLOBALauxIsPQ++;
 		if (GLOBALauxIsPQ == sistema->nPQ) {
@@ -552,23 +552,25 @@ bool isPQ(unsigned int barra, sistema* sistema, iterativo* iterativo) {
 // coloca primeiro os eltos da diagonal principal para minimizar a divergência
 void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* iterativo) {
 
-	unsigned int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
+	int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
 
 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
 	// segundo profiler do visual studio: parte mais onerosa são os push_backs. Contribuição insignificante para o resultado final (até ieee118x8).
 	// loops for não são paralelizáveis (dependem do valor de nnzJ)
 
-	h_sparse->Hpos.resize(sistema->nB - 1);
-	unsigned int nDiagH = 0;
-	h_sparse->Lpos.resize(sistema->nPQ);
-	unsigned int nDiagL = 0;
-	h_sparse->Mpos.resize(sistema->nPQ);
-	unsigned int nDiagM = 0;
-	h_sparse->Npos.resize(sistema->nPQ);
-	unsigned int nDiagN = 0;
+	// sistema->cooRowIndY[j] ==> i/**/
 
-	for (size_t i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	h_sparse->Hpos.resize(sistema->nB - 1);
+	int nDiagH = 0;
+	h_sparse->Lpos.resize(sistema->nPQ);
+	int nDiagL = 0;
+	h_sparse->Mpos.resize(sistema->nPQ);
+	int nDiagM = 0;
+	h_sparse->Npos.resize(sistema->nPQ);
+	int nDiagN = 0;
+
+	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
@@ -589,8 +591,8 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			//unsigned short* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			//int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			//if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 			//	continue;
 			//}
@@ -601,7 +603,7 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
+			int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
 
 			h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -618,8 +620,8 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 		}
 		GLOBALauxIsPQ = 0;
 	}
-	for (size_t i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
@@ -639,8 +641,8 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			//unsigned short* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			//int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			//if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 			//	continue;
 			//}
@@ -651,7 +653,7 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
+			int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
 
 			h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -671,8 +673,8 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 
 	// M L]
 
-	for (size_t i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
 
 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
@@ -697,8 +699,8 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 			nnzJ++;
 		}
 
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
-			//unsigned short* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+			//int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
 			if (isPQ(sistema->csrColIndY[j] + 1, sistema, iterativo) /*pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim*/) { // se coluna for PQ
 				// linha de L
 				//h_sparse->spJsubmatType.push_back(L);
@@ -706,7 +708,7 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 				h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 				h_sparse->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-				unsigned int col = GLOBALauxIsPQ; //pntRowPQ - iterativo->barrasPQlim;
+				int col = GLOBALauxIsPQ; //pntRowPQ - iterativo->barrasPQlim;
 
 				h_sparse->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
 				h_sparse->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);
@@ -744,60 +746,259 @@ void Jstencil_eficiente(sistema* sistema, h_sparse* h_sparse, barra* barra, iter
 }
 
 // coloca primeiro os eltos da diagonal principal para minimizar a divergência
-void Jstencil_eficienteTeste(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* iterativo) {
+// void Jstencil_eficienteTeste(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* iterativo) {
 
-	unsigned int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
+// 	int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
+
+// 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
+// 	// segundo profiler do visual studio: parte mais onerosa são os push_backs. Contribuição insignificante para o resultado final (até ieee118x8).
+// 	// loops for não são paralelizáveis (dependem do valor de nnzJ)
+
+// 	h_sparse->Hpos.resize(sistema->nB - 1);
+// 	int nDiagH = 0;
+// 	h_sparse->Lpos.resize(sistema->nPQ);
+// 	int nDiagL = 0;
+// 	h_sparse->Mpos.resize(sistema->nPQ);
+// 	int nDiagM = 0;
+// 	h_sparse->Npos.resize(sistema->nPQ);
+// 	int nDiagN = 0;
+
+// 	int nnzH = 0, nnzL = 0, nnzM = 0, nnzN = 0;
+
+// 	h_sparse->cooColIndSubMatJ.resize(137197);
+// 	h_sparse->cooRowIndSubMatJ.resize(137197);
+
+// 	h_sparse->Hpos.resize(70000);
+// 	h_sparse->Lpos.resize(70000);
+// 	h_sparse->Mpos.resize(70000);
+// 	h_sparse->Npos.resize(70000);
+
+
+
+// 	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+// 		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+// 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
+// 				continue;
+// 			}
+// 			//h_sparse->spJsubmatType.push_back(H);
+// 			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
+// 			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+
+// 			//h_sparse->cooColIndJ.push_back(HtoJcol(sistema->csrColIndY[j], sistema) - 1);
+// 			//h_sparse->cooRowIndJ.push_back(HtoJrow(sistema->cooRowIndY[j], sistema) - 1);
+
+// 			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+// 				h_sparse->Hpos[nDiagH] = nnzJ;
+// 				nDiagH++;
+// 			}
+// 			else {
+// 				h_sparse->Hpos[sistema->nB - 1 + nnzH] = (nnzJ);
+// 				nnzH++;
+// 			}
+
+// 			nnzJ++;
+// 		}
+// 		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+// 			//int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+// 			//if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
+// 			//	continue;
+// 			//}
+// 			if (!isPQ(sistema->csrColIndY[j] + 1, sistema, iterativo)) {
+// 				continue;
+// 			}
+// 			//h_sparse->spJsubmatType.push_back(N);
+// 			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+// 			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
+
+// 			int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
+
+// 			//h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
+// 			//h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
+
+// 			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+// 				h_sparse->Npos[nDiagN] = nnzJ;
+// 				nDiagN++;
+// 			}
+// 			else {
+// 				h_sparse->Npos[sistema->nPQ + nnzN] = (nnzJ);
+// 				nnzN++;
+// 			}
+
+// 			nnzJ++;
+// 		}
+// 		GLOBALauxIsPQ = 0;
+// 	}
+// 	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+// 		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+// 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
+// 				continue;
+// 			}
+// 			//h_sparse->spJsubmatType.push_back(H);
+// 			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
+// 			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+
+// 			//h_sparse->cooColIndJ.push_back(HtoJcol(sistema->csrColIndY[j], sistema) - 1);
+// 			//h_sparse->cooRowIndJ.push_back(HtoJrow(sistema->cooRowIndY[j], sistema) - 1);
+// 			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+// 				h_sparse->Hpos[nDiagH] = nnzJ;
+// 				nDiagH++;
+// 			}
+// 			else {
+// 				h_sparse->Hpos[sistema->nB - 1 + nnzH] = (nnzJ);
+// 				nnzH++;
+// 			}
+
+// 			nnzJ++;
+// 		}
+// 		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+// 			//int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+// 			//if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
+// 			//	continue;
+// 			//}
+// 			if (!isPQ(sistema->csrColIndY[j] + 1, sistema, iterativo)) {
+// 				continue;
+// 			}
+// 			//h_sparse->spJsubmatType.push_back(N);
+// 			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
+// 			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+
+// 			int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
+
+// 			//h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
+// 			//h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
+
+// 			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+// 				h_sparse->Npos[nDiagN] = nnzJ;
+// 				nDiagN++;
+// 			}
+// 			else {
+// 				h_sparse->Npos[sistema->nPQ + nnzN] = (nnzJ);
+// 				nnzN++;
+// 			}
+
+// 			nnzJ++;
+// 		}
+// 		GLOBALauxIsPQ = 0;
+// 	}
+
+// 	// M L]
+
+// 	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+// 		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+
+// 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
+// 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
+// 				continue;
+// 			}
+// 			//h_sparse->spJsubmatType.push_back(M);
+
+// 			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
+// 			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+
+// 			//h_sparse->cooColIndJ.push_back(MtoJcol(sistema->csrColIndY[j] + 1, sistema) - 1);
+// 			//h_sparse->cooRowIndJ.push_back(MtoJrow(i + 1, sistema) - 1);
+
+// 			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+// 				h_sparse->Mpos[nDiagM] = nnzJ;
+// 				nDiagM++;
+// 			}
+// 			else {
+// 				h_sparse->Mpos[sistema->nPQ + nnzM] = (nnzJ);
+// 				nnzM++;
+// 			}
+
+// 			nnzJ++;
+// 		}
+
+// 		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+// 			//int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+// 			if (isPQ(sistema->csrColIndY[j] + 1, sistema, iterativo) /*pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim*/) { // se coluna for PQ
+// 				// linha de L
+// 				//h_sparse->spJsubmatType.push_back(L);
+// 				//h_sparse->Lpos.push_back(nnzJ);
+// 				h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
+// 				h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+
+// 				int col = GLOBALauxIsPQ; //pntRowPQ - iterativo->barrasPQlim;
+
+// 				//h_sparse->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
+// 				//h_sparse->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);
+
+// 				if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+// 					h_sparse->Lpos[nDiagL] = nnzJ;
+// 					nDiagL++;
+// 				}
+// 				else {
+// 					h_sparse->Lpos[sistema->nPQ + nnzL] = (nnzJ);
+// 					nnzL++;
+// 				}
+
+// 				nnzJ++;
+// 			}
+// 			GLOBALauxIsPQ = 0;
+// 		}
+// 	}
+// 	h_sparse->nnzJ = nnzJ;
+// 	h_sparse->spJval.reserve(nnzJ);
+// 	h_sparse->spJval.resize(nnzJ);
+
+// 	// coo to csr
+// 	int /*acc = 0,*/ linha = 0;
+// 	h_sparse->csrRowPtrJ.clear();
+// 	h_sparse->csrRowPtrJ.resize(sistema->nB - 1 + iterativo->nPQlim + 1);
+// 	h_sparse->csrRowPtrJ[0] = 0;
+// 	h_sparse->csrRowPtrJ[sistema->nB - 1 + iterativo->nPQlim] = h_sparse->nnzJ;
+// 	//linha++; // se é 1 based
+// 	//for (int j = 1; j < h_sparse->nnzJ; j++) {
+// 	//	if (h_sparse->cooRowIndJ[j] != linha /*+1...*/) {
+// 	//		h_sparse->csrRowPtrJ[linha + 1] = j;
+// 	//		linha++;
+// 	//	}
+// 	//}
+// }
+
+// coloca primeiro os eltos da diagonal principal para minimizar a divergência
+void Jstencil_eficiente_(sistema* sistema, h_sparse* h_sparse, barra* barra, iterativo* iterativo) {
+
+	int nnzJ = 0/*, cntH = 0, cntL = 0, cntM = 0, cntN = 0*/;
 
 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
 	// segundo profiler do visual studio: parte mais onerosa são os push_backs. Contribuição insignificante para o resultado final (até ieee118x8).
 	// loops for não são paralelizáveis (dependem do valor de nnzJ)
 
 	h_sparse->Hpos.resize(sistema->nB - 1);
-	unsigned int nDiagH = 0;
+	int nDiagH = 0;
 	h_sparse->Lpos.resize(sistema->nPQ);
-	unsigned int nDiagL = 0;
+	int nDiagL = 0;
 	h_sparse->Mpos.resize(sistema->nPQ);
-	unsigned int nDiagM = 0;
+	int nDiagM = 0;
 	h_sparse->Npos.resize(sistema->nPQ);
-	unsigned int nDiagN = 0;
+	int nDiagN = 0;
 
-	unsigned int nnzH = 0, nnzL = 0, nnzM = 0, nnzN = 0;
-
-	h_sparse->cooColIndSubMatJ.resize(137197);
-	h_sparse->cooRowIndSubMatJ.resize(137197);
-
-	h_sparse->Hpos.resize(70000);
-	h_sparse->Lpos.resize(70000);
-	h_sparse->Mpos.resize(70000);
-	h_sparse->Npos.resize(70000);
-
-
-
-	for (size_t i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
 			//h_sparse->spJsubmatType.push_back(H);
-			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
-			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
+			h_sparse->cooRowIndSubMatJ.push_back(i); // i <- row index
 
-			//h_sparse->cooColIndJ.push_back(HtoJcol(sistema->csrColIndY[j], sistema) - 1);
-			//h_sparse->cooRowIndJ.push_back(HtoJrow(sistema->cooRowIndY[j], sistema) - 1);
+			h_sparse->cooColIndJ.push_back(HtoJcol(sistema->csrColIndY[j], sistema) - 1);
+			h_sparse->cooRowIndJ.push_back(HtoJrow(i, sistema) - 1); // i <- row index
 
-			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+			if (sistema->csrColIndY[j] == i) { // i <- row index
 				h_sparse->Hpos[nDiagH] = nnzJ;
 				nDiagH++;
 			}
 			else {
-				h_sparse->Hpos[sistema->nB - 1 + nnzH] = (nnzJ);
-				nnzH++;
+				h_sparse->Hpos.push_back(nnzJ);
 			}
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			//unsigned short* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			//int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			//if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 			//	continue;
 			//}
@@ -805,51 +1006,49 @@ void Jstencil_eficienteTeste(sistema* sistema, h_sparse* h_sparse, barra* barra,
 				continue;
 			}
 			//h_sparse->spJsubmatType.push_back(N);
-			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
-			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
+			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
+			h_sparse->cooRowIndSubMatJ.push_back(i); // i <- row index
 
-			unsigned int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
+			int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
 
-			//h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
-			//h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
+			h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
+			h_sparse->cooRowIndJ.push_back(NtoJrow(i, sistema) - 1); // i <- row index
 
-			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+			if (sistema->csrColIndY[j] == i) { // i <- row index
 				h_sparse->Npos[nDiagN] = nnzJ;
 				nDiagN++;
 			}
 			else {
-				h_sparse->Npos[sistema->nPQ + nnzN] = (nnzJ);
-				nnzN++;
+				h_sparse->Npos.push_back(nnzJ);
 			}
 
 			nnzJ++;
 		}
 		GLOBALauxIsPQ = 0;
 	}
-	for (size_t i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
 			//h_sparse->spJsubmatType.push_back(H);
-			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
-			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
+			h_sparse->cooRowIndSubMatJ.push_back(i); // i <- row index
 
-			//h_sparse->cooColIndJ.push_back(HtoJcol(sistema->csrColIndY[j], sistema) - 1);
-			//h_sparse->cooRowIndJ.push_back(HtoJrow(sistema->cooRowIndY[j], sistema) - 1);
-			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+			h_sparse->cooColIndJ.push_back(HtoJcol(sistema->csrColIndY[j], sistema) - 1);
+			h_sparse->cooRowIndJ.push_back(HtoJrow(i, sistema) - 1); // i <- row index
+			if (sistema->csrColIndY[j] == i) { // i <- row index
 				h_sparse->Hpos[nDiagH] = nnzJ;
 				nDiagH++;
 			}
 			else {
-				h_sparse->Hpos[sistema->nB - 1 + nnzH] = (nnzJ);
-				nnzH++;
+				h_sparse->Hpos.push_back(nnzJ);
 			}
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			//unsigned short* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			//int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			//if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 			//	continue;
 			//}
@@ -857,21 +1056,20 @@ void Jstencil_eficienteTeste(sistema* sistema, h_sparse* h_sparse, barra* barra,
 				continue;
 			}
 			//h_sparse->spJsubmatType.push_back(N);
-			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
-			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
+			h_sparse->cooRowIndSubMatJ.push_back(i); // i <- row index
 
-			unsigned int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
+			int col = GLOBALauxIsPQ; //pntColPQ - iterativo->barrasPQlim;
 
-			//h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
-			//h_sparse->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
+			h_sparse->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
+			h_sparse->cooRowIndJ.push_back(NtoJrow(i, sistema) - 1); // i <- row index
 
-			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+			if (sistema->csrColIndY[j] == i) { // i <- row index
 				h_sparse->Npos[nDiagN] = nnzJ;
 				nDiagN++;
 			}
 			else {
-				h_sparse->Npos[sistema->nPQ + nnzN] = (nnzJ);
-				nnzN++;
+				h_sparse->Npos.push_back(nnzJ);
 			}
 
 			nnzJ++;
@@ -881,8 +1079,8 @@ void Jstencil_eficienteTeste(sistema* sistema, h_sparse* h_sparse, barra* barra,
 
 	// M L]
 
-	for (size_t i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
 
 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
@@ -890,45 +1088,43 @@ void Jstencil_eficienteTeste(sistema* sistema, h_sparse* h_sparse, barra* barra,
 			}
 			//h_sparse->spJsubmatType.push_back(M);
 
-			h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
-			h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+			h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
+			h_sparse->cooRowIndSubMatJ.push_back(IDX1F(iterativo->barrasPQlim[i])); // IDX1F(iterativo->barrasPQlim[i]) <- row index
 
-			//h_sparse->cooColIndJ.push_back(MtoJcol(sistema->csrColIndY[j] + 1, sistema) - 1);
-			//h_sparse->cooRowIndJ.push_back(MtoJrow(i + 1, sistema) - 1);
+			h_sparse->cooColIndJ.push_back(MtoJcol(sistema->csrColIndY[j] + 1, sistema) - 1);
+			h_sparse->cooRowIndJ.push_back(MtoJrow(i + 1, sistema) - 1);
 
-			if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+			if (sistema->csrColIndY[j] == i) { // i <- row index
 				h_sparse->Mpos[nDiagM] = nnzJ;
 				nDiagM++;
 			}
 			else {
-				h_sparse->Mpos[sistema->nPQ + nnzM] = (nnzJ);
-				nnzM++;
+				h_sparse->Mpos.push_back(nnzJ);
 			}
 
 			nnzJ++;
 		}
 
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
-			//unsigned short* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+			//int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
 			if (isPQ(sistema->csrColIndY[j] + 1, sistema, iterativo) /*pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim*/) { // se coluna for PQ
 				// linha de L
 				//h_sparse->spJsubmatType.push_back(L);
 				//h_sparse->Lpos.push_back(nnzJ);
-				h_sparse->cooColIndSubMatJ[nnzJ] = (sistema->csrColIndY[j]);
-				h_sparse->cooRowIndSubMatJ[nnzJ] = (sistema->cooRowIndY[j]);
+				h_sparse->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
+				h_sparse->cooRowIndSubMatJ.push_back(IDX1F(iterativo->barrasPQlim[i])); // IDX1F(iterativo->barrasPQlim[i]) <- row index
 
-				unsigned int col = GLOBALauxIsPQ; //pntRowPQ - iterativo->barrasPQlim;
+				int col = GLOBALauxIsPQ; //pntRowPQ - iterativo->barrasPQlim;
 
-				//h_sparse->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
-				//h_sparse->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);
+				h_sparse->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
+				h_sparse->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);
 
-				if (sistema->csrColIndY[j] == sistema->cooRowIndY[j]) {
+				if (sistema->csrColIndY[j] == i) { // i <- row index
 					h_sparse->Lpos[nDiagL] = nnzJ;
 					nDiagL++;
 				}
 				else {
-					h_sparse->Lpos[sistema->nPQ + nnzL] = (nnzJ);
-					nnzL++;
+					h_sparse->Lpos.push_back(nnzJ);
 				}
 
 				nnzJ++;
@@ -947,10 +1143,10 @@ void Jstencil_eficienteTeste(sistema* sistema, h_sparse* h_sparse, barra* barra,
 	h_sparse->csrRowPtrJ[0] = 0;
 	h_sparse->csrRowPtrJ[sistema->nB - 1 + iterativo->nPQlim] = h_sparse->nnzJ;
 	//linha++; // se é 1 based
-	//for (int j = 1; j < h_sparse->nnzJ; j++) {
-	//	if (h_sparse->cooRowIndJ[j] != linha /*+1...*/) {
-	//		h_sparse->csrRowPtrJ[linha + 1] = j;
-	//		linha++;
-	//	}
-	//}
+	for (int j = 1; j < h_sparse->nnzJ; j++) {
+		if (h_sparse->cooRowIndJ[j] != linha /*+1...*/) {
+			h_sparse->csrRowPtrJ[linha + 1] = j;
+			linha++;
+		}
+	}
 }

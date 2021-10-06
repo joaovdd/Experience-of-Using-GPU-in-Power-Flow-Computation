@@ -7,7 +7,7 @@ struct iterativoType {
 	float_type* Qcalc; //[NB];
 
 	float_type* J; //[(NB-1+NPQ)*(NB-1+NPQ)];
-	unsigned int iteracao, noMax;
+	int iteracao, noMax;
 
 	float_type* g;
 
@@ -22,10 +22,10 @@ struct iterativoType {
 	bool* limQ; // FUTURO?:dois bits: o 1o é 0 se o limite atingido é o superior, 1 se o inferior. O segundo é
 	            // 0 se o limite de injeção de reativos não foi atingido, 1 caso contrário
 				// nPV entradas
-	unsigned int* barrasPVlim; //[NPV]; // vetor contendo as barras de tipo PV após a análise de limite de reativos
-	unsigned int nPVlim; // número de barras de tipo PV após a análise de limite de reativos
-	unsigned int* barrasPQlim; //[NPV]; // vetor contendo as barras de tipo PV após a análise de limite de reativos
-	unsigned int nPQlim; // número de barras de tipo PV após a análise de limite de reativos
+	int* barrasPVlim; //[NPV]; // vetor contendo as barras de tipo PV após a análise de limite de reativos
+	int nPVlim; // número de barras de tipo PV após a análise de limite de reativos
+	int* barrasPQlim; //[NPV]; // vetor contendo as barras de tipo PV após a análise de limite de reativos
+	int nPQlim; // número de barras de tipo PV após a análise de limite de reativos
 
 	float_type* QliqLim;       // atualização do limite do valor de Qliq para as novas barras de tipo PQ
 };

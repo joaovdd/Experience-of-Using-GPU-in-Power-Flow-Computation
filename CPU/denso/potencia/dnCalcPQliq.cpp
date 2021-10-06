@@ -1,9 +1,9 @@
 #include "dnCalcPQliq.h"
 
 // minimiza acesso a elementos
-float_type calcP(const unsigned int k, sistemaType* sistema, barraType* barra, ramoType* ramo) {
+float_type calcP(const int k, sistemaType* sistema, barraType* barra, ramoType* ramo) {
 	float_type acc = 0;
-	for (unsigned int i = 0; i < sistema->nL; i++) { // i percorre ramos
+	for (int i = 0; i < sistema->nL; i++) { // i percorre ramos
 		float_type aux = 0;
 		if (ramo->de[i] == k) { // se k est� ligada � para[i] =>
 			aux = ramo->phi[i]; //atan2(ramo->tap[i].y, ramo->tap[i].x); // defasagem do transformador
@@ -36,9 +36,9 @@ float_type calcP(const unsigned int k, sistemaType* sistema, barraType* barra, r
 }
 
 // denso
-float_type calcP2(const unsigned int k, sistemaType* sistema, barraType* barra, ramoType* ramo){
+float_type calcP2(const int k, sistemaType* sistema, barraType* barra, ramoType* ramo){
 	float_type acc = 0;
-	for (unsigned int i = 1; i <= sistema->nB; i++) { // i percorre colunas da k-�sima linha da Ybarra
+	for (int i = 1; i <= sistema->nB; i++) { // i percorre colunas da k-�sima linha da Ybarra
 		float_type aux = 0;
 
 		// aux = dnPhif(k, i, sistema, ramo); // defasagem do transformador
@@ -52,9 +52,9 @@ float_type calcP2(const unsigned int k, sistemaType* sistema, barraType* barra, 
 }
 
 // minimiza acesso a elementos
-float_type calcQ(const unsigned int k, sistemaType* sistema, barraType* barra, ramoType* ramo) {
+float_type calcQ(const int k, sistemaType* sistema, barraType* barra, ramoType* ramo) {
 	float_type acc = 0;
-	for (unsigned int i = 0; i < sistema->nL; i++) { // i percorre ramos
+	for (int i = 0; i < sistema->nL; i++) { // i percorre ramos
 		float_type aux = 0;
 		if (ramo->de[i] == k) { // se k est� ligada � para[i] =>
 			aux = ramo->phi[i]; //atan2(ramo->tap[i].y, ramo->tap[i].x); // defasagem do transformador
@@ -87,9 +87,9 @@ float_type calcQ(const unsigned int k, sistemaType* sistema, barraType* barra, r
 }
 
 // denso
-float_type calcQ2(const unsigned int k, sistemaType* sistema, barraType* barra, ramoType* ramo) {
+float_type calcQ2(const int k, sistemaType* sistema, barraType* barra, ramoType* ramo) {
 	float_type acc = 0;
-	for (unsigned int i = 1; i <= sistema->nB; i++) { // i percorre colunas da k-�sima linha da Ybarra
+	for (int i = 1; i <= sistema->nB; i++) { // i percorre colunas da k-�sima linha da Ybarra
 		float_type aux = 0;
 
 		//aux = dnPhif(k, i, sistema, ramo); // defasagem do transformador
@@ -109,9 +109,9 @@ float_type calcQ2(const unsigned int k, sistemaType* sistema, barraType* barra, 
 	return barra->V[IDX1F(k)] * acc;
 }
 
-void dnCalculePQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo/*, const unsigned int* card*/){
+void dnCalculePQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo/*, const int* card*/){
 	#pragma omp parallel for if (global::openmp)
-		for(unsigned int i = 1; i <= sistema->nB; i++){
+		for(int i = 1; i <= sistema->nB; i++){
 			iterativo->Pcalc[IDX1F(i)] = calcP2(i, sistema, barra, ramo);
 		}
 
@@ -127,7 +127,7 @@ void dnCalculePQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterati
 
 	 //Calcula os valores de Qk...
 	#pragma omp parallel for if (global::openmp)
-		for(unsigned int i = 1; i <= sistema->nB; i++){
+		for(int i = 1; i <= sistema->nB; i++){
     		iterativo->Qcalc[IDX1F(i)] = calcQ(i, sistema, barra, ramo);
 		}
 

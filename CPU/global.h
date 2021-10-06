@@ -12,7 +12,7 @@
 namespace global {
 	extern float_type v_inicial;
 	extern float_type theta_inicial;
-	extern unsigned int no_max_iter;
+	extern int no_max_iter;
 	extern float_type tol;
 	extern float_type tol_limInjReat;
 	extern std::string arq_entrada;

@@ -4,7 +4,7 @@
 void geraVetPV(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 	iterativo->nPVlim = 0;
 	//#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV
+		for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 			if (!(iterativo->limQ[i])) {
 				iterativo->barrasPVlim[iterativo->nPVlim] = sistema->barrasPV[i];
 				iterativo->nPVlim++;
@@ -15,10 +15,10 @@ void geraVetPV(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativo
 // preenche vetor sistema->barrasPQlim com as barras PQ e as PV que atingiram os limites de 
 // reativos. Sempre em ordem crescente.
 void geraVetPQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
-	unsigned int pntPQ = 0; // aponta para a próxima entrada do vetor sistema->nPQ a ser copiada para sistema->barrasPQlim
-	unsigned int pntPQlim = 0; // aponta para a próxima entrada do vetor sistema->barrasPQlim a ser preenchida
+	int pntPQ = 0; // aponta para a próxima entrada do vetor sistema->nPQ a ser copiada para sistema->barrasPQlim
+	int pntPQlim = 0; // aponta para a próxima entrada do vetor sistema->barrasPQlim a ser preenchida
 	//#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV
+		for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 			if (iterativo->limQ[i]) { // encontrou o índice da barra PQ "novata"
 				while ((sistema->barrasPQ[pntPQ] < sistema->barrasPV[i]) && (pntPQ < sistema->nPQ)) { // j percorre barras PQ diretamente.
 																									  // enquanto forem inferiores à novata
@@ -43,7 +43,7 @@ void geraVetPQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativo
 //void chkLimQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 //	//printf("\n");
 //#pragma omp parallel for if (global::openmp)
-//	for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV
+//	for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 //		// Qg = Qliq - Qload
 //		if ((iterativo->Qcalc[IDX1F(sistema->barrasPV[i])] + barra->Qload[IDX1F(sistema->barrasPV[i])]) < (sistema->limQinf[i] - global::tol)) {
 //			if (!iterativo->limQ[i]) {
@@ -87,11 +87,11 @@ void geraVetPQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativo
 void chkLimQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 	//printf("\n");
 	auto folga = global::tol_limInjReat; // 0.000001; ///*10**/global::tol;
-	//unsigned int cnt = 0;
-	//unsigned int max = 9999;
+	//int cnt = 0;
+	//int max = 9999;
 
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV
+		for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 			if (!iterativo->limQ[i]) { // se iterativo->limQ[i] == 0
 				// Qg = Qliq + Qload
 				if ((iterativo->Qcalc[IDX1F(sistema->barrasPV[i])] + barra->Qload[IDX1F(sistema->barrasPV[i])]) < (sistema->limQinf[i] - folga)) {
@@ -153,11 +153,11 @@ bool undo_chkLimQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterat
 	
 	bool ans = 0;
 	auto folga = global::tol_limInjReat;//0.00001; ///*10*/global::tol;
-	//unsigned int cnt = 0;
-	//unsigned int max = 9999;
+	//int cnt = 0;
+	//int max = 9999;
 
 #pragma omp parallel for if (global::openmp)
-	for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV
+	for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 		if (iterativo->limQ[i]) { // se iterativo->limQ[i] == 1
 			// verificar se a tensão não precisa mais ser controlada:
 			if (iterativo->QliqLim[IDX1F(sistema->barrasPV[i])] == sistema->limQsup[i] - barra->Qload[IDX1F(sistema->barrasPV[i])]) {
@@ -197,7 +197,7 @@ bool undo_chkLimQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterat
 void do_chkLimQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 	//printf("\n");
 #pragma omp parallel for if (global::openmp)
-	for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV
+	for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV
 		if (!iterativo->limQ[i]) { // se iterativo->limQ[i] == 0
 			// Qg = Qliq - Qload
 			if ((iterativo->Qcalc[IDX1F(sistema->barrasPV[i])] + barra->Qload[IDX1F(sistema->barrasPV[i])]) < (sistema->limQinf[i] - global::tol)) {
@@ -226,7 +226,7 @@ void do_chkLimQ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativ
 void calcResLim(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 	// deltaPs
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 1; i < sistema->barraVO; i++) { //antes da swing; i percorre barras
+		for (int i = 1; i < sistema->barraVO; i++) { //antes da swing; i percorre barras
 			// deltaP = |Pcalc - Pesp|
 			iterativo->gLim[IDX1F(i)] = barra->Pliq[IDX1F(i)] - iterativo->Pcalc[IDX1F(i)];
 			//printf("g[%d] = ", i-1);
@@ -235,7 +235,7 @@ void calcResLim(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativ
 		}
 
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = sistema->barraVO + 1; i <= sistema->nB; i++) { // depois da swing; i percorre barras
+		for (int i = sistema->barraVO + 1; i <= sistema->nB; i++) { // depois da swing; i percorre barras
 			// deltaP = |Pcalc - Pesp|
 			float_type aux = barra->Pliq[IDX1F(i)] - iterativo->Pcalc[IDX1F(i)];
 			iterativo->gLim[IDX1F(i) - 1] = aux;
@@ -245,9 +245,9 @@ void calcResLim(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativ
 		}
 
 	// deltaQs
-	const unsigned int offset = sistema->nB - 1;
+	const int offset = sistema->nB - 1;
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < iterativo->nPQlim; i++) { // i é iterador das barras PQ
+		for (int i = 0; i < iterativo->nPQlim; i++) { // i é iterador das barras PQ
 			// deltaQ = |Qcalc - Qesp|
 			iterativo->gLim[i + offset] = iterativo->QliqLim[IDX1F(iterativo->barrasPQlim[i])] - iterativo->Qcalc[IDX1F(iterativo->barrasPQlim[i])];
 			//printf("g[%d] = ", i+sistema->nPQ+sistema->nPV);
@@ -261,13 +261,13 @@ void calcResLim(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativ
 void initLim(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 	// Barras PQ
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < sistema->nPQ; i++) { // percorre barras PV diretamente
+		for (int i = 0; i < sistema->nPQ; i++) { // percorre barras PV diretamente
 			iterativo->barrasPQlim[i] = sistema->barrasPQ[i];
 		}
 	iterativo->nPQlim = sistema->nPQ;
 	// Barras PV
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV diretamente
+		for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV diretamente
 			iterativo->barrasPVlim[i] = sistema->barrasPV[i];
 		}
 	iterativo->nPVlim = sistema->nPV;
@@ -275,12 +275,12 @@ void initLim(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 	iterativo->ngLim = sistema->nPQ + sistema->nPQ + sistema->nPV;
 
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < sistema->nPV; i++) { // percorre barras PV diretamente
+		for (int i = 0; i < sistema->nPV; i++) { // percorre barras PV diretamente
 			iterativo->limQ[i] = 0;
 		}
 
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < sistema->nB; i++) { // percorre barras PV diretamente
+		for (int i = 0; i < sistema->nB; i++) { // percorre barras PV diretamente
 			iterativo->QliqLim[i] = barra->Qliq[i];
 		}
 
@@ -297,19 +297,19 @@ void initLim(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 
 void attVOlim(sistemaType* sistema, barraType* barra, iterativoType* iterativo) {
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 1; i < sistema->barraVO; i++) {  // i percorre as barras diretamente e pula a barra swing
+		for (int i = 1; i < sistema->barraVO; i++) {  // i percorre as barras diretamente e pula a barra swing
 			barra->theta[IDX1F(i)] += iterativo->gLim[IDX1F(i)]; // atualiza valor de theta; g é igual a -deltaX!
 			//printf("attVO: theta[%d] = %f\n", i, barra->theta[IDX1F(i)]);
 		}
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = sistema->barraVO + 1; i <= sistema->nB; i++) { // i percorre as barras diretamente e pula a barra swing
+		for (int i = sistema->barraVO + 1; i <= sistema->nB; i++) { // i percorre as barras diretamente e pula a barra swing
 			barra->theta[IDX1F(i)] += iterativo->gLim[IDX1F(i) - 1];           // atualiza valor de theta; g é igual a -deltaX!
 			//printf("attVO: theta[%d] = %f\n", i, barra->theta[IDX1F(i)]);
 		}
 
-	const unsigned int offset = sistema->nB - 1;
+	const int offset = sistema->nB - 1;
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int i = 0; i < iterativo->nPQlim; i++) {                 // i é iterador das barras PQ
+		for (int i = 0; i < iterativo->nPQlim; i++) {                 // i é iterador das barras PQ
 			barra->V[IDX1F(iterativo->barrasPQlim[i])] += iterativo->gLim[i + offset]; // atualiza valor de V; g é igual a -deltaX!
 			//printf("attVO: V[%d] = %f\n", sistema->barrasPQ[i], barra->V[IDX1F(sistema->barrasPQ[i])]);
 		}

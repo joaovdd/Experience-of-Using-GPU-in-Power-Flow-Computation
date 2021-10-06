@@ -45,16 +45,16 @@ bool lerTamanhos(std::string cdfFile, sistemaType &sistema){
 		}
 		std::getline(CDF, line); // pula duas linhas
 		sistema.nL = 0;
-		std::vector<unsigned int> de, para;
+		std::vector<int> de, para;
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 		{
 			if (line.find("-999") == std::string::npos) {
 				
-				unsigned int auxde   = atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
-				unsigned int auxpara = atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
+				int auxde   = atoi(line.substr(0, 4).c_str()); // ramo da linha i // [0, 3]
+				int auxpara = atoi(line.substr(4, 5).c_str()); // at� a j // [4, 8]
 				bool flgRamoNovo = 1;
 
-				for (unsigned int i = 0; i < sistema.nL; i++){
+				for (int i = 0; i < sistema.nL; i++){
 					if( (de[i] == auxde)&&(para[i] == auxpara) ){
 						// ramo atual é o mesmo que o i-ésimo ramo
 						// soma elementos em paralelo
@@ -127,16 +127,16 @@ bool lerTamanhosCDFX(std::string cdfFile, sistemaType& sistema) {
 		}
 		std::getline(CDF, line); // pula duas linhas
 		sistema.nL = 0;
-		std::vector<unsigned int> de, para;
+		std::vector<int> de, para;
 
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 		{
 			if (line.find("-999") == std::string::npos) {
-				unsigned int auxde = atoi(line.substr(0, 5).c_str()); // ramo da linha i // [0, 3]
-				unsigned int auxpara = atoi(line.substr(6, 5).c_str()); // at� a j // [4, 8]
+				int auxde = atoi(line.substr(0, 5).c_str()); // ramo da linha i // [0, 3]
+				int auxpara = atoi(line.substr(6, 5).c_str()); // at� a j // [4, 8]
 				bool flgRamoNovo = 1;
 
-				for (unsigned int i = 0; i < sistema.nL; i++) {
+				for (int i = 0; i < sistema.nL; i++) {
 					if ((de[i] == auxde) && (para[i] == auxpara)) {
 						// ramo atual é o mesmo que o i-ésimo ramo
 						// soma elementos em paralelo
@@ -181,7 +181,7 @@ bool readCDF(std::string cdfFile, sistemaType& sistema, barraType& barra, ramoTy
 		//std::cout << "linha: " << atoi(line.substr(31, 6).c_str()) << std::endl;
 		sistema.baseMVA = atoi(line.substr(31, 6).c_str());
 
-		unsigned int i = 0; // i é o número da barra que está sendo lida
+		int i = 0; // i é o número da barra que está sendo lida
 
 		std::getline(CDF, line); // pula duas linhas
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
@@ -253,15 +253,15 @@ bool readCDF(std::string cdfFile, sistemaType& sistema, barraType& barra, ramoTy
 
 		std::getline(CDF, line); // pula duas linhas
 		sistema.nL = 0;
-		unsigned int nRamosDuplicatas = 0;
+		int nRamosDuplicatas = 0;
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 		{
 			if (line.find("-999") == std::string::npos) {
 				// Parse branch	
-				unsigned int auxde = id2i(atoi(line.substr(0, 4).c_str()), sistema, barra); // ramo da linha i // [0, 3]
-				unsigned int auxpara = id2i(atoi(line.substr(4, 5).c_str()), sistema, barra); // at� a j // [4, 8]
+				int auxde = id2i(atoi(line.substr(0, 4).c_str()), sistema, barra); // ramo da linha i // [0, 3]
+				int auxpara = id2i(atoi(line.substr(4, 5).c_str()), sistema, barra); // at� a j // [4, 8]
 				bool flgRamoNovo = 1;
-				unsigned int i;
+				int i;
 
 				for (i = 0; i < sistema.nL; i++) {
 					if ((ramo.de[i] == auxde) && (ramo.para[i] == auxpara)) {
@@ -357,7 +357,7 @@ bool readCDFX(std::string cdfFile, sistemaType& sistema, barraType& barra, ramoT
 		//std::cout << "linha: " << atoi(line.substr(31, 6).c_str()) << std::endl;
 		sistema.baseMVA = atoi(line.substr(31, 6).c_str());
 
-		unsigned int i = 0; // i é o número da barra que está sendo lida
+		int i = 0; // i é o número da barra que está sendo lida
 
 		std::getline(CDF, line); // pula duas linhas
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
@@ -429,15 +429,15 @@ bool readCDFX(std::string cdfFile, sistemaType& sistema, barraType& barra, ramoT
 
 		std::getline(CDF, line); // pula duas linhas
 		sistema.nL = 0;
-		unsigned int nRamosDuplicatas = 0;
+		int nRamosDuplicatas = 0;
 		while (std::getline(CDF, line)) // atualiza line a cada itera��o
 		{
 			if (line.find("-999") == std::string::npos) {
 				// Parse branch	
-				unsigned int auxde = id2i(atoi(line.substr(0, 5).c_str()), sistema, barra); // ramo da linha i 
-				unsigned int auxpara = id2i(atoi(line.substr(6, 5).c_str()), sistema, barra); // at� a j 
+				int auxde = id2i(atoi(line.substr(0, 5).c_str()), sistema, barra); // ramo da linha i 
+				int auxpara = id2i(atoi(line.substr(6, 5).c_str()), sistema, barra); // at� a j 
 				bool flgRamoNovo = 1;
-				unsigned int i;
+				int i;
 
 				for (i = 0; i < sistema.nL; i++) {
 					if ((ramo.de[i] == auxde) && (ramo.para[i] == auxpara)) {

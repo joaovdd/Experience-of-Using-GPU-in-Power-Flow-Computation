@@ -1,7 +1,7 @@
 // defina como verdadeiro para que seja usado double,
 // caso contr�rio ser� utilizado float 
 // n�o esquecer de fazer mudan�a no outro arquivo tamb�m!!!!!!!!!!
-#define DOUBLE_MODE false
+#define DOUBLE_MODE true
 
 // *****************************************************************************************
 // N�o alterar a partir daqui***************************************************************

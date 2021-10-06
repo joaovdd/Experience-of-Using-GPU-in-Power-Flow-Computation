@@ -4,7 +4,7 @@
 
 // indexador é o numero da barra (via IDX1F)
 struct barraType {
-	unsigned int* id; // bus identifier number
+	int* id; // bus identifier number
 	float_type* V;//[NB];
 	float_type* theta;//[NB];
 

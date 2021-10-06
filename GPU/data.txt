@@ -1,10 +1,10 @@
-metodo         = hibridoC;       // hibridoC (hybrid CPU-GPU routines), esparso (sparse routines), denso (dense routines)
+metodo         = hibridoC;        // hibridoC (hybrid CPU-GPU routines), esparso (sparse routines), denso (dense routines)
 openmp         = OFF; 
-v_inicial      = 1.0;            // flat start
+v_inicial      = 1.0;             // flat start
 theta_inicial  = 0.0;
 tolerancia     = 0.0001;
 no_max_iter    = 100;
-arq_entrada    = ieee118x128.cdfx;     // input cdf file name
+arq_entrada    = ieee118.cdf;     // input cdf file name
 laconic_mode   = OFF;             // if turned on doesn't print on the terminal and generates benchmark csv file
-output_bench   = SCREEN;         // output_benchmark: SCREEN, FILE ou ALL;
-output_ans     = OFF;
+output_bench   = SCREEN;          // output_benchmark: SCREEN, FILE ou ALL;
+output_ans     = ON;

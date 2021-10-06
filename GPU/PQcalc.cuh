@@ -1,6 +1,6 @@
 // numero de threads: deve ser potência de 2
 // nl é o número de LTs conectadas à barra k (card[k])
-unsigned int noThreadsPQ(int nl){
+int noThreadsPQ(int nl){
 	int aux = 1;
 	while (nl > aux){
 		aux <<= 1;
@@ -10,12 +10,12 @@ unsigned int noThreadsPQ(int nl){
 }
 
 // cardinalidade do conjunto K-1: a quantas barras está ligada cada barra
-unsigned int* cardK(sistema &sistema, ramo &ramo){
-	unsigned int* card = (unsigned int *)malloc(sistema.nB * sizeof(unsigned int));
-	for (unsigned int i = 0; i < sistema.nB; i++){
+int* cardK(sistema &sistema, ramo &ramo){
+	int* card = (int *)malloc(sistema.nB * sizeof(int));
+	for (int i = 0; i < sistema.nB; i++){
 		card[i] = 0;
 	}
-	for (unsigned int i = 0; i < sistema.nB; i++){
+	for (int i = 0; i < sistema.nB; i++){
 		card[IDX1F(ramo.de[i])]++;
 		card[IDX1F(ramo.para[i])]++;
 	}
@@ -23,20 +23,9 @@ unsigned int* cardK(sistema &sistema, ramo &ramo){
 }
 
 // retorna a posição do elemento de índices (lin, col) no vetor de valores da matriz
-// armazenada da forma csr (overload para indexadores unsigned int)
-__host__ __device__ int coeffPos(unsigned int lin, unsigned int col, unsigned int* csrRowPtrY, unsigned int* csrColIndY, int nnzY) {
-	for (unsigned int i = csrRowPtrY[/*IDX1F(*/lin/*)*/]; i < csrRowPtrY[/*IDX1F(*/lin + 1/*)*/]; i++) {
-		if (csrColIndY[i] == /*IDX1F(*/col/*)*/) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-// retorna a posição do elemento de índices (lin, col) no vetor de valores da matriz
 // armazenada da forma csr (overload para indexadores int)
-__host__ __device__ int coeffPos(unsigned int lin, unsigned int col, int* csrRowPtrY, int* csrColIndY, int nnzY) {
-	for (unsigned int i = csrRowPtrY[/*IDX1F(*/lin/*)*/]; i < csrRowPtrY[/*IDX1F(*/lin + 1/*)*/]; i++) {
+__host__ __device__ int coeffPos(int lin, int col, int* csrRowPtrY, int* csrColIndY, int nnzY) {
+	for (int i = csrRowPtrY[/*IDX1F(*/lin/*)*/]; i < csrRowPtrY[/*IDX1F(*/lin + 1/*)*/]; i++) {
 		if (csrColIndY[i] == /*IDX1F(*/col/*)*/) {
 			return i;
 		}
@@ -46,7 +35,7 @@ __host__ __device__ int coeffPos(unsigned int lin, unsigned int col, int* csrRow
 
 // retorna valor da defasagem angular entre as barras a e b
 // pode se tornar mais eficiente (será?) ao se utilizar a função coeff (O(log(nnz_j)).
-__device__ float_type phif(unsigned int a, unsigned int b, const sistema sistPon, const barra barraPon, const ramo ramoPon) {
+__device__ float_type phif(int a, int b, const sistema sistPon, const barra barraPon, const ramo ramoPon) {
 	auto aux = coeffPos(IDX1F(a), IDX1F(b), ramoPon.d_csrRowPtrPhi, ramoPon.d_csrColIndPhi, ramoPon.nnzPhi);
 	if (aux == -1) {
 		aux = coeffPos(IDX1F(b), IDX1F(a), ramoPon.d_csrRowPtrPhi, ramoPon.d_csrColIndPhi, ramoPon.nnzPhi);
@@ -63,7 +52,7 @@ __device__ float_type phif(unsigned int a, unsigned int b, const sistema sistPon
 }
 
 // retorna valor da defasagem angular entre as barras a e b
-__host__ __device__ float_type phif(unsigned int a, unsigned int b, sistema* sistema, ramo* ramo) {
+__host__ __device__ float_type phif(int a, int b, sistema* sistema, ramo* ramo) {
 #ifdef __CUDA_ARCH__
 	auto aux = coeffPos(IDX1F(a), IDX1F(b), ramo->d_csrRowPtrPhi, ramo->d_csrColIndPhi, ramo->nnzPhi);
 	if (aux == -1) {
@@ -97,7 +86,7 @@ __host__ __device__ float_type phif(unsigned int a, unsigned int b, sistema* sis
 #endif
 }
 
-//__device__ float_type phif(unsigned int a, unsigned int b, const sistema sistPon, const barra barraPon, const ramo ramoPon) {
+//__device__ float_type phif(int a, int b, const sistema sistPon, const barra barraPon, const ramo ramoPon) {
 //	for (int i = 0; i < sistPon.nL; i++) { // i percorre ramos
 //		if (ramoPon.de[i] == a) { // se k está ligada à para[i] =>
 //			if (ramoPon.para[i] == b) { // se k está ligada à para[i] =>
@@ -115,8 +104,8 @@ __host__ __device__ float_type phif(unsigned int a, unsigned int b, sistema* sis
 //	return(0.);
 //}
 //
-//__host__ __device__ float_type phif(unsigned int a, unsigned int b, sistema* sistema, ramo* ramo) {
-//	for (unsigned int i = 0; i < sistema->nL; i++) { // i percorre ramos
+//__host__ __device__ float_type phif(int a, int b, sistema* sistema, ramo* ramo) {
+//	for (int i = 0; i < sistema->nL; i++) { // i percorre ramos
 //		if (ramo->de[i] == a) { // se k está ligada à para[i] =>
 //			if (ramo->para[i] == b) { // se k está ligada à para[i] =>
 //				return (ramo->phi[i]);
@@ -133,8 +122,8 @@ __host__ __device__ float_type phif(unsigned int a, unsigned int b, sistema* sis
 //	return(0.);
 //}
 
-__host__ __device__ float_type bshf(unsigned short a, unsigned short b, const sistema &sistPon, const ramo &ramoPon) {
-	for (unsigned int i = 0; i < sistPon.nL; i++) { // i percorre ramos
+__host__ __device__ float_type bshf(int a, int b, const sistema &sistPon, const ramo &ramoPon) {
+	for (int i = 0; i < sistPon.nL; i++) { // i percorre ramos
 		if (ramoPon.de[i] == a) { // se k está ligada à para[i] =>
 			if (ramoPon.para[i] == b) { // se k está ligada à para[i] =>
 				return (ramoPon.bsh[i]);
@@ -153,7 +142,7 @@ __host__ __device__ float_type bshf(unsigned short a, unsigned short b, const si
 
 // // debugado! WORKING
 // __global__ void calcPeficiente(sistema* d_sistema, ramo* d_ramo, sistema sistPon, barra barraPon, iterativo iterPon){
-// 	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
+// 	int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
 //  	if(idx <= sistPon.nB){
 //  	//calculo de P_idx	
 //  		float_type aux = 0;
@@ -182,7 +171,7 @@ __host__ __device__ float_type bshf(unsigned short a, unsigned short b, const si
 
 // debugado!
 __global__ void calcPeficiente(sistema* d_sistema, ramo* d_ramo, sistema sistPon, barra barraPon, iterativo iterPon){
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
  	if(idx <= sistPon.nB){
  	//calculo de P_idx	
  		float_type aux = 0;
@@ -211,7 +200,7 @@ __global__ void calcPeficiente(sistema* d_sistema, ramo* d_ramo, sistema sistPon
 }
 
 __global__ void calcQeficiente(sistema* d_sistema, ramo* d_ramo, sistema sistPon, barra barraPon, iterativo iterPon){
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
  	if(idx <= sistPon.nB){
  	//calculo de P_idx	
  		float_type aux = 0;
@@ -240,17 +229,17 @@ __global__ void calcQeficiente(sistema* d_sistema, ramo* d_ramo, sistema sistPon
 }
 
 __global__ void calcPeficiente_0based_sha(sistema* d_sistema, ramo* d_ramo, sistema sistPon, barra barraPon, iterativo iterPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
 
 	extern __shared__ int s_csrRowPtrY[];
 	int* s_csrColIndY = s_csrRowPtrY + sistPon.nB;
 
 		
-	for (size_t i = threadIdx.x; i <= sistPon.nB; i+= blockDim.x)	{
+	for (int i = threadIdx.x; i <= sistPon.nB; i+= blockDim.x)	{
 		s_csrRowPtrY[i] = sistPon.csrRowPtrY[i];
 	}
 
-	for (size_t i = threadIdx.x; i < sistPon.nnzY; i += blockDim.x) {
+	for (int i = threadIdx.x; i < sistPon.nnzY; i += blockDim.x) {
 		s_csrColIndY[i] = sistPon.csrColIndY[i];
 	}
 		
@@ -283,7 +272,7 @@ __global__ void calcPeficiente_0based_sha(sistema* d_sistema, ramo* d_ramo, sist
 }
 
 __global__ void calcPeficiente_0based(sistema* d_sistema, ramo* d_ramo, sistema sistPon, barra barraPon, iterativo iterPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
 	if (idx <= sistPon.nB) {
 		//calculo de P_idx	
 		float_type aux = 0;
@@ -312,7 +301,7 @@ __global__ void calcPeficiente_0based(sistema* d_sistema, ramo* d_ramo, sistema 
 }
 
 __global__ void calcQeficiente_0based(sistema* d_sistema, ramo* d_ramo, sistema sistPon, barra barraPon, iterativo iterPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
 	if (idx <= sistPon.nB) {
 		//calculo de P_idx	
 		float_type aux = 0;
@@ -340,10 +329,10 @@ __global__ void calcQeficiente_0based(sistema* d_sistema, ramo* d_ramo, sistema 
 	}
 }
 
-__global__ void calcP_sha(const unsigned int k, sistema* d_sistema, barra* barra, ramo* ramo, float_type* d_Out) {
+__global__ void calcP_sha(const int k, sistema* d_sistema, barra* barra, ramo* ramo, float_type* d_Out) {
 	extern __shared__ float_type s_data[];
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
-	unsigned int tid = threadIdx.x;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int tid = threadIdx.x;
 	if (idx <= d_sistema->nB) {
 		//		printf("(%d)\n", idx);
 		float_type aux = 0;
@@ -374,7 +363,7 @@ __global__ void calcP_sha(const unsigned int k, sistema* d_sistema, barra* barra
 	//	}
 	//}
 
-	for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+	for (int s = blockDim.x / 2; s > 0; s >>= 1) {
 		if (tid < s) {
 			s_data[tid] += s_data[tid + s];
 			//printf("idx = %d;\ts = %d\n", tid, s);
@@ -387,8 +376,8 @@ __global__ void calcP_sha(const unsigned int k, sistema* d_sistema, barra* barra
 }
 
 //idx = 1:nB
-__global__ void calcP(const unsigned int k, float_type* d_Pparcelas, sistema* d_sistema, barra* barra, ramo* ramo, unsigned int threads){
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
+__global__ void calcP(const int k, float_type* d_Pparcelas, sistema* d_sistema, barra* barra, ramo* ramo, int threads){
+	int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
 	if(idx <= d_sistema->nB){
 //		printf("(%d)\n", idx);
 		float_type aux = 0;
@@ -416,7 +405,7 @@ __global__ void calcP(const unsigned int k, float_type* d_Pparcelas, sistema* d_
 
 		__syncthreads();
 
-	for (unsigned int s = threads/2; s > 0; s >>= 1){
+	for (int s = threads/2; s > 0; s >>= 1){
 		if (idx < s){
 			d_Pparcelas[idx] += d_Pparcelas[idx + s];
 			//printf("idx = %d;\ts = %d\n", idx, s);
@@ -425,11 +414,11 @@ __global__ void calcP(const unsigned int k, float_type* d_Pparcelas, sistema* d_
 	}
 }
 
-//void d_calcPf(const unsigned int k, sistema& h_sistema, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, iterativo& iterPon, unsigned int* card, unsigned int cudaCap, unsigned int noSM) {
+//void d_calcPf(const int k, sistema& h_sistema, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, iterativo& iterPon, int* card, int cudaCap, int noSM) {
 //	float_type* d_Pparcelas = NULL;
 //	float_type aux = 0;
 //
-//	unsigned int /*threads         = noThreadsPQ(card[IDX1F(k)]), // potência de dois imediatamente superior ao número de barras ligadas à k
+//	int /*threads         = noThreadsPQ(card[IDX1F(k)]), // potência de dois imediatamente superior ao número de barras ligadas à k
 //				   threadsPerBlock = noThreadsPerBlock(threads, cudaCap, noSM),*/
 //		noBlocks = noMaxBlocks(cudaCap, noSM);
 //	checkCudaErrors(cudaMalloc(&d_Pparcelas, sizeof(float_type) * noThreadsPQ(h_sistema.nB)));
@@ -457,15 +446,15 @@ __global__ void calcP(const unsigned int k, float_type* d_Pparcelas, sistema* d_
 //	}
 //}
 
-unsigned int min_(unsigned int x, unsigned int y) {
+int min_(int x, int y) {
 	return y ^ ((x ^ y) & -(x < y));
 }
 
-void d_dnCalcPf_sha(const unsigned int k, sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& sistPon, iterativo& iterPon) { 
+void d_dnCalcPf_sha(const int k, sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& sistPon, iterativo& iterPon) { 
 
-	const unsigned int threads = noThreadsPQ(sistPon.nB);
-	const unsigned int threadsPerBlock = min_(512, threads);
-	const unsigned int blocks = ceil((float_type)threads / (float_type)threadsPerBlock);
+	const int threads = noThreadsPQ(sistPon.nB);
+	const int threadsPerBlock = min_(512, threads);
+	const int blocks = ceil((float_type)threads / (float_type)threadsPerBlock);
 
 	float_type *d_Out = nullptr, *h_Out = nullptr;
 	checkCudaErrors(cudaMalloc(&d_Out, sizeof(float_type) * blocks));
@@ -479,7 +468,7 @@ void d_dnCalcPf_sha(const unsigned int k, sistema* d_sistema, barra* d_barra, ra
 	checkCudaErrors(cudaMemcpy(h_Out, d_Out, sizeof(float_type) * blocks, cudaMemcpyDeviceToHost));
 
 	float_type acc = 0;
-	for (unsigned int i = 0; i < blocks; i++) {
+	for (int i = 0; i < blocks; i++) {
 		acc += h_Out[i];
 	}
 
@@ -496,7 +485,7 @@ void d_dnCalcPf_sha(const unsigned int k, sistema* d_sistema, barra* d_barra, ra
 	}
 }
 
-void d_dnCalcPf(const unsigned int k, sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& sistPon, iterativo& iterPon) { //(const unsigned int k, sistema& h_sistema, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, iterativo& iterPon) {
+void d_dnCalcPf(const int k, sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& sistPon, iterativo& iterPon) { //(const int k, sistema& h_sistema, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, iterativo& iterPon) {
 	float_type* d_Pparcelas = NULL;
 	float_type aux = 0;
 
@@ -522,8 +511,8 @@ void d_dnCalcPf(const unsigned int k, sistema* d_sistema, barra* d_barra, ramo* 
 //***************************************************************************************************************************************************************************************
 
 //idx = 0:nL-1
-__global__ void calcQ(const unsigned int k, float_type* d_Qparcelas, sistema* d_sistema, barra* d_barra, ramo* d_ramo, unsigned int threads){
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
+__global__ void calcQ(const int k, float_type* d_Qparcelas, sistema* d_sistema, barra* d_barra, ramo* d_ramo, int threads){
+	int idx = threadIdx.x + blockDim.x * blockIdx.x +1;
 	if(idx <= d_sistema->nB){
 //		printf("(%d)\n", idx);
 		float_type aux = 0;
@@ -560,7 +549,7 @@ __global__ void calcQ(const unsigned int k, float_type* d_Qparcelas, sistema* d_
 
 	// da pra ganhar eficiencia aqui ainda... ver memória shared e aqueles slides
 	// o que acontece quando tiver mais de um bloco no mesmo P??????????
-	for (unsigned int s = threads/2; s > 0; s >>= 1){
+	for (int s = threads/2; s > 0; s >>= 1){
 		if (idx < s){
 			d_Qparcelas[idx] += d_Qparcelas[idx + s];
 			//printf("idx = %d;\ts = %d\n", idx, s);
@@ -574,10 +563,10 @@ __global__ void calcQ(const unsigned int k, float_type* d_Qparcelas, sistema* d_
 	// ATENÇÃO: MULTIPLICAR POR VK na cpu ou em outro kernel otimiza alguma coisa?????????????????????????????????????????????????????????????????????????????
 }
 
-__global__ void calcQ_sha(const unsigned int k, sistema* d_sistema, barra* barra, ramo* ramo, float_type* d_Out) {
+__global__ void calcQ_sha(const int k, sistema* d_sistema, barra* barra, ramo* ramo, float_type* d_Out) {
 	extern __shared__ float_type s_data[];
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
-	unsigned int tid = threadIdx.x;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int tid = threadIdx.x;
 	if (idx <= d_sistema->nB) {
 		//		printf("(%d)\n", idx);
 		float_type aux = 0;
@@ -608,7 +597,7 @@ __global__ void calcQ_sha(const unsigned int k, sistema* d_sistema, barra* barra
 	//	}
 	//}
 
-	for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+	for (int s = blockDim.x / 2; s > 0; s >>= 1) {
 		if (tid < s) {
 			s_data[tid] += s_data[tid + s];
 			//printf("idx = %d;\ts = %d\n", tid, s);
@@ -620,10 +609,10 @@ __global__ void calcQ_sha(const unsigned int k, sistema* d_sistema, barra* barra
 	}
 }
 
-//void d_calcQf(const unsigned int k, sistema &h_sistema, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, iterativo& iterPon, unsigned int* card, unsigned int cudaCap, unsigned int noSM){
+//void d_calcQf(const int k, sistema &h_sistema, sistema* d_sistema, barra* d_barra, ramo* d_ramo, iterativo* d_iterativo, iterativo& iterPon, int* card, int cudaCap, int noSM){
 //    float_type* d_Qparcelas = NULL;
 //    float_type aux = 0;
-//    unsigned int /*threads         = noThreadsPQ(card[IDX1F(k)]),
+//    int /*threads         = noThreadsPQ(card[IDX1F(k)]),
 //				   threadsPerBlock = noThreadsPerBlock(threads, cudaCap, noSM),*/
 //				   noBlocks        = noMaxBlocks(cudaCap, noSM);
 //
@@ -648,11 +637,11 @@ __global__ void calcQ_sha(const unsigned int k, sistema* d_sistema, barra* barra
 //	}
 //}
 
-void d_dnCalcQf_sha(const unsigned int k, sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& sistPon, iterativo& iterPon) {
+void d_dnCalcQf_sha(const int k, sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& sistPon, iterativo& iterPon) {
 
-	const unsigned int threads = noThreadsPQ(sistPon.nB);
-	const unsigned int threadsPerBlock = min_(512, threads);
-	const unsigned int blocks = ceil((float_type)threads / (float_type)threadsPerBlock);
+	const int threads = noThreadsPQ(sistPon.nB);
+	const int threadsPerBlock = min_(512, threads);
+	const int blocks = ceil((float_type)threads / (float_type)threadsPerBlock);
 
 	float_type* d_Out = nullptr, * h_Out = nullptr;
 	checkCudaErrors(cudaMalloc(&d_Out, sizeof(float_type) * blocks));
@@ -666,7 +655,7 @@ void d_dnCalcQf_sha(const unsigned int k, sistema* d_sistema, barra* d_barra, ra
 	checkCudaErrors(cudaMemcpy(h_Out, d_Out, sizeof(float_type) * blocks, cudaMemcpyDeviceToHost));
 
 	float_type acc = 0;
-	for (unsigned int i = 0; i < blocks; i++) {
+	for (int i = 0; i < blocks; i++) {
 		acc += h_Out[i];
 	}
 
@@ -683,7 +672,7 @@ void d_dnCalcQf_sha(const unsigned int k, sistema* d_sistema, barra* d_barra, ra
 	}
 }
 
-void d_dnCalcQf(const unsigned int k, sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& sistPon, iterativo& iterPon) {
+void d_dnCalcQf(const int k, sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& sistPon, iterativo& iterPon) {
 	float_type* d_Qparcelas = NULL;
 	float_type aux = 0;
 
@@ -707,11 +696,11 @@ void d_dnCalculePQ(sistema* d_sistema, barra* d_barra, ramo* d_ramo, sistema& si
 	// <N�O!!!>Pcalc e Qcalc possuem nB entradas e a entrada k � relativa � k-�sima barra
 
 	// Calcula os valores de Pk...
-	for (unsigned int i = 1; i <= sistPon.nB; i++) {
+	for (int i = 1; i <= sistPon.nB; i++) {
 		d_dnCalcPf_sha(i, d_sistema, d_barra, d_ramo, sistPon, iterPon);
 	}
 	// Calcula os valores de Qk...
-	for (unsigned int i = 1; i <= sistPon.nB; i++) {
+	for (int i = 1; i <= sistPon.nB; i++) {
 		d_dnCalcQf_sha(i, d_sistema, d_barra, d_ramo, sistPon, iterPon);
 	}
 }
@@ -721,8 +710,8 @@ void d_calculePQ(sistema* d_sistema, ramo* d_ramo, sistema &sistPon, barra &barr
 
 	int threadsPerBlock = 128;
 
-	calcPeficiente<<<(unsigned int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
-	calcQeficiente<<<(unsigned int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
+	calcPeficiente<<<(int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
+	calcQeficiente<<<(int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
 
 	checkCudaErrors(cudaGetLastError());
 }
@@ -732,19 +721,19 @@ void d_calculePQ_0based(sistema* d_sistema, ramo* d_ramo, sistema &sistPon, barr
 
 	int threadsPerBlock = 128;
 
-	calcPeficiente_0based<<<(unsigned int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock, 0, streams[0]>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
-	//calcPeficiente_0based_sha<<<(unsigned int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock, (sistPon.nnzY + sistPon.nB + 1) * sizeof(unsigned int), streams[0]>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
-	calcQeficiente_0based<<<(unsigned int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock, 0, streams[1]>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
+	calcPeficiente_0based<<<(int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock, 0, streams[0]>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
+	//calcPeficiente_0based_sha<<<(int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock, (sistPon.nnzY + sistPon.nB + 1) * sizeof(int), streams[0]>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
+	calcQeficiente_0based<<<(int) ceil(((float) sistPon.nB) / (float) (threadsPerBlock)), threadsPerBlock, 0, streams[1]>>>(d_sistema, d_ramo, sistPon, barraPon, iterPon);
 
 	checkCudaErrors(cudaGetLastError());
 }
 
 // 1 thread para cada ramo
 void __global__ d_P_Eficiente(const sistema sistPon, const barra barraPon, const ramo ramoPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
 	if (idx <= sistPon.nL){
 		float_type aux = 0;
-		const unsigned int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
+		const int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
 		aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
 		aux += barraPon.theta[IDX1F(k)] - barraPon.theta[IDX1F(m)]; // theta_k para[i]
 		ramoPon.Pdp[IDX1F(idx)] = (barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(k)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].x - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].x*cos(aux) - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].y*sin(aux));
@@ -754,10 +743,10 @@ void __global__ d_P_Eficiente(const sistema sistPon, const barra barraPon, const
 
 // 1 thread para cada ramo
 void __global__ d_Q_Eficiente(const sistema sistPon, const barra barraPon, const ramo ramoPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
 	if (idx <= sistPon.nL){
 		float_type aux = 0;
-		const unsigned int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
+		const int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
 		aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
 		aux += barraPon.theta[IDX1F(k)] - barraPon.theta[IDX1F(m)]; // theta_k para[i]
 		ramoPon.Qdp[IDX1F(idx)] = (-barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(k)] * (sistPon.Y[IDX2F(k, m, sistPon.nB)].y + bshf(k, m, sistPon, ramoPon)) + barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].y*cos(aux) - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].x*sin(aux));
@@ -766,10 +755,10 @@ void __global__ d_Q_Eficiente(const sistema sistPon, const barra barraPon, const
 }
 
 void calcFluxf_Eficiente(sistema &h_sistema, barra &h_barra, ramo &h_ramo, iterativo &h_iterativo, const sistema &sistPon, const barra &barraPon, const ramo &ramoPon, const iterativo &iterPon, cudaDeviceProp deviceprop) {
-	unsigned int tamanho = sistPon.nL;
+	int tamanho = sistPon.nL;
 	dim3 dimBlock(16*deviceprop.warpSize, 1);
 	dim3 dimGrid(
-			(unsigned int) ceil(
+			(int) ceil(
 					((float) tamanho) / (float) (8*deviceprop.warpSize)), 1);
 
 	// Calcula os valores de Pkm e Pmk
@@ -781,10 +770,10 @@ void calcFluxf_Eficiente(sistema &h_sistema, barra &h_barra, ramo &h_ramo, itera
 
 // 1 thread para cada ramo
 void __global__ d_P_Eficiente_Sp(const sistema sistPon, const barra barraPon, const ramo ramoPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
 	if (idx <= sistPon.nL){
 		float_type aux = 0;
-		const unsigned int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
+		const int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
 		aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
 		aux += barraPon.theta[IDX1F(k)] - barraPon.theta[IDX1F(m)]; // theta_k para[i]
 		ramoPon.Pdp[IDX1F(idx)] = (barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(k)] * sistPon.spYval[coeffPos(IDX1F(k), IDX1F(m), sistPon.csrRowPtrY, sistPon.csrColIndY, sistPon.nnzY)].x - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.spYval[coeffPos(IDX1F(k), IDX1F(m), sistPon.csrRowPtrY, sistPon.csrColIndY, sistPon.nnzY)].x * cos(aux)  - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.spYval[coeffPos(IDX1F(k), IDX1F(m), sistPon.csrRowPtrY, sistPon.csrColIndY, sistPon.nnzY)].y * sin(aux));
@@ -794,10 +783,10 @@ void __global__ d_P_Eficiente_Sp(const sistema sistPon, const barra barraPon, co
 
 // 1 thread para cada ramo
 void __global__ d_Q_Eficiente_Sp(const sistema sistPon, const barra barraPon, const ramo ramoPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1;
 	if (idx <= sistPon.nL){
 		float_type aux = 0;
-		const unsigned int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
+		const int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
 		aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
 		aux += barraPon.theta[IDX1F(k)] - barraPon.theta[IDX1F(m)]; // theta_k para[i]
 		ramoPon.Qdp[IDX1F(idx)] = (-barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(k)] * (sistPon.spYval[coeffPos(IDX1F(k), IDX1F(m), sistPon.csrRowPtrY, sistPon.csrColIndY, sistPon.nnzY)].y + bshf(k, m, sistPon, ramoPon)) + barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.spYval[coeffPos(IDX1F(k), IDX1F(m), sistPon.csrRowPtrY, sistPon.csrColIndY, sistPon.nnzY)].y*cos(aux)  - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.spYval[coeffPos(IDX1F(k), IDX1F(m), sistPon.csrRowPtrY, sistPon.csrColIndY, sistPon.nnzY)].x*sin(aux));
@@ -806,13 +795,13 @@ void __global__ d_Q_Eficiente_Sp(const sistema sistPon, const barra barraPon, co
 }
 
 void calcFluxf_Eficiente_Sp(sistema &h_sistema, barra &h_barra, ramo &h_ramo, iterativo &h_iterativo, const sistema &sistPon, const barra &barraPon, const ramo &ramoPon, const iterativo &iterPon, cudaDeviceProp deviceprop, cudaStream_t* streams) {
-	unsigned int tamanho = sistPon.nL;
+	int tamanho = sistPon.nL;
 	dim3 dimBlock(16*deviceprop.warpSize, 1);
 	dim3 dimGrid(
-			(unsigned int) ceil(
+			(int) ceil(
 					((float) tamanho) / (float) (8*deviceprop.warpSize)), 1);
 
-	//printf(" tamanho = %d, threads/block = %d, blocks/grid = %d\n\n", tamanho, 16 * deviceprop.warpSize, (unsigned int)ceil(((float)tamanho) / (float)(16 * deviceprop.warpSize)));
+	//printf(" tamanho = %d, threads/block = %d, blocks/grid = %d\n\n", tamanho, 16 * deviceprop.warpSize, (int)ceil(((float)tamanho) / (float)(16 * deviceprop.warpSize)));
 
 	// Calcula os valores de Pkm e Pmk
 	d_P_Eficiente_Sp<<<dimGrid, dimBlock, 0, streams[0]>>>(sistPon, barraPon, ramoPon);
@@ -821,28 +810,28 @@ void calcFluxf_Eficiente_Sp(sistema &h_sistema, barra &h_barra, ramo &h_ramo, it
 	d_Q_Eficiente_Sp<<<dimGrid, dimBlock, 0, streams[1]>>>(sistPon, barraPon, ramoPon);
 }
 
-void __global__ d_P_dp(unsigned int k, unsigned int m, const sistema sistPon, const barra barraPon, const ramo ramoPon, const unsigned int i) {
+void __global__ d_P_dp(int k, int m, const sistema sistPon, const barra barraPon, const ramo ramoPon, const int i) {
 	float_type aux = 0;
 	aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
 	aux += barraPon.theta[IDX1F(k)] - barraPon.theta[IDX1F(m)]; // theta_k para[i]
 	ramoPon.Pdp[i] = (barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(k)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].x - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].x*cos(aux) - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].y*sin(aux));
 }
 
-void __global__ d_Q_dp(unsigned int k, unsigned int m, const sistema sistPon, const barra barraPon, const ramo ramoPon, const unsigned int i) {
+void __global__ d_Q_dp(int k, int m, const sistema sistPon, const barra barraPon, const ramo ramoPon, const int i) {
 	float_type aux = 0;
 	aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
 	aux += barraPon.theta[IDX1F(k)] - barraPon.theta[IDX1F(m)]; // theta_k para[i]
 	ramoPon.Qdp[i] = (-barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(k)] * (sistPon.Y[IDX2F(k, m, sistPon.nB)].y + bshf(k, m, sistPon, ramoPon)) + barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].y*cos(aux) - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].x*sin(aux));
 }
 
-void __global__ d_P_pd(unsigned int k, unsigned int m, const sistema sistPon, const barra barraPon, const ramo ramoPon, const unsigned int i) {
+void __global__ d_P_pd(int k, int m, const sistema sistPon, const barra barraPon, const ramo ramoPon, const int i) {
 	float_type aux = 0;
 	aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
 	aux += barraPon.theta[IDX1F(k)] - barraPon.theta[IDX1F(m)]; // theta_k para[i]
 	ramoPon.Ppd[i] = (barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(k)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].x - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].x*cos(aux) - barraPon.V[IDX1F(k)] * barraPon.V[IDX1F(m)] * sistPon.Y[IDX2F(k, m, sistPon.nB)].y*sin(aux));
 }
 
-void __global__ d_Q_pd(unsigned int k, unsigned int m, const sistema sistPon, const barra barraPon, const ramo ramoPon, const unsigned int i) {
+void __global__ d_Q_pd(int k, int m, const sistema sistPon, const barra barraPon, const ramo ramoPon, const int i) {
 	float_type aux = 0;
 	aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
 	aux += barraPon.theta[IDX1F(k)] - barraPon.theta[IDX1F(m)]; // theta_k para[i]
@@ -851,26 +840,26 @@ void __global__ d_Q_pd(unsigned int k, unsigned int m, const sistema sistPon, co
 
 //muito ineficiente
 void calcFluxf(sistema &h_sistema, barra &h_barra, ramo &h_ramo, const sistema &sistPon, const barra &barraPon, const ramo &ramoPon, cudaDeviceProp deviceprop) {
-	unsigned int tamanho = sistPon.nL; // nPQ
+	int tamanho = sistPon.nL; // nPQ
 	dim3 dimBlock(3*deviceprop.warpSize, 1);
 	dim3 dimGrid(
-			(unsigned int) ceil(
+			(int) ceil(
 					((float) tamanho) / (float) (3*deviceprop.warpSize)), 1);
 
 	// Calcula os valores de Pkm...
-	for (unsigned int i = 1; i <= sistPon.nL; i++) {
+	for (int i = 1; i <= sistPon.nL; i++) {
 		d_P_dp<<<dimGrid, dimBlock>>>(h_ramo.de[IDX1F(i)], h_ramo.para[IDX1F(i)], sistPon, barraPon, ramoPon, IDX1F(i));
 	}
 	// Calcula os valores de Qkm...
-	for (unsigned int i = 1; i <= sistPon.nL; i++) {
+	for (int i = 1; i <= sistPon.nL; i++) {
 		d_Q_dp<<<dimGrid, dimBlock>>>(h_ramo.de[IDX1F(i)], h_ramo.para[IDX1F(i)], sistPon, barraPon, ramoPon, IDX1F(i));
 	}
 	// Calcula os valores de Pmk
-	for (unsigned int i = 1; i <= sistPon.nL; i++) {
+	for (int i = 1; i <= sistPon.nL; i++) {
 		d_P_pd<<<dimGrid, dimBlock>>>(h_ramo.para[IDX1F(i)], h_ramo.de[IDX1F(i)], sistPon, barraPon, ramoPon, IDX1F(i));
 	}
 	// Calcula os valores de Qmk...
-	for (unsigned int i = 1; i <= sistPon.nL; i++) {
+	for (int i = 1; i <= sistPon.nL; i++) {
 		d_Q_pd<<<dimGrid, dimBlock>>>(h_ramo.para[IDX1F(i)], h_ramo.de[IDX1F(i)], sistPon, barraPon, ramoPon, IDX1F(i));
 	}
 //	cudaDeviceSynchronize();
@@ -884,11 +873,11 @@ void calcFluxf(sistema &h_sistema, barra &h_barra, ramo &h_ramo, const sistema &
 
 // *eficientes*********************************************
 void __global__ d_P_ef(const sistema sistPon, const barra barraPon, const ramo ramoPon) {
-	unsigned int i = (threadIdx.x + blockDim.x * blockIdx.x);
-	unsigned int idx = i + 1;
+	int i = (threadIdx.x + blockDim.x * blockIdx.x);
+	int idx = i + 1;
 
 	if (i < sistPon.nL) {
-		unsigned int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
+		int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
 
 		float_type aux = 0;
 		aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
@@ -900,11 +889,11 @@ void __global__ d_P_ef(const sistema sistPon, const barra barraPon, const ramo r
 }
 
 void __global__ d_Q_ef(const sistema sistPon, const barra barraPon, const ramo ramoPon) {
-	unsigned int i = (threadIdx.x + blockDim.x * blockIdx.x);
-	unsigned int idx = i + 1;
+	int i = (threadIdx.x + blockDim.x * blockIdx.x);
+	int idx = i + 1;
 
 	if (i < sistPon.nL) {
-		unsigned int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
+		int k = ramoPon.de[IDX1F(idx)], m = ramoPon.para[IDX1F(idx)];
 
 		float_type aux = 0;
 		aux = phif(k, m, sistPon, barraPon, ramoPon); // defasagem do transformador
@@ -918,14 +907,14 @@ void __global__ d_Q_ef(const sistema sistPon, const barra barraPon, const ramo r
 // ********************************************************
 
 void calcFluxf_ef(sistema &h_sistema, barra &h_barra, ramo &h_ramo, const sistema &sistPon, const barra &barraPon, const ramo &ramoPon, cudaDeviceProp deviceprop) {
-	unsigned int tamanho = sistPon.nL;
+	int tamanho = sistPon.nL;
 	
-	unsigned int threadsPerBlock = 128;
-	unsigned int blocksPerGrid = (unsigned int)ceil((float)(tamanho) / (float)threadsPerBlock);
+	int threadsPerBlock = 128;
+	int blocksPerGrid = (int)ceil((float)(tamanho) / (float)threadsPerBlock);
 
 	//dim3 dimBlock(3*deviceprop.warpSize, 1);
 	//dim3 dimGrid(
-	//		(unsigned int) ceil(
+	//		(int) ceil(
 	//				((float) tamanho) / (float) (3*deviceprop.warpSize)), 1);
 
 	// Calcula os valores de P...

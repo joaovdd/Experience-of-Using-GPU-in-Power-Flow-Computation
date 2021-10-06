@@ -18,7 +18,7 @@ void lerArquivoEAlocarMemoria(sistemaType& sistema, barraType& barra, ramoType& 
 		initIter(sistema, iterativo);
 
 		if (readCDF(global::arq_entrada, sistema, barra, ramo)) { // l� dados do arquivo .CDF
-			printf("Deu ruim...");
+			printf("Erro ao abrir o arquivo...");
 		}
 		InitCsrPhi(sistema, ramo);
 	}
@@ -31,7 +31,7 @@ void lerArquivoEAlocarMemoria(sistemaType& sistema, barraType& barra, ramoType& 
 		initIter(sistema, iterativo);
 
 		if (readCDFX(global::arq_entrada, sistema, barra, ramo)) { // l� dados do arquivo .CDF
-			printf("Deu ruim...");
+			printf("Erro ao abrir o arquivo...");
 		}
 		InitCsrPhi(sistema, ramo);
 	}
@@ -40,6 +40,23 @@ void lerArquivoEAlocarMemoria(sistemaType& sistema, barraType& barra, ramoType& 
 		lerPWFEAlocarMemoria(global::arq_entrada, sistema, barra, ramo, iterativo);
 		InitCsrPhi(sistema, ramo);
 	}
+	else if (ext == "m") {
+		//matlab - MatPOWER file
+
+		matPowerDataType mpData = lerMatPowerEAlocarMemoria(global::arq_entrada, sistema, barra, ramo, iterativo);
+		//lerTamanhos(global::arq_entrada, sistema); // para aloca��o din�mica das vari�veis
+
+		//initBranch(sistema, ramo);
+		//initSistema(sistema);
+		//initBus(sistema, barra);
+		//initIter(sistema, iterativo);
+
+		//if (storeMatPOWER(sistema, barra, ramo, mpData)) { // l� dados do arquivo .CDF
+		//	printf("Erro ao abrir o arquivo...");
+		//}
+		InitCsrPhi(sistema, ramo);
+	}
+
 	else {
 		printf("nda == %s", ext.c_str());
 	}

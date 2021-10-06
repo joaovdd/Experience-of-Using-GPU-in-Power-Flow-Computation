@@ -3,10 +3,10 @@
 // Jacobiano com lim inj reat
 
 void calcHlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
-	unsigned int szJ = iterativo->nPVlim + iterativo->nPQlim + iterativo->nPQlim;
+	int szJ = iterativo->nPVlim + iterativo->nPQlim + iterativo->nPQlim;
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int idx = 1; idx <= sistema->nB - 1; idx++) {
-			//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+		for (int idx = 1; idx <= sistema->nB - 1; idx++) {
+			//int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
 			bool offm = (idx >= sistema->barraVO); // barra idx, posicao idx+offswing
 			idx += offm; // if idx >= swing : idx = idx = threadIdx.x + blockDim.x * blockIdx.x + 2
 
@@ -15,7 +15,7 @@ void calcHlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativo
 			// i percorre linhas de H diretamente
 			// i=1:nPQ+nPV
 
-			for (unsigned int i = 1; i <= sistema->nB - 1; i++) {
+			for (int i = 1; i <= sistema->nB - 1; i++) {
 				bool offk = (i >= sistema->barraVO);
 				i += offk; // pula barra swing
 				if (i != idx) {
@@ -35,18 +35,18 @@ void calcHlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativo
 }
 
 void calcLlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
-	unsigned int szJ = iterativo->nPVlim + iterativo->nPQlim + iterativo->nPQlim;
+	int szJ = iterativo->nPVlim + iterativo->nPQlim + iterativo->nPQlim;
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int idx = 1; idx <= iterativo->nPQlim; idx++) {
-			//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
-			unsigned int offset = iterativo->nPVlim + iterativo->nPQlim; // deslocamento para armazenar elementos na matriz J
+		for (int idx = 1; idx <= iterativo->nPQlim; idx++) {
+			//int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+			int offset = iterativo->nPVlim + iterativo->nPQlim; // deslocamento para armazenar elementos na matriz J
 
 			// i   é iterador do vetor barrasPQ, percorre linhas  de L
 			// idx é iterador do vetor barrasPQ, percorre colunas de L
 
 			//bool offm = (barrasPQ[IDX1F(idx)] > swing); // se idx>swing => armazenara elto uma posição a menos em J
 
-			for (unsigned int i = 1; i <= iterativo->nPQlim; i++) {
+			for (int i = 1; i <= iterativo->nPQlim; i++) {
 				if (iterativo->barrasPQlim[IDX1F(i)] != iterativo->barrasPQlim[IDX1F(idx)]) {
 					//fórmula pra km
 					//float_type aux = dnPhif(iterativo->barrasPQlim[IDX1F(i)], iterativo->barrasPQlim[IDX1F(idx)], sistema, ramo);
@@ -62,21 +62,21 @@ void calcLlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativo
 }
 
 void calcMlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
-	unsigned int szJ = iterativo->nPVlim + iterativo->nPQlim + iterativo->nPQlim;
+	int szJ = iterativo->nPVlim + iterativo->nPQlim + iterativo->nPQlim;
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int idx = 1; idx <= (sistema->nB - 1); idx++) {
-			//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1 // if idx >= swing : idx = idx = threadIdx.x + blockDim.x * blockIdx.x + 2
+		for (int idx = 1; idx <= (sistema->nB - 1); idx++) {
+			//int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1 // if idx >= swing : idx = idx = threadIdx.x + blockDim.x * blockIdx.x + 2
 			bool offm = (idx >= sistema->barraVO); // barra idx, posicao idx+offswing
 			idx += offm;
 
-			unsigned int offset = sistema->nB - 1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J
+			int offset = sistema->nB - 1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J
 
 			// i é iterador do vetor barrasPQ, percorre linhas de M
 			// i=1:nPQ
 			// idx percorre colunas de M diretamente
 			// idx=1:nB - swing
 
-			for (unsigned int i = 1; i <= iterativo->nPQlim; i++) {
+			for (int i = 1; i <= iterativo->nPQlim; i++) {
 				if (iterativo->barrasPQlim[IDX1F(i)] != idx) {
 					//fórmula pra km
 					//float_type aux = dnPhif(iterativo->barrasPQlim[IDX1F(i)], idx, sistema, ramo);
@@ -95,19 +95,19 @@ void calcMlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativo
 }
 
 void calcNlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
-	unsigned int szJ = iterativo->nPVlim + iterativo->nPQlim + iterativo->nPQlim;
+	int szJ = iterativo->nPVlim + iterativo->nPQlim + iterativo->nPQlim;
 	#pragma omp parallel for if (global::openmp)
-		for (unsigned int idx = 1; idx <= iterativo->nPQlim; idx++) {
-			//unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1 // if idx >= swing : idx = idx = threadIdx.x + blockDim.x * blockIdx.x + 2
+		for (int idx = 1; idx <= iterativo->nPQlim; idx++) {
+			//int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1 // if idx >= swing : idx = idx = threadIdx.x + blockDim.x * blockIdx.x + 2
 
-			unsigned int offset = sistema->nB - 1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J (colunas)
+			int offset = sistema->nB - 1; // =nPV+nPQ deslocamento para armazenar elementos na matriz J (colunas)
 
 			// idx é iterador do vetor barrasPQ, percorre colunas de N
 			// idx=1:nPQ
 			// i percorre linhas de N diretamente
 			// i=1:nPQ+nPV
 
-			for (unsigned int i = 1; i <= sistema->nPQ + sistema->nPV; i++) {
+			for (int i = 1; i <= sistema->nPQ + sistema->nPV; i++) {
 				bool offk = (i >= sistema->barraVO);
 				i += offk;
 				if (i != iterativo->barrasPQlim[IDX1F(idx)]) {
@@ -128,7 +128,7 @@ void calcNlimf(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativo
 }
 
 void calcJacLim(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
-	int sz = (sistema->nB - 1 + sistema->nPQ) * (sistema->nB - 1 + sistema->nPQ);
+	// int sz = (sistema->nB - 1 + sistema->nPQ) * (sistema->nB - 1 + sistema->nPQ);
 
 	//printf("Jacobiano =\n");
 	//showMat(iterativo->J, sistema->nB - 1 + sistema->nPQ);

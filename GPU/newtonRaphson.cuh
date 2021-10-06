@@ -31,9 +31,9 @@
 
 #include "solverCPU.h"
 
-float_type maxi(float_type* vet, unsigned int dim) {
+float_type maxi(float_type* vet, int dim) {
 	float_type aux = 0;
-	for (unsigned int i = 0; i < dim; i++) {
+	for (int i = 0; i < dim; i++) {
 		if (abs(vet[i]) > aux) {
 			aux = abs(vet[i]);
 			//printf("oi %d\n", aux);
@@ -45,7 +45,7 @@ float_type maxi(float_type* vet, unsigned int dim) {
 // idx = 1:nPQ+nPV
 __global__ void calcResPLim(const sistema sistPon, const barra barraPon,
 	const ramo ramoPon, const iterativo iterPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
 	bool offx = (idx >= sistPon.barraVO);
 	idx += offx;
 
@@ -60,8 +60,8 @@ __global__ void calcResPLim(const sistema sistPon, const barra barraPon,
 // idx = 1:iterativo->nPQLim
 __global__ void calcResQLim(const sistema sistPon, const barra barraPon,
 	const ramo ramoPon, const iterativo iterPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x; //começa de 0
-	const unsigned int offset = sistPon.nB - 1;
+	int idx = threadIdx.x + blockDim.x * blockIdx.x; //começa de 0
+	const int offset = sistPon.nB - 1;
 	//printf("idx = %d sistPon.nPQ = %d ; %d\n", idx, sistPon.nPQ, idx < sistPon.nPQ);
 
 	if (idx < iterPon.nPQlim) {
@@ -77,9 +77,9 @@ __global__ void calcResQLim(const sistema sistPon, const barra barraPon,
 void calcResLimf(const sistema sistPon, const barra barraPon, const ramo ramoPon,
 	const iterativo iterPon, cudaDeviceProp deviceprop) {
 	// deltaPs
-	unsigned int tamanho = sistPon.nB - 1; // nPQ+nPV
+	int tamanho = sistPon.nB - 1; // nPQ+nPV
 	dim3 dimBlock(3 * deviceprop.warpSize, 1);
-	dim3 dimGridP((unsigned int)ceil(
+	dim3 dimGridP((int)ceil(
 		((float)tamanho) / (float)(3 * deviceprop.warpSize)), 1);
 
 	calcResPLim <<<dimGridP, dimBlock >>> (sistPon, barraPon, ramoPon, iterPon);
@@ -89,7 +89,7 @@ void calcResLimf(const sistema sistPon, const barra barraPon, const ramo ramoPon
 
 		// deltaQs
 	tamanho = iterPon.nPQlim; 
-	dim3 dimGridQ((unsigned int)ceil(
+	dim3 dimGridQ((int)ceil(
 		((float)tamanho) / (float)(3 * deviceprop.warpSize)), 1);
 
 	calcResQLim <<<dimGridQ, dimBlock>>> (sistPon, barraPon, ramoPon, iterPon);
@@ -98,7 +98,7 @@ void calcResLimf(const sistema sistPon, const barra barraPon, const ramo ramoPon
 // idx = 1:nPQ+nPV
 __global__ void attOlim(const sistema sistPon, const barra barraPon,
 	const ramo ramoPon, const iterativo iterPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
 	//printf("attO: idx=%d bloco=%d\n", idx, blockIdx.x);
 	if (idx <= sistPon.nB - 1) {
 		//printf("CALC_attO: idx=%d bloco=%d\n", idx, blockIdx.x);
@@ -112,11 +112,11 @@ __global__ void attOlim(const sistema sistPon, const barra barraPon,
 // idx = 1:nPQ+nPV
 __global__ void attVlim(const sistema sistPon, const barra barraPon,
 	const ramo ramoPon, const iterativo iterPon) {
-	unsigned int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
+	int idx = threadIdx.x + blockDim.x * blockIdx.x + 1; //começa de 1
 	//printf("attV: idx=%d bloco=%d\n", idx, blockIdx.x);
 	if (idx <= iterPon.nPQlim) {
 		//printf("CALC_attV: idx=%d bloco=%d\n", idx, blockIdx.x);
-		const unsigned int offset = sistPon.nB - 1;
+		const int offset = sistPon.nB - 1;
 
 		barraPon.V[IDX1F(iterPon.barrasPQlim[IDX1F(idx)])] += iterPon.gLim[IDX1F(
 			idx + offset)]; // atualiza valor de V; g é igual a -deltaX!
@@ -127,11 +127,11 @@ __global__ void attVlim(const sistema sistPon, const barra barraPon,
 void attVOlimf(const sistema sistPon, const barra barraPon, const ramo ramoPon,
 	const iterativo iterPon, cudaDeviceProp deviceprop) {
 	// theta
-	unsigned int tamanho = sistPon.nB - 1; // nPQ+nPV
+	int tamanho = sistPon.nB - 1; // nPQ+nPV
 	//printf("4/3*32) = %f",ceil((float) tamanho/ ((float) (3*deviceprop.warpSize))));
 	dim3 dimBlock(3 * deviceprop.warpSize, 1);
 	dim3 dimGridO(
-		(unsigned int)ceil(
+		(int)ceil(
 		((float)tamanho) / (float)(3 * deviceprop.warpSize)), 1);
 
 	attOlim <<<dimGridO, dimBlock >>> (sistPon, barraPon, ramoPon, iterPon);
@@ -139,7 +139,7 @@ void attVOlimf(const sistema sistPon, const barra barraPon, const ramo ramoPon,
 	// V
 	tamanho = iterPon.nPQlim; // nPQ
 	dim3 dimGridV(
-		(unsigned int)ceil(
+		(int)ceil(
 		((float)tamanho) / (float)(3 * deviceprop.warpSize)), 1);
 
 	attVlim <<<dimGridV, dimBlock>>> (sistPon, barraPon, ramoPon, iterPon);
@@ -414,8 +414,8 @@ void mNR(sistema& h_sistema, barra& h_barra, ramo& h_ramo, iterativo& h_iterativ
 				geraVetPQ(&h_sistema, &h_barra, &h_iterativo); // atualiza sistema->barrasPQlim e iterativo->nPQlim  [[ver openmp while]]
 				iterPon.nPQlim = h_iterativo.nPQlim;
 				iterPon.ngLim = iterPon.nPQlim + iterPon.nPQlim + iterPon.nPVlim; // atualiza o tamanho de g com os limites
-				checkCudaErrors(cudaMemcpy(iterPon.barrasPQlim, h_iterativo.barrasPQlim, iterPon.nPQlim * sizeof(unsigned short), cudaMemcpyHostToDevice));
-				checkCudaErrors(cudaMemcpy(iterPon.barrasPVlim, h_iterativo.barrasPVlim, iterPon.nPVlim * sizeof(unsigned short), cudaMemcpyHostToDevice)); // ver transferencia device-device
+				checkCudaErrors(cudaMemcpy(iterPon.barrasPQlim, h_iterativo.barrasPQlim, iterPon.nPQlim * sizeof(int), cudaMemcpyHostToDevice));
+				checkCudaErrors(cudaMemcpy(iterPon.barrasPVlim, h_iterativo.barrasPVlim, iterPon.nPVlim * sizeof(int), cudaMemcpyHostToDevice)); // ver transferencia device-device
 				checkCudaErrors(cudaMemcpy(iterPon.QliqLim, h_iterativo.QliqLim, h_sistema.nB * sizeof(float_type), cudaMemcpyHostToDevice));
 
 				switch (global::metodo)
@@ -483,7 +483,7 @@ void mNR(sistema& h_sistema, barra& h_barra, ramo& h_ramo, iterativo& h_iterativ
 
 				//printf("\nQg_barrasPV^(%d) =\n", h_iterativo.iteracao);
 				//cout << '[' << h_iterativo.Qcalc[IDX1F(h_sistema.barrasPV[0])] + h_barra.Qload[IDX1F(h_sistema.barrasPV[0])] << endl;
-				//for (unsigned short i = 1; i < (h_sistema.nPV - 1); i++) {
+				//for (int i = 1; i < (h_sistema.nPV - 1); i++) {
 				//	cout << ' ' << h_iterativo.Qcalc[IDX1F(h_sistema.barrasPV[i])] + h_barra.Qload[IDX1F(h_sistema.barrasPV[i])] << endl;
 				//}
 				//cout << ' ' << h_iterativo.Qcalc[IDX1F(h_sistema.barrasPV[h_sistema.nPV - 1])] + h_barra.Qload[IDX1F(h_sistema.barrasPV[h_sistema.nPV - 1])] << ']' << endl;
@@ -651,7 +651,8 @@ void mNR(sistema& h_sistema, barra& h_barra, ramo& h_ramo, iterativo& h_iterativ
 						checkCudaErrors(cudaMemcpy(h_sparse.spJval.data(), sparsePon.spJval, sizeof(float_type) * (sparsePon.nnzJ),
 							cudaMemcpyDeviceToHost));
 
-						spSolve(&h_sistema, &h_barra, &h_ramo, &h_iterativo, &h_sparse);
+						// spSolve(&h_sistema, &h_barra, &h_ramo, &h_iterativo, &h_sparse);
+						spSolveMKL(&h_sistema, &h_barra, &h_ramo, &h_iterativo, &h_sparse);
 						
 						checkCudaErrors(cudaMemcpy(iterPon.gLim, h_iterativo.gLim, sizeof(float_type) * (iterPon.ngLim),
 							cudaMemcpyHostToDevice));

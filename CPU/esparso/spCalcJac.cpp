@@ -3,66 +3,66 @@
 using namespace std;
 using namespace Eigen;
 
-std::pair<unsigned int, unsigned int> HtoJ(unsigned int row, unsigned int col, sistemaType* sistema) {
-	//std::pair<unsigned int, unsigned int> ans = 
+std::pair<int, int> HtoJ(int row, int col, sistemaType* sistema) {
+	//std::pair<int, int> ans = 
 	return { row - (row >= sistema->barraVO), col - (col >= sistema->barraVO) };
 }
 
-unsigned int HtoJrow(unsigned int row, sistemaType* sistema) {
+int HtoJrow(int row, sistemaType* sistema) {
 	return row+1 - (row+1 >= sistema->barraVO);
 }
 
-unsigned int HtoJcol(unsigned int col, sistemaType* sistema) {
+int HtoJcol(int col, sistemaType* sistema) {
 	return col+1 - (col+1 >= sistema->barraVO);
 }
 
-std::pair<unsigned int, unsigned int> LtoJ(unsigned int row, unsigned int col, sistemaType* sistema) {
-	//std::pair<unsigned int, unsigned int> ans = 
+std::pair<int, int> LtoJ(int row, int col, sistemaType* sistema) {
+	//std::pair<int, int> ans = 
 	return { row + sistema->nPV + sistema->nPQ, col + sistema->nPV + sistema->nPQ };
 }
 
-unsigned int LtoJrow(unsigned int row, sistemaType* sistema) {
+int LtoJrow(int row, sistemaType* sistema) {
 	return row + sistema->nB - 1;
 }
 
-unsigned int LtoJcol(unsigned int col, sistemaType* sistema) {
+int LtoJcol(int col, sistemaType* sistema) {
 	return col + sistema->nB - 1;
 }
 
-std::pair<unsigned int, unsigned int> MtoJ(unsigned int row, unsigned int col, sistemaType* sistema) {
-	//std::pair<unsigned int, unsigned int> ans = 
+std::pair<int, int> MtoJ(int row, int col, sistemaType* sistema) {
+	//std::pair<int, int> ans = 
 	return { row + sistema->nPV + sistema->nPQ, col - (col >= sistema->barraVO) };
 }
 
-unsigned int MtoJrow(unsigned int row, sistemaType* sistema) {
+int MtoJrow(int row, sistemaType* sistema) {
 	return row + sistema->nB - 1;
 }
 
-unsigned int MtoJcol(unsigned int col, sistemaType* sistema) {
+int MtoJcol(int col, sistemaType* sistema) {
 	return col - (col >= sistema->barraVO);
 }
 
-std::pair<unsigned int, unsigned int> NtoJ(unsigned int row, unsigned int col, sistemaType* sistema) {
-	//std::pair<unsigned int, unsigned int> ans = 
+std::pair<int, int> NtoJ(int row, int col, sistemaType* sistema) {
+	//std::pair<int, int> ans = 
 	return { row - (row >= sistema->barraVO), col + sistema->nPV + sistema->nPQ };
 }
 
-unsigned int NtoJrow(unsigned int row, sistemaType* sistema) {
+int NtoJrow(int row, sistemaType* sistema) {
 	return row+1 - (row+1 >= sistema->barraVO);
 }
 
-unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
+int NtoJcol(int col, sistemaType* sistema) {
 	return col+1 + sistema->nB - 1;
 }
 
 // void Jstencil1based(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 
-// 	unsigned int nnzJ = 0, cntH = 0, cntL = 0, cntM = 0, cntN = 0;
+// 	int nnzJ = 0, cntH = 0, cntL = 0, cntM = 0, cntN = 0;
 
 // 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
 	
-// 	for (size_t i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
-// 		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+// 	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+// 		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 // 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 // 				continue;
 // 			}
@@ -74,8 +74,8 @@ unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
 
 // 			nnzJ++;
 // 		}
-// 		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-// 			unsigned int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+// 		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+// 			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 // 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 // 				continue;
 // 			}
@@ -83,7 +83,7 @@ unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
 // 			sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j] + 1);
 // 			sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j] + 1);
 
-// 			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+// 			int col = pntColPQ - iterativo->barrasPQlim;
 
 // 			sistema->cooColIndJ.push_back(NtoJcol(col, sistema));
 // 			sistema->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema));
@@ -91,8 +91,8 @@ unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
 // 			nnzJ++;
 // 		}
 // 	}
-// 	for (size_t i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
-// 		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+// 	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+// 		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 // 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 // 				continue;
 // 			}
@@ -104,8 +104,8 @@ unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
 
 // 			nnzJ++;
 // 		}
-// 		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-// 			unsigned int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+// 		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+// 			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 // 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 // 				continue;
 // 			}
@@ -113,7 +113,7 @@ unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
 // 			sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j] + 1);
 // 			sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j] + 1);
 
-// 			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+// 			int col = pntColPQ - iterativo->barrasPQlim;
 
 // 			sistema->cooColIndJ.push_back(NtoJcol(col, sistema));
 // 			sistema->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema));
@@ -124,8 +124,8 @@ unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
 
 // 	// M L]
 
-// 	for (size_t i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
-// 		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+// 	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+// 		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
 
 // 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
 // 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
@@ -140,15 +140,15 @@ unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
 // 			nnzJ++;
 // 		}
 
-// 		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
-// 			unsigned int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+// 		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+// 			int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
 // 			if (pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim) { // se coluna for PQ
 // 				// linha de L
 // 				sistema->spJsubmatType.push_back(L);
 // 				sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j] + 1);
 // 				sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j] + 1);
 
-// 				unsigned int col = pntRowPQ - iterativo->barrasPQlim;
+// 				int col = pntRowPQ - iterativo->barrasPQlim;
 
 // 				sistema->cooColIndJ.push_back(LtoJcol(col + 1, sistema));
 // 				sistema->cooRowIndJ.push_back(LtoJrow(i + 1, sistema));
@@ -165,14 +165,14 @@ unsigned int NtoJcol(unsigned int col, sistemaType* sistema) {
 
 void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 
-	unsigned int nnzJ = 0, cntH = 0, cntL = 0, cntM = 0, cntN = 0;
+	int nnzJ = 0; // , cntH = 0, cntL = 0, cntM = 0, cntN = 0;
 
 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
 	// segundo profiler do visual studio: parte mais onerosa são os push_backs. Contribuição insignificante para o resultado final (até ieee118x8).
 	// loops for não são paralelizáveis (dependem do valor de nnzJ)
 
-	for (unsigned int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
-		for (unsigned int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue; // pula coluna VO
 			}
@@ -184,8 +184,8 @@ void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iter
 
 			nnzJ++;
 		}
-		for (unsigned int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			unsigned int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 				continue;
 			}
@@ -193,7 +193,7 @@ void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iter
 			sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+			int col = pntColPQ - iterativo->barrasPQlim;
 
 			sistema->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			sistema->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -201,8 +201,8 @@ void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iter
 			nnzJ++;
 		}
 	}
-	for (unsigned int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
-		for (unsigned int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue;
 			}
@@ -214,8 +214,8 @@ void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iter
 
 			nnzJ++;
 		}
-		for (unsigned int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			unsigned int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 				continue;
 			}
@@ -223,7 +223,7 @@ void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iter
 			sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+			int col = pntColPQ - iterativo->barrasPQlim;
 
 			sistema->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			sistema->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -234,8 +234,8 @@ void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iter
 
 	// M L]
 
-	for (unsigned int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
-		for (unsigned int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
 
 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
@@ -250,15 +250,15 @@ void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iter
 			nnzJ++;
 		}
 
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
-			unsigned int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+			int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
 			if (pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim) { // se coluna for PQ
 				// linha de L
 				sistema->spJsubmatType.push_back(L);
 				sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 				sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-				unsigned int col = pntRowPQ - iterativo->barrasPQlim;
+				int col = pntRowPQ - iterativo->barrasPQlim;
 
 				sistema->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
 				sistema->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);
@@ -288,7 +288,7 @@ void Jstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, iter
 // void fillJstencil1based(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo) {
 // 	//sistema->spJval.clear();
 // 	//sistema->spJval.resize(sistema->nnzJ);
-// 	for (size_t i = 0; i < sistema->nnzJ; i++) {
+// 	for (int i = 0; i < sistema->nnzJ; i++) {
 // 		switch (sistema->spJsubmatType[i]) {
 // 			case H:
 // 				if (sistema->cooRowIndSubMatJ[i] != sistema->cooColIndSubMatJ[i]) {
@@ -380,7 +380,7 @@ void fillJstencil0based(sistemaType* sistema, barraType* barra, ramoType* ramo, 
 	//sistema->spJval.clear();
 	//sistema->spJval.resize(sistema->nnzJ);
 	#pragma omp parallel for if (global::openmp)
-		for (size_t i = 0; i < sistema->nnzJ; i++) {
+		for (int i = 0; i < sistema->nnzJ; i++) {
 			switch (sistema->spJsubmatType[i]) {
 			case H:
 				if (sistema->cooRowIndSubMatJ[i] != sistema->cooColIndSubMatJ[i]) {
@@ -474,14 +474,14 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 	sistema->cooColIndJ.clear();
 	sistema->cooRowIndJ.clear();
 
-	unsigned int nnzJ = 0, cntH = 0, cntL = 0, cntM = 0, cntN = 0;
+	int nnzJ = 0; // , cntH = 0, cntL = 0, cntM = 0, cntN = 0;
 
 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
 	// segundo profiler do visual studio: parte mais onerosa são os push_backs. Contribuição insignificante para o resultado final (até ieee118x8).
 	// loops for não são paralelizáveis (dependem do valor de nnzJ)
 
-	for (size_t i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue; // pula coluna VO
 			}
@@ -507,8 +507,8 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			unsigned int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 				continue;
 			}
@@ -516,7 +516,7 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 			//sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			//sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+			int col = pntColPQ - iterativo->barrasPQlim;
 
 			sistema->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			sistema->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -539,8 +539,8 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 			nnzJ++;
 		}
 	}
-	for (size_t i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue; // pula coluna VO
 			}
@@ -566,8 +566,8 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			unsigned int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 				continue;
 			}
@@ -575,7 +575,7 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 			//sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			//sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = pntColPQ - iterativo->barrasPQlim;
+			int col = pntColPQ - iterativo->barrasPQlim;
 
 			sistema->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			sistema->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -601,8 +601,8 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 
 	// M L]
 
-	for (size_t i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
 
 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
@@ -632,15 +632,15 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 			nnzJ++;
 		}
 
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
-			unsigned int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+			int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
 			if (pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim) { // se coluna for PQ
 				// linha de L
 				//sistema->spJsubmatType.push_back(L);
 				//sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 				//sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-				unsigned int col = pntRowPQ - iterativo->barrasPQlim;
+				int col = pntRowPQ - iterativo->barrasPQlim;
 
 				sistema->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
 				sistema->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);
@@ -682,8 +682,8 @@ void spCalcJ(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTy
 	}
 }
 
-unsigned int GLOBALauxIsPQ = 0;
-bool isPQ(unsigned int barra, sistemaType* sistema, iterativoType* iterativo) {
+int GLOBALauxIsPQ = 0;
+bool isPQ(int barra, sistemaType* sistema, iterativoType* iterativo) {
 	while (iterativo->barrasPQlim[GLOBALauxIsPQ] < barra) {
 		GLOBALauxIsPQ++;
 		if (GLOBALauxIsPQ == sistema->nPQ) {
@@ -699,14 +699,14 @@ void spCalcJ_eficiente(sistemaType* sistema, barraType* barra, ramoType* ramo, i
 	sistema->cooColIndJ.clear();
 	sistema->cooRowIndJ.clear();
 
-	unsigned int nnzJ = 0, cntH = 0, cntL = 0, cntM = 0, cntN = 0;
+	int nnzJ = 0; //, cntH = 0, cntL = 0, cntM = 0, cntN = 0;
 
 	// cabe otimização da parte de N com buscas no vetor coo de Y pelos elementos PQ de forma direta ?
 	// segundo profiler do visual studio: parte mais onerosa são os push_backs. Contribuição insignificante para o resultado final (até ieee118x8).
 	// loops for não são paralelizáveis (dependem do valor de nnzJ)
 
-	for (size_t i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = 0; i < IDX1F(sistema->barraVO); i++) { // i percorre as barras diretamente e pula a barra swing (linhas do jacobiano) para montar H e N
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue; // pula coluna VO
 			}
@@ -732,8 +732,8 @@ void spCalcJ_eficiente(sistemaType* sistema, barraType* barra, ramoType* ramo, i
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			//unsigned int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			//int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			//if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 			//	continue;
 			//}
@@ -744,7 +744,7 @@ void spCalcJ_eficiente(sistemaType* sistema, barraType* barra, ramoType* ramo, i
 			//sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			//sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = GLOBALauxIsPQ; // pntColPQ - iterativo->barrasPQlim;
+			int col = GLOBALauxIsPQ; // pntColPQ - iterativo->barrasPQlim;
 
 			sistema->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			sistema->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -768,8 +768,8 @@ void spCalcJ_eficiente(sistemaType* sistema, barraType* barra, ramoType* ramo, i
 		}
 		GLOBALauxIsPQ = 0;
 	}
-	for (size_t i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
+	for (int i = IDX1F(sistema->barraVO) + 1; i < sistema->nB; i++) { // i percorre as barras diretamente e pula a linha d Y referente à barra swing
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de H
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
 				continue; // pula coluna VO
 			}
@@ -795,8 +795,8 @@ void spCalcJ_eficiente(sistemaType* sistema, barraType* barra, ramoType* ramo, i
 
 			nnzJ++;
 		}
-		for (size_t j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
-			//unsigned int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
+		for (int j = sistema->csrRowPtrY[i]; j < sistema->csrRowPtrY[i + 1]; j++) { // linha de N
+			//int* pntColPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procure sistema->csrColIndY[cntN] em iterativo->barrasPQlim
 			//if (pntColPQ == iterativo->barrasPQlim + iterativo->nPQlim) { // apenas prossegue se é coluna PQ de Y
 			//	continue;
 			//}
@@ -807,7 +807,7 @@ void spCalcJ_eficiente(sistemaType* sistema, barraType* barra, ramoType* ramo, i
 			//sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 			//sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-			unsigned int col = GLOBALauxIsPQ; // pntColPQ - iterativo->barrasPQlim;
+			int col = GLOBALauxIsPQ; // pntColPQ - iterativo->barrasPQlim;
 
 			sistema->cooColIndJ.push_back(NtoJcol(col, sistema) - 1);
 			sistema->cooRowIndJ.push_back(NtoJrow(sistema->cooRowIndY[j], sistema) - 1);
@@ -834,8 +834,8 @@ void spCalcJ_eficiente(sistemaType* sistema, barraType* barra, ramoType* ramo, i
 
 	// M L]
 
-	for (size_t i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+	for (int i = 0; i < iterativo->nPQlim; i++) { // i percorre as barras PQ (linhas do jacobiano) para montar M e L
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
 
 			// linha de M (percorre linhas PQ de Y e pega todas as colunas)
 			if (sistema->csrColIndY[j] == IDX1F(sistema->barraVO)) {
@@ -865,15 +865,15 @@ void spCalcJ_eficiente(sistemaType* sistema, barraType* barra, ramoType* ramo, i
 			nnzJ++;
 		}
 
-		for (size_t j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
-			//unsigned int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
+		for (int j = sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i])]; j < sistema->csrRowPtrY[IDX1F(iterativo->barrasPQlim[i]) + 1]; j++) { // j percorre i-ésima linha de Y para preencher uma linha de J
+			//int* pntRowPQ = std::find(iterativo->barrasPQlim, iterativo->barrasPQlim + iterativo->nPQlim, sistema->csrColIndY[j] + 1); // procura sistema->csrColIndY[j] em iterativo->barrasPQlim i.e., elto da coluna também é PQ?
 			if (isPQ(sistema->csrColIndY[j] + 1, sistema, iterativo) /*pntRowPQ != iterativo->barrasPQlim + iterativo->nPQlim*/) { // se coluna for PQ
 				// linha de L
 				//sistema->spJsubmatType.push_back(L);
 				//sistema->cooColIndSubMatJ.push_back(sistema->csrColIndY[j]);
 				//sistema->cooRowIndSubMatJ.push_back(sistema->cooRowIndY[j]);
 
-				unsigned int col = GLOBALauxIsPQ; //pntRowPQ - iterativo->barrasPQlim;
+				int col = GLOBALauxIsPQ; //pntRowPQ - iterativo->barrasPQlim;
 
 				sistema->cooColIndJ.push_back(LtoJcol(col + 1, sistema) - 1);
 				sistema->cooRowIndJ.push_back(LtoJrow(i + 1, sistema) - 1);

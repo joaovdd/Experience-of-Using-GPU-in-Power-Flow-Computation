@@ -17,32 +17,32 @@
 
 #include "global.h"
 
-void showVec(bool* show, unsigned int dim, unsigned int prec);
+void showVec(bool* show, int dim, int prec);
 
-void showVec(float_type* show, unsigned int dim, unsigned int prec);
+void showVec(float_type* show, int dim, int prec);
 
-void showVec(unsigned int* show, unsigned int dim, unsigned int prec);
+void showVec(int* show, int dim, int prec);
 
-void showVec(int* show, int dim, unsigned int prec);
+void showVec(int* show, int dim, int prec);
 
-void showVecR(complex_type* show, unsigned int dim, unsigned int prec);
+void showVecR(complex_type* show, int dim, int prec);
 
-void showVecI(complex_type* show, unsigned int dim, unsigned int prec);
+void showVecI(complex_type* show, int dim, int prec);
 
-void showVec(complex_type* show, unsigned int dim, unsigned int prec);
+void showVec(complex_type* show, int dim, int prec);
 
-void showMatI(complex_type* show, unsigned int dim, unsigned int prec);
+void showMatI(complex_type* show, int dim, int prec);
 
-void showMatI(complex_type* show, unsigned int dim, unsigned int prec);
+void showMatI(complex_type* show, int dim, int prec);
 
-void showMat(const complex_type* show, const unsigned int dim);
+void showMat(const complex_type* show, const int dim);
 
-void showMat(const float_type* show, const unsigned int dim);
+void showMat(const float_type* show, const int dim);
 
-void showMat(const float* show, const unsigned int dim);
+void showMat(const float* show, const int dim);
 
-void showMat(const bool* show, const unsigned int dim);
+void showMat(const bool* show, const int dim);
 
-void showMatRI(const complex_type* show, const unsigned int dim);
+void showMatRI(const complex_type* show, const int dim);
 
 void printAll(sistemaType& sistema, barraType &barra, ramoType &ramo);

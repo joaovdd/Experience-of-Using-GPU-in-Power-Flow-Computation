@@ -14,7 +14,8 @@ bool solver(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoTyp
 		spEigenSolverNaive(sistema, barra, ramo, iterativo);
 		break;
 	case esparso:
-		return spSolve(sistema, barra, ramo, iterativo);
+		return spSolveMKL(sistema, barra, ramo, iterativo);
+		// return spSolve(sistema, barra, ramo, iterativo);
 		break;
 	default:
 		printf("ERRO [solver] metodo inválido!\n");
