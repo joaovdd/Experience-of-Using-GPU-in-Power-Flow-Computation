@@ -22,6 +22,4 @@
 
 #include "benchmarks.h"
 
-//#include <lapacke.h>
-
 void nR(sistemaType* sistema, barraType* barra, ramoType* ramo, iterativoType* iterativo);

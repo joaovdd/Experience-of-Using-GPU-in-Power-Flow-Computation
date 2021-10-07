@@ -5,12 +5,11 @@
 #include <math.h>
 
 #ifndef FLUMEN_GPU
-    // #include "externo/cuComplex.h"
+    
     #include <cuComplex.h>
 #else
     #include <cuComplex.h>
 #endif
-
 
 #include "estruturas.h"
 #include "leitura/config.h"

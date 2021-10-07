@@ -25,31 +25,21 @@
 
 #include "benchmarks.h"
 
-// ATENÇÃO: limite de sistemas de 65.535 barras pelo uso de int
-// Bug: barra swing do método esparso não pode ser a última!
-
-//#define JACOBIANO_ESPARSO_STENCIL true // ativar apenas um dos modos de cálculo do jacobiano -> no arquivo global.h
-//#define JACOBIANO_ESPARSO_PADRAO false
-
 int main()
 {
-	//timerType timer(processoIterativo);
-	loadFile(); // config
+	loadFile(); 
 	sistemaType sistema;
 	barraType barra;
 	ramoType ramo;
 	iterativoType iterativo;
-	
-	lerArquivoEAlocarMemoria(sistema, barra, ramo, iterativo); // data sistema
 
-	if(global::openmp /*&& (global::metodo == denso)*/){Eigen::setNbThreads(0);}
+	lerArquivoEAlocarMemoria(sistema, barra, ramo, iterativo); 
+
+	if(global::openmp ){Eigen::setNbThreads(0);}
 	else{Eigen::setNbThreads(1);}
-
-	// auto inicio = std::chrono::high_resolution_clock::now();
 
 	{ timerType timer(geral);
 
-		// calcula Ybus
 		switch (global::metodo)
 		{
 		case denso:
@@ -61,10 +51,9 @@ int main()
 
 		case esparso:
 		{ BENCHMARK_ADMITANCIA
-			//calcYbusSp(sistema, barra, ramo);
-			//calcYbusSp_eficinte(sistema, barra, ramo);
+			
 			calcYbusSp_Matpower(sistema, barra, ramo);
-			//std::cout << *sistema.spY << std::endl;
+			
 			break;
 		}
 
@@ -86,17 +75,17 @@ int main()
 		case denso_LAPACKE:
 			if (global::laconic_mode) { printf("[DENSO_LAPACK]\n"); }
 			else { printf("\n\n[DENSO_LAPACK]\n"); }
-			// printf("\n\n[DENSO_LAPACK]\n\n");
+			
 			break;
 		case esparso:
 			if (global::laconic_mode) { printf("[ESPARSO]\n"); }
 			else { printf("\n\n[ESPARSO]\n"); }
-			//printf("\n\n[ESPARSO]\n\n");
+			
 			break;
 		case esparsoSimples:
 			if (global::laconic_mode) { printf("[ESPARSO SIMPLES]\n"); }
 			else { printf("\n\n[ESPARSO SIMPLES]\n"); }
-			//printf("\n\n[ESPARSO SIMPLES]\n\n");
+			
 			break;
 		default:
 			std::cout << "[METODO] METODO INVALIDO LIDO DO ARQUIVO!\n" << std::endl;
@@ -130,12 +119,6 @@ int main()
 		}
 	}
 
-	//if (global::laconic_mode) {
-	//	printf("%d iteracoes.\n%f ms.\n", iterativo.iteracao, std::get<2>(global::tracker.benchmarkTable[0]));
-	//}
-	//else {
-	//	impressao2(sistema, barra, ramo, iterativo); 
-	//}
 	if (!global::laconic_mode &&
 	    global::output_ans) {
 		impressao2(sistema, barra, ramo, iterativo);
@@ -157,7 +140,7 @@ int main()
 	finIter(iterativo);
 
 	if (!global::laconic_mode) {
-		printf("\nExecucao concluida."); // Pressione qualquer tecla para sair.
+		printf("\nExecucao concluida."); 
 	}
 
 	return 0;

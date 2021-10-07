@@ -9,7 +9,6 @@
 #include "../dim.h"
 #include "../phifBshf.h"
 
-//#include "lapacke.h"
 #ifndef FLUMEN_GPU
     #include "../externo/Eigen/Sparse"
 #endif

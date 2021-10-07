@@ -1,17 +1,5 @@
-/*
- ============================================================================
- Name        : 4.cu
- Author      : joaovdd
- Version     :
- Copyright   : All rights reserved.
- Description : CUDA compute reciprocals
- ============================================================================
- */
-
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-
-// #include <helper_cuda.h>
 
 #include "opcoesDeCompilacao_2.h"
 
@@ -20,7 +8,6 @@
 #include <cuComplex.h>
 #include <math.h>
 
-//#include <time.h>
 #include <chrono>
 
 #include "benchmarks.h"
@@ -35,7 +22,6 @@
 #include "impressao.h"
 #include "arquivo.h"
 
-
 int main(void)
 {
 	loadFile();
@@ -43,23 +29,6 @@ int main(void)
 	barra h_barra, barraPon, * d_barra = NULL;
 	ramo h_ramo, ramoPon, * d_ramo = NULL;
 	iterativo h_iterativo, iterPon, * d_iterativo = NULL;
-
-	//if (lerTamanhos(global::arq_entrada, h_sistema)) {
-	//	printf("Deu ruim...");
-	//	return 1;
-	//}
-
-	//initSistema(h_sistema);
-	//initBranch(h_sistema, h_ramo);
-	//initBus(h_sistema, h_barra);
-	//initIter(h_sistema, h_iterativo);
-
-	//if (readCDF(global::arq_entrada, h_sistema, h_barra, h_ramo)) {
-	//	printf("Erro! O arquivo de entrada não pode ser lido!\n\n");
-	//	return 1;
-	//}
-
-	//InitCsrPhi(h_sistema, h_ramo);
 
 	lerArquivoEAlocarMemoria(h_sistema, h_barra, h_ramo, h_iterativo);
 
@@ -94,13 +63,13 @@ int main(void)
 	cudaStream_t streams[nStreams] = { nullptr };
 
 	cudaDeviceProp deviceProp;
-	deviceProp = initGPU(); // deve ser contabilisado?
+	deviceProp = initGPU(); 
 
 	cudaEventCreate(&global::start);
 	cudaEventCreate(&global::stop);
-	{ cudaEventRecord(global::start); // BENCHMARK_GERAL
+	{ cudaEventRecord(global::start); 
 		{ BENCHMARK_ADMITANCIA
-			// calcula Ybus
+			
 			switch (global::metodoDeCalculoDeYbus) {
 			case metodoDeCalculoDeYbus::dnCPU:
 				calcYbus(h_sistema, h_barra, h_ramo);
@@ -122,19 +91,13 @@ int main(void)
 			printAll(h_sistema, h_barra, h_ramo);
 		}
 
-		// std::cout << *h_sistema.spY << std::endl;
-
-		// cudaDeviceProp deviceProp;
-		
 		{ BENCHMARK_INITGPU
-			//deviceProp = initGPU(); // deve ser contabilisado?
-			//aloca espaço para as estruturas na memória global do device
+			
 			checkCudaErrors(cudaMalloc(&d_sistema, sizeof(sistema)));
 			checkCudaErrors(cudaMalloc(&d_barra, sizeof(barra)));
 			checkCudaErrors(cudaMalloc(&d_ramo, sizeof(ramo)));
 			checkCudaErrors(cudaMalloc(&d_iterativo, sizeof(iterativo)));
 
-			// ADICIONAL para paralelismo P Q e transferencias de memória
 			if (global::streams) {
 				if (global::metodo == metodo::esparso || global::metodo == metodo::hibridoB) {
 					for (int i = 0; i < nStreams; i++)
@@ -143,13 +106,11 @@ int main(void)
 					}
 				}
 				else if (global::metodo == metodo::denso) {
-					// construa-me
+					
 				}
 			}
-	
-			checkCudaErrors(cudaGetLastError());
 
-			//inicia variáveis alocadas dinamicamente
+			checkCudaErrors(cudaGetLastError());
 
 			sistPon = d_initSistema(h_sistema, d_sistema);
 			ramoPon = d_initRamo(h_sistema, h_ramo, d_ramo);
@@ -162,31 +123,27 @@ int main(void)
 		}
 
 		{ BENCHMARK_CUDAMEMCPY
-			// transfere dados lidos para a GPU (device)
-
+			
 			sistemacpyH2D(h_sistema, d_sistema, sistPon);
 			ramocpyH2D(h_sistema, h_ramo, d_ramo, ramoPon);
 			barracpyH2D(h_sistema, h_barra, d_barra, barraPon);
 			itercpyH2D(h_sistema, h_iterativo, d_iterativo, iterPon);
 		}
 
-
 		if (global::verbose_mode) {
 			printf("V =\n");
 			d_showVecf(barraPon.V, h_sistema.nB);
 		}
 
-		// Cálculo das matrizes esparsas no caso denso (para funções otimizadas)
 		switch (global::metodo) {
 		case metodo::hibridoA:
 			d_criarYesparso(sistPon);
-			// apenas para algumas abordagens híbridas 
+			
 			break;
 		default:
 			break;
 		}
 
-		// nR(h_sistema, h_barra, h_ramo, h_iterativo, d_sistema, d_barra, d_ramo, d_iterativo, sistPon, barraPon, ramoPon, iterPon, deviceProp);
 		mNR(h_sistema, h_barra, h_ramo, h_iterativo, d_sistema, d_barra, d_ramo, d_iterativo, sistPon, barraPon, ramoPon, iterPon, deviceProp, streams);
 
 		{ BENCHMARK_CUDAMEMCPY
@@ -196,15 +153,11 @@ int main(void)
 			BENCHMARK_SYNC
 		}
 
-		//calcFluxf(h_sistema, h_barra, h_ramo, sistPon, barraPon, ramoPon, deviceProp);
-
-		//calcFluxf_Eficiente_Sp(h_sistema, h_barra, h_ramo, h_iterativo, sistPon, barraPon, ramoPon, iterPon, deviceProp);
-
 		{ BENCHMARK_FLUXO
 			switch (global::metodo) {
 			case metodo::denso:
-				//calcFluxf(h_sistema, h_barra, h_ramo, sistPon, barraPon, ramoPon, deviceProp); // inieficiente
-				calcFluxf_ef(h_sistema, h_barra, h_ramo, sistPon, barraPon, ramoPon, deviceProp); // inieficiente
+				
+				calcFluxf_ef(h_sistema, h_barra, h_ramo, sistPon, barraPon, ramoPon, deviceProp); 
 				break;
 			case metodo::hibridoA:
 			case metodo::hibridoB:
@@ -226,21 +179,11 @@ int main(void)
 			checkCudaErrors(cudaMemcpy(h_iterativo.Pcalc, iterPon.Pcalc, sistPon.nB * sizeof(float_type), cudaMemcpyDeviceToHost));
 			checkCudaErrors(cudaMemcpy(h_iterativo.Qcalc, iterPon.Qcalc, sistPon.nB * sizeof(float_type), cudaMemcpyDeviceToHost));
 
-			checkCudaErrors(cudaDeviceSynchronize()); // deve-se terminar o a cópia de dados antes de finalizar a contagem de tempo
+			checkCudaErrors(cudaDeviceSynchronize()); 
 		}
 
 		cudaEventRecord(global::stop);
 	}
-	//std::chrono::duration<float_type, std::milli> duracao = fim - inicio;
-
-	//if (global::laconic_mode) {
-	//	printf("%d iteracoes.\n%f ms.\n", iterPon.iteracao, duracao.count());
-	//	benchmarkModePrint(iterPon, duracao);
-	//}
-	//else {
-	//	printf("\n\nForam efetuadas %d iteracoes.\nO metodo de NR e calculo do fluxo foram feitos em %f ms.\n", iterPon.iteracao, duracao.count());
-	//	impressao(h_sistema, h_barra, h_ramo, h_iterativo);
-	//}
 
 	if (!global::laconic_mode &&
 		global::output_ans) {

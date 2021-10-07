@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include "estruturas.h"
 #include "dim.h"
-//#include "PcalcQcalc.h"
-//#include "jacobiano.h"
+
 #include "esparso.h"
 
 #include "benchmarks.h"

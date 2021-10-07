@@ -2,25 +2,23 @@
 #include "../global.h"
 #include "sistema.h"
 
-// indexador é o numero da barra (via IDX1F)
 struct barraType {
-	int* id; // bus identifier number
-	float_type* V;//[NB];
-	float_type* theta;//[NB];
+	int* id; 
+	float_type* V;
+	float_type* theta;
 
-	float_type* Pliq;//[NB];
-	float_type* Qliq;//[NB];
-	float_type* Pload;//[NB];
-	float_type* Qload;//[NB];
-	float_type* Pg;//[NB];
-	float_type* Qg;//[NB];
+	float_type* Pliq;
+	float_type* Qliq;
+	float_type* Pload;
+	float_type* Qload;
+	float_type* Pg;
+	float_type* Qg;
 
-	float_type* Vbase;//[NB];
+	float_type* Vbase;
 
-	float_type* gsh;//[NB];
-	float_type* bsh;//[NB];
+	float_type* gsh;
+	float_type* bsh;
 
-	//float_type* phi;
 };
 
 void initBus(sistemaType &sistema, barraType &barra);

@@ -2,15 +2,13 @@
 #include <vector>
 #include "sistema.h"
 
-//usado apenas pela versão GPU
-
 struct h_sparse {
 	std::vector<float_type> spJval;
-	/* int* */ std::vector<subMatJ> spJsubmatType;
-	/* int* */ std::vector<int> cooColIndSubMatJ;
-	/* int* */ std::vector<int> cooRowIndSubMatJ;
-	/* int* */ std::vector<int> cooColIndJ;
-	/* int* */ std::vector<int> cooRowIndJ;
+	 std::vector<subMatJ> spJsubmatType;
+	 std::vector<int> cooColIndSubMatJ;
+	 std::vector<int> cooRowIndSubMatJ;
+	 std::vector<int> cooColIndJ;
+	 std::vector<int> cooRowIndJ;
 	std::vector<int> csrRowPtrJ;
 	int nnzJ;
 

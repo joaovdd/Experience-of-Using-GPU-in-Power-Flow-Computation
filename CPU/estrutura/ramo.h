@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef FLUMEN_GPU
-	//#include "../externo/cuComplex.h"
+
     #include <cuComplex.h>
 #else
     #include <cuComplex.h>
@@ -10,24 +10,21 @@
 #include "../global.h"
 #include "sistema.h"
 
-// indexador simples (iterador): No do ramo
 struct ramoType {
-	complex_type* z; //[NL];
-	float_type* bsh; //[NL];// = 0;
-	complex_type* tap; //[NL];// = 0;
+	complex_type* z; 
+	float_type* bsh; 
+	complex_type* tap; 
 
 	float_type* phi;
 	Eigen::SparseMatrix<float_type, Eigen::StorageOptions::RowMajor> eigen_phi;
-	//int csrColIndPhi; // GPU only
-	//int csrRowPtrPhi;
 
 	float_type* Pdp;
 	float_type* Ppd;
 	float_type* Qdp;
 	float_type* Qpd;
 
-	int* de; //[NL];
-	int* para; //[NL];
+	int* de; 
+	int* para; 
 };
 
 void initBranch(sistemaType &sistema, ramoType &ramo);

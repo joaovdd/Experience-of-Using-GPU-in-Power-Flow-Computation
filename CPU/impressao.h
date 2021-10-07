@@ -11,12 +11,11 @@
 
 #include <iterator>
 
-
 void impressao(sistemaType &sistema, barraType &barra, ramoType &ramo, iterativoType &iterativo);
 
 void impressao2(sistemaType& sistema, barraType& barra, ramoType& ramo, iterativoType& iterativo);
 
-void benchmarkModePrint(iterativoType& iterPon, /*std::chrono::duration<double, std::milli>*/double& duracao);
+void benchmarkModePrint(iterativoType& iterPon, double& duracao);
 
 void benchmarksPrint(iterativoType& iterPon);
 

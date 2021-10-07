@@ -4,11 +4,6 @@ void initIter(sistemaType &sistema, iterativoType &iterativo){
 	iterativo.Pcalc =  (float_type *)malloc(sistema.nB * sizeof(float_type));
 	iterativo.Qcalc =  (float_type *)malloc(sistema.nB * sizeof(float_type));
 
-	// rotinas com linInjReat
-	//iterativo.g = (float_type *)malloc((sistema.nPV + sistema.nPQ + sistema.nPQ) * sizeof(float_type));
-
-	//iterativo.J	= (float_type *)malloc((sistema.nPV + sistema.nPQ + sistema.nPQ)*(sistema.nPV + sistema.nPQ + sistema.nPQ) * sizeof(float_type));
-
 	iterativo.iteracao = 0;
 	iterativo.noMax = global::no_max_iter;
 	for (int i = 0; i < sistema.nB-1; i++){
@@ -17,11 +12,7 @@ void initIter(sistemaType &sistema, iterativoType &iterativo){
 	for (int i = 0; i < sistema.nPQ; i++){
 		iterativo.Qcalc[i] = 0.;
 	}
-	//for (int i = 0; i < (sistema.nPV + sistema.nPQ + sistema.nPQ)*(sistema.nPV + sistema.nPQ + sistema.nPQ); i++){
-	//	iterativo.J[i] = 0.;
-	//}
 
-	// limite injeção de reativos
 	iterativo.gLim = (float_type*)malloc((sistema.nPV + sistema.nPV + sistema.nPQ + sistema.nPQ) * sizeof(float_type));
 
 	if (global::metodo == metodoType::denso || global::metodo == metodoType::esparsoSimples) {
@@ -31,7 +22,6 @@ void initIter(sistemaType &sistema, iterativoType &iterativo){
 		}
 	}
 
-	//limite de injeção de reativos
 	iterativo.limQ = (bool*)malloc(sistema.nPV * sizeof(bool));
 	memset(iterativo.limQ, 0, sistema.nPV * sizeof(bool));
 	iterativo.barrasPVlim = (int*)malloc(sistema.nPV * sizeof(int));
@@ -45,7 +35,6 @@ void finIter(iterativoType &iterativo) {
 	if (iterativo.J == nullptr) { free(iterativo.J); }
 	if (iterativo.g == nullptr) { free(iterativo.g); }
 
-	// limite injeção de reativos
 	if (iterativo.gLim == nullptr) { free(iterativo.gLim);}
 	if (iterativo.Jlim == nullptr) { free(iterativo.Jlim); }
 	if (iterativo.limQ == nullptr) { free(iterativo.limQ); }

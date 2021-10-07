@@ -1,12 +1,12 @@
 #pragma once
 enum metodoType {
-	esparso,         // CPU e GPU
-	esparsoSimples,  // apenas CPU
-	denso,           // CPU e GPU
-	denso_LAPACKE,   // apenas CPU
+	esparso,         
+	esparsoSimples,  
+	denso,           
+	denso_LAPACKE,   
 	nda,
-	hibridoA,		 // GPU
-	hibridoB		 // GPU
+	hibridoA,		 
+	hibridoB		 
 };
 
 enum output_benchmarkType {

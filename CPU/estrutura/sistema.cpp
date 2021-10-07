@@ -1,14 +1,9 @@
 #include "sistema.h"
 
 void initSistema(sistemaType &sistema){
-	//sistema.nPV = 0;
-	//sistema.nPQ = 0;
 	sistema.barraVO = 0;
-	//sistema.nL = 0;
-	//sistema.nB = 0;
-	//sistema.baseMVA = 0;
 
-	#ifndef FLUMEN_GPU // #if !defined FLUMEN_GPU || !defined __NVCC__ // https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#nvcc-identification-macro
+	#ifndef FLUMEN_GPU 
 		if (global::metodo == denso || global::metodo == esparsoSimples) {
 			sistema.Y = (complex_type *)malloc(sistema.nB*sistema.nB * sizeof(complex_type));
 
@@ -17,7 +12,7 @@ void initSistema(sistemaType &sistema){
 			}
 		}
 	#else
-		// ... para gpu
+		
 		if (global::metodo == denso || global::metodo == hibridoB) {
 			sistema.Y = (complex_type *)malloc(sistema.nB*sistema.nB * sizeof(complex_type));
 
@@ -30,12 +25,11 @@ void initSistema(sistemaType &sistema){
 	sistema.barrasPV = (int *)malloc(sistema.nPV * sizeof(int));
 	sistema.barrasPQ = (int *)malloc(sistema.nPQ * sizeof(int));
 
-	//limite de injeção de reativos
 	sistema.limQinf = (float_type*)malloc(sistema.nPV * sizeof(float_type));
 	sistema.limQsup = (float_type*)malloc(sistema.nPV * sizeof(float_type));
 
 	sistema.VfixadaPV = (float_type*)malloc(sistema.nPV * sizeof(float_type));
-	//memset(sistema.VfixadaPV, 0, sistema.nPV * sizeof(float_type));
+
 }
 
 void finSistema(sistemaType &sistema) {

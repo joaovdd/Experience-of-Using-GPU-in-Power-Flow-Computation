@@ -1,29 +1,16 @@
 #include "ramo.h"
 #include "../idx.h"
 
-// popula estrutura csr com os dados de defasagem angular dos ramos do sistema e inicializa vetores
 void InitCsrPhi(sistemaType& sistema, ramoType& ramo) {
-
 	std::vector<Eigen::Triplet<float_type>> valores;
 	for (int i = 0; i < sistema.nL; i++) {
 		valores.push_back(Eigen::Triplet<float_type>(IDX1F(ramo.de[i]), IDX1F(ramo.para[i]), ramo.phi[i]));
 	}
 
-	// ramo.eigen_phi = new Eigen::SparseMatrix<float_type, Eigen::StorageOptions::RowMajor>(sistema.nL, sistema.nL);
-
 	ramo.eigen_phi.resize(sistema.nL, sistema.nL);
 
 	ramo.eigen_phi.setFromTriplets(valores.begin(), valores.end());
 
-	//ramo.csrColIndPhi = (int*)malloc(ramo.phi->nonZeros() * sizeof(int));
-	//for (int j = 0; j < ramo.eigen_phi->nonZeros(); j++) {
-	//	ramo.csrColIndPhi[j] = ramo.eigen_phi->innerIndexPtr()[j] /*+ 1*/;
-	//}
-
-	//ramo.csrRowPtrPhi = (int*)malloc((ramo.eigen_phi->outerSize() + 1) * sizeof(int));
-	//for (int j = 0; j <= ramo.eigen_phi->outerSize(); j++) {
-	//	ramo.csrRowPtrPhi[j] = ramo.eigen_phi->outerIndexPtr()[j] /*+ 1*/;
-	//}
 }
 
 void initBranch(sistemaType &sistema, ramoType &ramo){
@@ -31,7 +18,7 @@ void initBranch(sistemaType &sistema, ramoType &ramo){
 	ramo.bsh = (float_type *)malloc(sistema.nL * sizeof(float_type));
 	ramo.tap = (complex_type *)malloc(sistema.nL * sizeof(complex_type));
 	ramo.phi  = (float_type *)malloc(sistema.nL * sizeof(float_type));
-	
+
 	ramo.de	  = (int *)malloc(sistema.nL * sizeof(float_type));
 	ramo.para = (int *)malloc(sistema.nL * sizeof(float_type));
 
@@ -39,7 +26,6 @@ void initBranch(sistemaType &sistema, ramoType &ramo){
 	ramo.Qdp = (float_type *)malloc(sistema.nL * sizeof(float_type));
 	ramo.Ppd = (float_type *)malloc(sistema.nL * sizeof(float_type));
 	ramo.Qpd = (float_type *)malloc(sistema.nL * sizeof(float_type));
-
 
 	for (int i = 0; i < sistema.nL; i++){
 		ramo.z[i] = _mkComplex(0., 0.);

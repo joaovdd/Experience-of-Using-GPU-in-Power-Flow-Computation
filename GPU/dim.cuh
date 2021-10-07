@@ -60,7 +60,7 @@ __global__ void d_showMat(float_type* show, int dim){
 
 void d_showMatf(float_type* show, int dim){
 	d_showMat<<<1,1>>>(show, dim);
-//	cudaDeviceSynchronize();
+
 }
 
 __global__ void d_showMat(const complex_type* show, const int dim){
@@ -77,5 +77,5 @@ __global__ void d_showMat(const complex_type* show, const int dim){
 
 void d_showMatf(const complex_type* show, const int dim){
 	d_showMat<<<1,1>>>(show, dim);
-//	cudaDeviceSynchronize();
+
 }

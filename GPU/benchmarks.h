@@ -1,17 +1,6 @@
-// Copyright (c) 2020, João Daibes
-
-#define BENCHMARK_MODE true // compila programa com as rotinas para medição de tempo de execução
-
-/*
-MODO DE USAR
-
-1. criar um escopo
-2. Ao seu início, usar uma diretiva de préprocessador BENCHMARK
-3. Se necessário, ao seu fim, usar uma diretiva de préprocessador BENCHMARK_SYNC
-
-*/
 
 
+#define BENCHMARK_MODE true 
 
 #if BENCHMARK_MODE
 
@@ -29,14 +18,14 @@ MODO DE USAR
 #define BENCHMARK_SISTEMALINEAR checkCudaErrors(cudaDeviceSynchronize()); timerType timer(benchmarkType::sistemaLinear, iterPon.iteracao);
 #define BENCHMARK_FLUXO checkCudaErrors(cudaDeviceSynchronize()); timerType timer(benchmarkType::fluxo);
 
-#define AVISO_ERRO_TEMPO_TOTAL " "//" ATENCAO, tempos acumulados podem apresentar erro quando benchmarks internos estao sendo executados!!!!\n Diretivas de sincronizacao extras estao presentes!\n\n" 
-#define AVISO_ERRO_TEMPO_TOTAL_FILE " "//" ATENCAO, tempos acumulados podem apresentar erro quando benchmarks internos estao sendo executados!!!! Diretivas de sincronizacao extras estao presentes!, " 
+#define AVISO_ERRO_TEMPO_TOTAL " "
+#define AVISO_ERRO_TEMPO_TOTAL_FILE " "
 
 #define BENCHMARK_SYNC checkCudaErrors(cudaDeviceSynchronize());
 
 #else
 
-#define BENCHMARK_GERAL timerType timer(benchmarkType::geral);  // ligado independente da configuração...
+#define BENCHMARK_GERAL timerType timer(benchmarkType::geral);  
 #define BENCHMARK_ADMITANCIA
 #define BENCHMARK_INITGPU
 #define BENCHMARK_PROCESSOITERATIVO
@@ -57,9 +46,6 @@ MODO DE USAR
 
 #endif
 
-//#define BENCHMARK_SISTEMA_LINEAR
-
-// #define BENCHMARK_*
 #ifndef BENCHMARKS
 #define BENCHMARKS
 
@@ -68,9 +54,8 @@ MODO DE USAR
 #include <tuple>
 #include <chrono>
 
-#include <limits> // std::numeric_limits<int>::max(); 
+#include <limits> 
 
-// contém todos os tipos de elementos que estão sendo individualmente avaliados
 enum class benchmarkType {
 	geral,
 	admitancia,
@@ -87,10 +72,9 @@ enum class benchmarkType {
 	fluxo
 };
 
-// dipo do objeto global que armazenará todas as medições
 class trackerType {
 public:
-	//                 tipo de medida; iteração; valor
+
 	std::vector<std::tuple<benchmarkType, int, double>> benchmarkTable;
 
 	void log(benchmarkType tipo, int iteracao, double duracao) {
@@ -98,15 +82,11 @@ public:
 	}
 };
 
-//namespace global {
-//	extern trackerType tracker;
-//}
 namespace global {
 	trackerType tracker;
 	cudaEvent_t start, stop;
 }
 
-// tipo do objeto que medira tempo usando a biblioteca chrono com seu construtor e destrutor
 class timerType {
 public:
 	timerType(benchmarkType tipo, int iteracao) {
@@ -125,7 +105,7 @@ public:
 		auto fimTimepoint = std::chrono::high_resolution_clock::now();
 
 		std::chrono::duration<double, std::nano> duration = fimTimepoint - m_inicioTimepoint;
-		global::tracker.log(m_tipo, m_iteracao, duration.count() / 1000000); // ms
+		global::tracker.log(m_tipo, m_iteracao, duration.count() / 1000000); 
 	}
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_inicioTimepoint;
@@ -133,11 +113,4 @@ private:
 	int m_iteracao;
 };
 
-// não está sendo usado
-//const char* benchmarkTypeString[] = {
-//	"processoIterativo",
-//	"jacobiano",
-//	"jacobianoStencil",
-//	"calcPQ"
-//};
 #endif

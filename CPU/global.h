@@ -2,7 +2,6 @@
 #include <string>
 #include <type_traits>
 
-//#include "externo/cuComplex.h"
 #include <cuComplex.h>
 
 #include "estrutura/metodo.h"
@@ -22,7 +21,7 @@ namespace global {
 	extern bool openmp;
 	extern metodoType metodo;
 	extern bool temporizador;
-	extern output_benchmarkType output_benchmark; // output_benchmarkType definition in metodo.h
+	extern output_benchmarkType output_benchmark; 
 	extern bool output_ans;
 	extern bool output_processo_iterativo;
 }
@@ -35,8 +34,6 @@ static inline cuDoubleComplex _cuCon(cuDoubleComplex x) { return cuConj(x); }
 static inline double _cuAbs(cuDoubleComplex x) { return cuCabs(x); }
 static inline double _cuReal(cuDoubleComplex x) { return cuCreal(x); }
 static inline double _cuImag(cuDoubleComplex x) { return cuCimag(x); }
-
-// static inline cuDoubleComplex _mkComplex(double x, double y) { return make_cuDoubleComplex(x, y); }
 
 static inline cuFloatComplex _cuAdd(cuFloatComplex x, cuFloatComplex y) { return cuCaddf(x, y); }
 static inline cuFloatComplex _cuSub(cuFloatComplex x, cuFloatComplex y) { return cuCsubf(x, y); }

@@ -1,6 +1,6 @@
-// Copyright (c) 2020, João Daibes
+// Copyright (c) 2020, Joï¿½o Daibes
 
-#define BENCHMARK_MODE true // compila programa com as rotinas para medição de tempo de execução
+#define BENCHMARK_MODE true // compila programa com as rotinas para mediï¿½ï¿½o de tempo de execuï¿½ï¿½o
 
 #if BENCHMARK_MODE
 
@@ -30,9 +30,6 @@
 
 #endif
 
-//#define BENCHMARK_SISTEMA_LINEAR
-
-// #define BENCHMARK_*
 #ifndef BENCHMARKS
 #define BENCHMARKS
 
@@ -56,7 +53,7 @@ enum benchmarkType {
 
 class trackerType {
 public:
-	//                 tipo de medida; iteração; valor
+	//                 tipo de medida; iteraï¿½ï¿½o; valor
 	std::vector<std::tuple<benchmarkType, int, double>> benchmarkTable;
 
 	void log(benchmarkType tipo, int iteracao, double duracao) {
@@ -86,7 +83,7 @@ public:
 		auto fimTimepoint = std::chrono::high_resolution_clock::now();
 
 		std::chrono::duration<double, std::nano> duration = fimTimepoint - m_inicioTimepoint;
-		global::tracker.log(m_tipo, m_iteracao, duration.count() / 1000000); // ms
+		global::tracker.log(m_tipo, m_iteracao, duration.count() / 1000000); 
 	}
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_inicioTimepoint;

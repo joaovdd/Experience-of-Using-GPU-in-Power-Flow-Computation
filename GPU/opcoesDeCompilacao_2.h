@@ -5,36 +5,6 @@
 #include "cusolverSp.h"
 #include "opcoesDeCompilacao.h"
 
-//// defina como verdadeiro para que seja usado double,
-//// caso contrário será utilizado float 
-//// não esquecer de fazer mudança no outro arquivo também!!!!!!!!!!
-//#define DOUBLE_MODE false 
-//
-//// *****************************************************************************************
-//// Não alterar a partir daqui***************************************************************
-//// *****************************************************************************************
-//
-//// definição do tipo de ponto flutuante
-//#if DOUBLE_MODE
-//typedef double float_type;
-//#else
-//typedef float float_type;
-//#endif
-//
-//// definição do tipo de número complexo
-//#if DOUBLE_MODE
-//typedef cuDoubleComplex complex_type;
-//#else
-//typedef cuFloatComplex complex_type;
-//#endif
-//
-//// definição do constritor complexo
-//#if DOUBLE_MODE
-//#define MK_COMPLEX_FUNCTION(x, y) make_cuDoubleComplex(x, y) 
-//#else
-//#define MK_COMPLEX_FUNCTION(x, y) make_cuFloatComplex(x, y)
-//#endif
-
 __host__ __device__ static inline cuDoubleComplex _cuAdd(cuDoubleComplex x, cuDoubleComplex y) { return cuCadd(x, y); }
 __host__ __device__ static inline cuDoubleComplex _cuSub(cuDoubleComplex x, cuDoubleComplex y) { return cuCsub(x, y); }
 __host__ __device__ static inline cuDoubleComplex _cuDiv(cuDoubleComplex x, cuDoubleComplex y) { return cuCdiv(x, y); }
@@ -43,8 +13,6 @@ __host__ __device__ static inline cuDoubleComplex _cuCon(cuDoubleComplex x) { re
 __host__ __device__ static inline double _cuAbs(cuDoubleComplex x) { return cuCabs(x); }
 __host__ __device__ static inline double _cuReal(cuDoubleComplex x) { return cuCreal(x); }
 __host__ __device__ static inline double _cuImag(cuDoubleComplex x) { return cuCimag(x); }
-
-// static inline cuDoubleComplex _mkComplex(double x, double y) { return make_cuDoubleComplex(x, y); }
 
 __host__ __device__ static inline cuFloatComplex _cuAdd(cuFloatComplex x, cuFloatComplex y) { return cuCaddf(x, y); }
 __host__ __device__ static inline cuFloatComplex _cuSub(cuFloatComplex x, cuFloatComplex y) { return cuCsubf(x, y); }
@@ -56,10 +24,6 @@ __host__ __device__ static inline float _cuReal(cuFloatComplex x) { return cuCre
 __host__ __device__ static inline float _cuImag(cuFloatComplex x) { return cuCimagf(x); }
 
 __host__ __device__ static inline complex_type _mkComplex(float_type x, float_type y) { return MK_COMPLEX_FUNCTION(x, y); }
-
-
-// funções das bibliotecas CUDA
-
 
 #if DOUBLE_MODE
 __host__ __device__ static inline cusparseStatus_t _cusparseNnz(cusparseHandle_t          handle,
@@ -143,7 +107,6 @@ _cusolverDnGetrf_bufferSize(
     return cusolverDnSgetrf_bufferSize(handle, m, n, A, lda, Lwork);
 }
 #endif
-
 
 #if DOUBLE_MODE
 static inline cusolverStatus_t

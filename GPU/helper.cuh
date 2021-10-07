@@ -17,13 +17,10 @@ inline void gpuAssert(cudaError_t code, const char* file, int line, bool abort =
 #define MAX(a,b) (a > b ? a : b)
 #endif
 
-// Beginning of GPU Architecture definitions
 inline int _ConvertSMVer2Cores(int major, int minor) {
-	// Defines for GPU Architecture types (using the SM version to determine
-	// the # of cores per SM
 	typedef struct {
-		int SM;  // 0xMm (hexidecimal notation), M = SM Major version,
-		// and m = SM minor version
+		int SM;  
+		
 		int Cores;
 	} sSMtoCores;
 
@@ -55,8 +52,6 @@ inline int _ConvertSMVer2Cores(int major, int minor) {
 		index++;
 	}
 
-	// If we don't find the values, we default use the previous one
-	// to run properly
 	printf(
 		"MapSMtoCores for SM %d.%d is undefined."
 		"  Default to use %d Cores/SM\n",
@@ -64,7 +59,6 @@ inline int _ConvertSMVer2Cores(int major, int minor) {
 	return nGpuArchCoresPerSM[index - 1].Cores;
 }
 
-// This function returns the best GPU (with maximum GFLOPS)
 inline int gpuGetMaxGflopsDeviceId()
 {
 	int current_device = 0, sm_per_multiproc = 0;
@@ -73,7 +67,6 @@ inline int gpuGetMaxGflopsDeviceId()
 	cudaDeviceProp deviceProp;
 	cudaGetDeviceCount(&device_count);
 
-	// Find the best major SM Architecture GPU device
 	while (current_device < device_count)
 	{
 		cudaGetDeviceProperties(&deviceProp, current_device);
@@ -84,7 +77,6 @@ inline int gpuGetMaxGflopsDeviceId()
 		current_device++;
 	}
 
-	// Find the best CUDA capable GPU device
 	current_device = 0;
 	while (current_device < device_count)
 	{
@@ -102,10 +94,10 @@ inline int gpuGetMaxGflopsDeviceId()
 
 		if (compute_perf > max_compute_perf)
 		{
-			// If we find GPU with SM major > 2, search only these
+			
 			if (best_SM_arch > 2)
 			{
-				// If our device==dest_SM_arch, choose this, or else pass
+				
 				if (deviceProp.major == best_SM_arch)
 				{
 					max_compute_perf = compute_perf;
